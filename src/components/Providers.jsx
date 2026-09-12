@@ -70,14 +70,15 @@ function ProvidersInner({ children }) {
     pathname?.startsWith('/login') || 
     pathname?.startsWith('/register') || 
     pathname?.startsWith('/profile') || 
+    pathname?.startsWith('/checkout') || 
     pathname?.startsWith('/account');
 
   const handleOpenAuth = () => {
-    router.push('/login');
+    setAuthOpen(true);
   };
 
   return (
-    <UIModalContext.Provider value={{ setAuthOpen: handleOpenAuth, openCheckout }}>
+    <UIModalContext.Provider value={{ setAuthOpen: () => setAuthOpen(true), openCheckout: (summary) => { setIsCartOpen(false); setCheckoutData(summary); } }}>
       {!isAdminRoute && (
         <Navbar
           onAuthOpen={handleOpenAuth}
@@ -89,6 +90,13 @@ function ProvidersInner({ children }) {
       <main>{children}</main>
 
       {!hideFooter && <Footer />}
+
+      {authOpen && (
+        <AuthModal
+          isOpen={authOpen}
+          onClose={() => setAuthOpen(false)}
+        />
+      )}
 
       {checkoutData && (
         <CheckoutModal

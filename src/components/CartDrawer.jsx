@@ -1,17 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { X, Plus, Minus, ShoppingBag, Tag, Truck } from 'lucide-react';
+import { PRESET_COUPONS } from '@/data/constants';
 import './CartDrawer.css';
 
 const SHIPPING_FREE_THRESHOLD = 499;
 const SHIPPING_FEE = 60;
 
-const COUPONS = {
-  FIRST10:   { type: 'percent', value: 10, label: '10% off' },
-  VENTHULIR: { type: 'flat',    value: 50, label: '₹50 off' },
-  ORGANIC20: { type: 'percent', value: 20, label: '20% off' },
+const getFallbackImage = (name = '', category = '') => {
+  const lowerName = (name || '').toLowerCase();
+  const lowerCat = (category || '').toLowerCase();
+
+  if (lowerName.includes('turmeric') || lowerName.includes('manjal') || lowerName.includes('yellow') || lowerName.includes('turm')) return '/assets/hero/turmeric.png';
+  if (lowerName.includes('chilli') || lowerName.includes('chili') || lowerName.includes('red') || lowerName.includes('milagai')) return '/assets/hero/chilli.png';
+  if (lowerName.includes('coriander') || lowerName.includes('mallie') || lowerName.includes('dhaniya') || lowerName.includes('kothamalli')) return '/assets/hero/coriander.png';
+  if (lowerName.includes('sambar') || lowerName.includes('masala') || lowerName.includes('garam') || lowerName.includes('rasam')) return '/assets/hero/sambar.png';
+  if (lowerName.includes('coconut') || lowerName.includes('thengai')) return '/assets/hero/oil_coconut.png';
+  if (lowerName.includes('groundnut') || lowerName.includes('kadalai')) return '/assets/hero/oil_groundnut.png';
+  if (lowerName.includes('gingelly') || lowerName.includes('sesame') || lowerName.includes('nallennai') || lowerName.includes('til')) return '/assets/hero/oil_gingelly.png';
+  if (lowerName.includes('oil') || lowerCat.includes('oil')) return '/assets/hero/oil_sunflower.png';
+  return '/assets/hero/turmeric.png';
 };
 
 export default function CartDrawer({ onCheckout }) {
@@ -20,10 +30,22 @@ export default function CartDrawer({ onCheckout }) {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError]   = useState('');
 
+  // Lock background body scroll while CartDrawer is open
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isCartOpen]);
+
   const applyCoupon = () => {
     const code = couponInput.trim().toUpperCase();
-    if (COUPONS[code]) {
-      setAppliedCoupon({ code, ...COUPONS[code] });
+    if (PRESET_COUPONS[code]) {
+      setAppliedCoupon({ code, ...PRESET_COUPONS[code] });
       setCouponError('');
     } else {
       setCouponError('Invalid coupon code');
@@ -69,7 +91,14 @@ export default function CartDrawer({ onCheckout }) {
             cartItems.map(item => (
               <div key={item.key} className="cart-item">
                 <div className="cart-item-img">
-                  {item.image ? <img src={item.image} alt={item.name} /> : <div className="cart-img-placeholder" />}
+                  <img 
+                    src={item.image || getFallbackImage(item.name, item.category)} 
+                    alt={item.name} 
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getFallbackImage(item.name, item.category);
+                    }}
+                  />
                 </div>
                 <div className="cart-item-info">
                   <p className="cart-item-name">{item.name}</p>

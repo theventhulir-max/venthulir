@@ -19,12 +19,7 @@ export async function POST(request) {
 
     const cleanOtp = (otp || '').toString().trim();
 
-    const record = await OtpStore.findOne({
-      $or: [
-        { email: cleanEmail, type: 'login' },
-        { email: 'admin@venthulir.com', type: 'login' }
-      ]
-    });
+    const record = await OtpStore.findOne({ email: cleanEmail, type: 'login' });
     if (!record || record.verified || new Date() > record.expiresAt) {
       return NextResponse.json({ msg: 'Verification code has expired. Please request a new one.' }, { status: 400 });
     }
@@ -34,9 +29,7 @@ export async function POST(request) {
       return NextResponse.json({ msg: 'Invalid verification code. Please check and try again.' }, { status: 400 });
     }
 
-    // Mark verified and delete OTP
-    record.verified = true;
-    await record.save();
+    // Delete OTP record on successful verification
     await OtpStore.deleteOne({ _id: record._id }).catch(() => {});
 
     // Find the user

@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectDB from '@/lib/db';
 import Order from '@/models/Order';
 import User from '@/models/User';
 import { requireAuth, requireAdmin } from '@/lib/auth';
 import { restoreStock } from '@/lib/inventory';
+import { invalidateStatsCache } from '@/lib/cache';
 
 export async function GET(request, { params }) {
   try {
@@ -15,7 +17,14 @@ export async function GET(request, { params }) {
     await connectDB();
     const { id } = await params;
 
-    const order = await Order.findById(id).lean();
+    let order = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      order = await Order.findById(id).lean();
+    }
+    if (!order) {
+      order = await Order.findOne({ orderId: id }).lean();
+    }
+
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
@@ -44,7 +53,14 @@ export async function PUT(request, { params }) {
     const body = await request.json();
     let { status, action } = body;
 
-    const order = await Order.findById(id);
+    let order = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      order = await Order.findById(id);
+    }
+    if (!order) {
+      order = await Order.findOne({ orderId: id });
+    }
+
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
@@ -52,7 +68,7 @@ export async function PUT(request, { params }) {
     // Customer cancellation
     if (action === 'cancel' || (!auth.user.isAdmin && status === 'Cancelled')) {
       const user = await User.findById(auth.user.id);
-      if (!user || order.customerEmail.toLowerCase() !== user.email.toLowerCase()) {
+      if (!user || (order.customerEmail && order.customerEmail.toLowerCase() !== user.email?.toLowerCase())) {
         return NextResponse.json({ error: 'Unauthorized to cancel this order' }, { status: 403 });
       }
 
@@ -66,6 +82,7 @@ export async function PUT(request, { params }) {
         await restoreStock(order.items);
       }
       await order.save();
+      invalidateStatsCache();
       return NextResponse.json({ msg: 'Order cancelled successfully', order });
     }
 
@@ -90,6 +107,7 @@ export async function PUT(request, { params }) {
     order.status = status;
     order.statusUpdatedAt = new Date();
     await order.save();
+    invalidateStatsCache();
 
     return NextResponse.json({ msg: 'Order status updated', order });
   } catch (err) {

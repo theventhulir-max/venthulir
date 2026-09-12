@@ -86,7 +86,7 @@ function ProductsPageContent({ onCheckout }) {
       if (sort) params.set('sort', sort);
       params.set('limit', '48');
 
-      const res = await fetch(`${API}/products?${params.toString()}`);
+      const res = await fetch(`${API}/products?${params.toString()}&_t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.products) && data.products.length > 0) {
@@ -101,10 +101,14 @@ function ProductsPageContent({ onCheckout }) {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    if (searchQuery.trim()) {
+      const timer = setTimeout(() => {
+        fetchCatalog(activeCategory, searchQuery, sortBy);
+      }, 200);
+      return () => clearTimeout(timer);
+    } else {
       fetchCatalog(activeCategory, searchQuery, sortBy);
-    }, 250);
-    return () => clearTimeout(timer);
+    }
   }, [activeCategory, searchQuery, sortBy, fetchCatalog]);
 
   const categories = ['All', 'Spices', 'Cold-Pressed Oils', 'Masala Blends', 'Grains', 'Sweeteners', 'Herbal'];
@@ -272,6 +276,11 @@ function ProductsPageContent({ onCheckout }) {
                   key={product._id}
                   product={product}
                   onQuickView={handleOpenQuickView}
+                  onBuyNow={(prod, variant) => {
+                    addToCart(prod, variant, 1);
+                    setIsCartOpen(false);
+                    router.push('/checkout');
+                  }}
                 />
               ))}
             </div>

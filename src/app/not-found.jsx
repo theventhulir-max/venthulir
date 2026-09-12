@@ -40,7 +40,7 @@ export default function NotFound() {
         The organic harvest or page you are looking for does not exist or has been relocated.
       </p>
       <Link 
-        href="/"
+        href="/home"
         style={{
           background: '#0f3d2a',
           color: '#ffffff',

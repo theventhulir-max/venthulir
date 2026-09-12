@@ -30,6 +30,8 @@ export async function POST(request) {
 
     return NextResponse.json({
       valid: true,
+      discountType: 'percent',
+      discountValue: coupon.discountPercentage,
       discountPercentage: coupon.discountPercentage,
       couponCode: coupon.couponCode
     });

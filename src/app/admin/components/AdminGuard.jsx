@@ -24,22 +24,13 @@ export default function AdminGuard({ children }) {
       let cleanInput = adminIdentifier.trim();
       if (cleanInput.toLowerCase() === 'admin') cleanInput = 'admin@venthulir.com';
 
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanInput, password: adminPassword })
-      });
-
-      const data = await res.json();
-      if (res.ok && data.token && data.user?.isAdmin) {
-        localStorage.setItem('venthulir_token', data.token);
-        localStorage.setItem('venthulir_user', JSON.stringify(data.user));
-        toast.success(`Welcome to Executive Portal, ${data.user.name || 'Admin'}!`);
-        window.location.reload();
-      } else if (res.ok && !data.user?.isAdmin) {
+      const res = await login(cleanInput, adminPassword);
+      if (res.success && res.user?.isAdmin) {
+        toast.success(`Welcome to Executive Portal, ${res.user.name || 'Admin'}!`);
+      } else if (res.success && !res.user?.isAdmin) {
         setErrorMsg('Access denied: This account does not possess administrator privileges.');
       } else {
-        setErrorMsg(data.msg || 'Invalid administrative credentials.');
+        setErrorMsg(res.msg || 'Invalid administrative credentials.');
       }
     } catch {
       setErrorMsg('Network error connecting to verification engine.');
@@ -224,7 +215,7 @@ export default function AdminGuard({ children }) {
         </form>
 
         <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '12px', color: '#94a3b8' }}>
-          <a href="/" style={{ color: '#0f3d2a', textDecoration: 'none', fontWeight: 600 }}>
+          <a href="/home" style={{ color: '#0f3d2a', textDecoration: 'none', fontWeight: 600 }}>
             ← Return to Organic Storefront
           </a>
         </div>

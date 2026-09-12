@@ -12,13 +12,18 @@ export async function GET(request) {
     }
 
     await connectDB();
-    const user = await User.findById(auth.user.id);
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    let email = auth.user.email;
+    if (!email && auth.user.id) {
+      const dbUser = await User.findById(auth.user.id);
+      email = dbUser?.email;
+    }
+
+    if (!email) {
+      return NextResponse.json([]);
     }
 
     const orders = await Order.find({
-      customerEmail: { $regex: new RegExp(`^${user.email}$`, 'i') }
+      customerEmail: { $regex: new RegExp(`^${email.trim()}$`, 'i') }
     }).sort({ createdAt: -1 }).lean();
 
     return NextResponse.json(orders);

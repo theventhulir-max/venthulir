@@ -194,15 +194,15 @@ const HERO_POWDERS = [
   {
     id: 'turmeric-powder',
     title: 'Salem Pure Turmeric Powder',
-    subtitle: 'High Curcumin Content • Fresh Farm Harvest',
-    badge: '100% Pure & Natural',
+    subtitle: 'High Curcumin (5.2%) • Sun-Dried & Stone-Ground',
+    badge: '100% Certified Organic',
     image: imgTurmeric,
     tag: 'Authentic Ground Turmeric Roots',
     price: 'From ₹140',
     rating: '4.9 ★ (420+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fffef4 0%, #fef3d3 50%, #fae29c 100%)',
-    spiceColor: '#b8860b',
-    auraGlow: 'rgba(218, 165, 32, 0.4)',
+    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fffef4 0%, #f6faf7 50%, #e2f0e8 100%)',
+    spiceColor: '#166534',
+    auraGlow: 'rgba(22, 101, 52, 0.25)',
   },
   {
     id: 'chilli-powder',
@@ -214,8 +214,8 @@ const HERO_POWDERS = [
     price: 'From ₹150',
     rating: '4.9 ★ (380+)',
     bgGradient: 'radial-gradient(ellipse at 50% 30%, #fff7f5 0%, #fde0da 50%, #f8b8ab 100%)',
-    spiceColor: '#c0392b',
-    auraGlow: 'rgba(192, 57, 43, 0.35)',
+    spiceColor: '#991b1b',
+    auraGlow: 'rgba(153, 27, 27, 0.25)',
   },
   {
     id: 'coriander-powder',
@@ -227,8 +227,8 @@ const HERO_POWDERS = [
     price: 'From ₹130',
     rating: '4.8 ★ (310+)',
     bgGradient: 'radial-gradient(ellipse at 50% 30%, #f5fcf7 0%, #dcf4e5 50%, #bae9cc 100%)',
-    spiceColor: '#27ae60',
-    auraGlow: 'rgba(39, 174, 96, 0.35)',
+    spiceColor: '#059669',
+    auraGlow: 'rgba(5, 150, 105, 0.25)',
   },
   {
     id: 'garam-masala',
@@ -239,9 +239,9 @@ const HERO_POWDERS = [
     tag: 'Cardamom, Cinnamon, Cloves & Star Anise',
     price: 'From ₹180',
     rating: '5.0 ★ (290+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fef8f4 0%, #faeade 50%, #ebd0bc 100%)',
-    spiceColor: '#8e4a23',
-    auraGlow: 'rgba(142, 74, 35, 0.35)',
+    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f9fdfa 0%, #edf7f2 50%, #d8ebd0 100%)',
+    spiceColor: '#0f766e',
+    auraGlow: 'rgba(15, 118, 110, 0.25)',
   },
   {
     id: 'sambar-powder',
@@ -252,9 +252,9 @@ const HERO_POWDERS = [
     tag: 'Rich Aroma & Perfect Homestyle Flavor',
     price: 'From ₹160',
     rating: '4.9 ★ (510+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fef8f3 0%, #fce7da 50%, #f8cdb4 100%)',
-    spiceColor: '#d35400',
-    auraGlow: 'rgba(211, 84, 0, 0.35)',
+    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f8fcf9 0%, #edf7f2 50%, #d8ebd0 100%)',
+    spiceColor: '#047857',
+    auraGlow: 'rgba(4, 120, 87, 0.25)',
   }
 ];
 
@@ -269,8 +269,8 @@ const HERO_OILS = [
     price: 'From ₹280',
     rating: '4.9 ★ (640+)',
     bgGradient: 'radial-gradient(ellipse at 50% 30%, #f6fcf8 0%, #e3f5ea 50%, #c5ebd6 100%)',
-    spiceColor: '#2e7d32',
-    auraGlow: 'rgba(46, 125, 50, 0.35)',
+    spiceColor: '#15803d',
+    auraGlow: 'rgba(21, 128, 61, 0.25)',
   },
   {
     id: 'groundnut-oil',
@@ -281,9 +281,9 @@ const HERO_OILS = [
     tag: 'Slow Chekku Pressed Under 40°C',
     price: 'From ₹260',
     rating: '4.9 ★ (820+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fffef4 0%, #fef1cf 50%, #f9de96 100%)',
-    spiceColor: '#c88612',
-    auraGlow: 'rgba(200, 134, 18, 0.4)',
+    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f6fdf9 0%, #edf8f2 50%, #d4ede0 100%)',
+    spiceColor: '#0f766e',
+    auraGlow: 'rgba(15, 118, 110, 0.25)',
   },
   {
     id: 'gingelly-oil',
@@ -294,9 +294,9 @@ const HERO_OILS = [
     tag: 'Generations of Authentic Flavour',
     price: 'From ₹340',
     rating: '5.0 ★ (570+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fef8f4 0%, #f8e6d7 50%, #e8c6ad 100%)',
-    spiceColor: '#965022',
-    auraGlow: 'rgba(150, 80, 34, 0.35)',
+    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f7fbf9 0%, #edf7f2 50%, #d6ecdf 100%)',
+    spiceColor: '#166534',
+    auraGlow: 'rgba(22, 101, 52, 0.25)',
   },
   {
     id: 'sunflower-oil',
@@ -307,9 +307,9 @@ const HERO_OILS = [
     tag: 'Fresh Seed Cold Extraction',
     price: 'From ₹240',
     rating: '4.8 ★ (390+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fffef2 0%, #fef7c8 50%, #fae890 100%)',
-    spiceColor: '#d49b00',
-    auraGlow: 'rgba(212, 155, 0, 0.4)',
+    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f6fcf8 0%, #edf8f2 50%, #d5eee0 100%)',
+    spiceColor: '#0d9488',
+    auraGlow: 'rgba(13, 148, 136, 0.25)',
   }
 ];
 
@@ -688,16 +688,16 @@ export default function HomePage({ onCheckout }) {
               <div className="hero-badge-capsule">
                 <span className="badge-pulsing-dot" />
                 <Sparkles size={13} className="badge-sparkle-icon" />
-                <span>100% Traditional Chekku &amp; Stone-Ground Harvest</span>
+                <span>100% PURE • TRADITIONAL • FARM-SOURCED</span>
               </div>
 
               <h1 className="hero-main-heading">
-                <span className="heading-line-1">Pure Goodness.</span>
-                <span className="heading-accent">From Tamil Nadu Farms.</span>
+                <span className="heading-line-1">Taste the Purity of Nature.</span>
+                <span className="heading-accent">From Tamil Nadu Farms to Your Kitchen.</span>
               </h1>
 
               <p className="hero-description">
-                Experience wood-pressed virgin oils &amp; single-origin spices — stone ground at low RPMs to retain live antioxidants, rich natural aroma &amp; ancestral taste.
+                Authentic stone-ground spices &amp; wood cold-pressed virgin oils, traditionally crafted from single-origin harvest to preserve natural aroma, rich flavour and timeless taste.
               </p>
 
               {/* Action Buttons */}
@@ -716,7 +716,7 @@ export default function HomePage({ onCheckout }) {
                   className="btn-hero-secondary" 
                   onClick={() => scrollToSection('story')}
                 >
-                  <span>Our Heritage</span>
+                  <span>Discover Our Story</span>
                   <Sparkles size={14} className="btn-sparkle-subtle" />
                 </button>
               </div>
@@ -728,7 +728,7 @@ export default function HomePage({ onCheckout }) {
                     <Leaf size={16} color="#15803d" />
                   </div>
                   <div className="trust-card-info">
-                    <strong>Single-Origin</strong>
+                    <strong>Farm Sourced</strong>
                     <span>Direct Tamil Farms</span>
                   </div>
                 </div>
@@ -737,8 +737,8 @@ export default function HomePage({ onCheckout }) {
                     <Droplets size={16} color="#b45309" />
                   </div>
                   <div className="trust-card-info">
-                    <strong>Wooden Chekku</strong>
-                    <span>Cold-Pressed &lt; 40°C</span>
+                    <strong>Traditional Craft</strong>
+                    <span>Stone-Ground &amp; Chekku</span>
                   </div>
                 </div>
                 <div className="trust-card-mini">
@@ -746,8 +746,8 @@ export default function HomePage({ onCheckout }) {
                     <ShieldCheck size={16} color="#047857" />
                   </div>
                   <div className="trust-card-info">
-                    <strong>Zero Chemicals</strong>
-                    <span>100% Lab Tested</span>
+                    <strong>100% Pure</strong>
+                    <span>Zero Chemicals &amp; Tested</span>
                   </div>
                 </div>
               </div>
@@ -763,9 +763,9 @@ export default function HomePage({ onCheckout }) {
                 <div className="social-proof-text">
                   <div className="proof-rating-line">
                     <span className="star-icons">★★★★★</span>
-                    <strong>4.9 / 5.0 Rating</strong>
+                    <strong>4.9 / 5.0 Rated</strong>
                   </div>
-                  <span className="proof-sub">Loved by <strong>5,000+ Happy Families</strong> across India</span>
+                  <span className="proof-sub">Trusted by <strong>5,000+ Happy Families</strong> across India</span>
                 </div>
               </div>
             </div>
@@ -922,8 +922,7 @@ export default function HomePage({ onCheckout }) {
                     }}
                   >
                     <Sparkles size={14} className="switch-icon" />
-                    <span>Spice Powders</span>
-                    <span className="switcher-count-badge">5</span>
+                    <span>Spice Powders · 5 Products</span>
                   </button>
                   <button 
                     type="button"
@@ -934,8 +933,7 @@ export default function HomePage({ onCheckout }) {
                     }}
                   >
                     <Droplets size={14} className="switch-icon" />
-                    <span>Cold-Pressed Oils</span>
-                    <span className="switcher-count-badge">4</span>
+                    <span>Cold-Pressed Oils · 4 Products</span>
                   </button>
                 </div>
 
@@ -1107,6 +1105,11 @@ export default function HomePage({ onCheckout }) {
                     <ProductCard
                       product={product}
                       onQuickView={handleOpenQuickView}
+                      onBuyNow={(prod, variant) => {
+                        addToCart(prod, variant, 1);
+                        setIsCartOpen(false);
+                        router.push('/checkout');
+                      }}
                     />
                   </div>
                 ))}

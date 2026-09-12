@@ -11,7 +11,35 @@ export async function GET(request) {
     }
 
     await connectDB();
-    const users = await User.find({ email: { $ne: 'thesmgroups@gmail.com' } }).sort({ createdAt: -1 }).lean();
+    const { searchParams } = new URL(request.url);
+    const filterRole = searchParams.get('role'); // 'all', 'admin', 'customer'
+
+    let query = {};
+    if (filterRole === 'admin') {
+      query = {
+        $or: [
+          { isAdmin: true },
+          { email: { $in: ['admin@gmail.com', 'admin@venthulir.com', 'thesmgroups@gmail.com', 'mentorixacademy.ma@gmail.com'] } }
+        ]
+      };
+    } else if (filterRole === 'all') {
+      query = {};
+    } else {
+      // Default: ONLY genuine customers (no admin accounts)
+      query = {
+        isAdmin: { $ne: true },
+        email: {
+          $nin: [
+            'admin@gmail.com',
+            'admin@venthulir.com',
+            'thesmgroups@gmail.com',
+            'mentorixacademy.ma@gmail.com'
+          ]
+        }
+      };
+    }
+
+    const users = await User.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json(users);
   } catch (err) {
     console.error('API Admin Get Users Error:', err);

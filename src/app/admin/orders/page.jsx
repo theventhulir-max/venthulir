@@ -37,13 +37,13 @@ export default function AdminOrdersPage() {
         headers: {
           ...(token && { Authorization: `Bearer ${token}` })
         }
-      });
-      if (res.ok) {
-        const data = await res.json();
+      }).catch(() => null);
+      if (res && res.ok) {
+        const data = await res.json().catch(() => []);
         setOrders(Array.isArray(data) ? data : []);
       }
     } catch (err) {
-      console.error('Failed to load orders:', err);
+      console.warn('Orders sync will retry in background');
     } finally {
       setLoading(false);
     }

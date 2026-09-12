@@ -10,7 +10,10 @@ try {
   // Ignore in environments where setServers is unsupported
 }
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://mentorixacademyma_db_user:LneWJGHjYKSDUCO1@cluster0.hnxrmlo.mongodb.net/ecomVen?retryWrites=true&w=majority&appName=Cluster0';
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.warn('WARNING: MONGO_URI environment variable is missing.');
+}
 
 /**
  * Global is used here to maintain a cached connection across hot-reloads in development.

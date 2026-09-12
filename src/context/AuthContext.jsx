@@ -186,7 +186,11 @@ export const AuthProvider = ({ children }) => {
       if (data.deliveryAddress && prev?.deliveryAddress) {
         merged.deliveryAddress = { ...prev.deliveryAddress, ...data.deliveryAddress };
       }
-      localStorage.setItem('venthulir_user', JSON.stringify(merged));
+      try {
+        localStorage.setItem('venthulir_user', JSON.stringify(merged));
+      } catch (err) {
+        console.warn('Failed to save user object to localStorage:', err);
+      }
       return merged;
     });
   };

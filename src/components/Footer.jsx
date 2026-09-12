@@ -10,8 +10,8 @@ export default function Footer() {
   const pathname = usePathname();
 
   const handleLinkClick = (path, hash) => {
-    if (path.startsWith('/#')) {
-      if (pathname === '/') {
+    if (path.includes('#')) {
+      if (pathname === '/home' || pathname === '/') {
         const el = document.querySelector(hash);
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       } else {
@@ -53,12 +53,12 @@ export default function Footer() {
             <h4>Quick Links</h4>
             <ul>
               {[
-                ['/', '#home', 'Home'],
+                ['/home', '#home', 'Home'],
                 ['/products', '#products', 'Products'],
-                ['/#categories', '#categories', 'Categories'],
-                ['/#story', '#story', 'Our Story'],
-                ['/#reviews', '#reviews', 'Reviews'],
-                ['/#faq', '#faq', 'Contact']
+                ['/home#categories', '#categories', 'Categories'],
+                ['/home#story', '#story', 'Our Story'],
+                ['/home#reviews', '#reviews', 'Reviews'],
+                ['/home#faq', '#faq', 'Contact']
               ].map(([path, hash, label]) => (
                 <li key={label}>
                   <a href={path} onClick={(e) => { e.preventDefault(); handleLinkClick(path, hash); }}>

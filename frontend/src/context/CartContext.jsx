@@ -10,7 +10,11 @@ export const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('venthulir_cart', JSON.stringify(cartItems));
+    try {
+      localStorage.setItem('venthulir_cart', JSON.stringify(cartItems));
+    } catch (e) {
+      console.warn('Failed to save cart to localStorage:', e);
+    }
   }, [cartItems]);
 
   const addToCart = (product, variant, quantity = 1) => {

@@ -29,8 +29,10 @@ import OrderDetailModal from './components/OrderDetailModal';
 import RestockModal from './components/RestockModal';
 import ProductFormModal from './components/ProductFormModal';
 import { toast } from 'react-toastify';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SimpleAdminDashboard() {
+  const { user, isAuthenticated } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -45,16 +47,38 @@ export default function SimpleAdminDashboard() {
   const fetchStats = async () => {
     try {
       setRefreshing(true);
+      if (typeof window === 'undefined') return;
+
       const token = localStorage.getItem('venthulir_token');
+      const savedUserStr = localStorage.getItem('venthulir_user');
+      
+      // Only proceed if user is verified admin in local state or auth context
+      let isAdminUser = user?.isAdmin;
+      if (!isAdminUser && savedUserStr) {
+        try {
+          const parsed = JSON.parse(savedUserStr);
+          isAdminUser = parsed?.isAdmin;
+        } catch {
+          isAdminUser = false;
+        }
+      }
+
+      if (!token || !isAdminUser) {
+        setLoading(false);
+        setRefreshing(false);
+        return;
+      }
+
       const res = await fetch('/api/admin/stats', {
         headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setStats(data);
+      }).catch(() => null);
+
+      if (res && res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data) setStats(data);
       }
-    } catch (err) {
-      console.error('Failed to load dashboard statistics:', err);
+    } catch {
+      // Safe fallback
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -63,11 +87,27 @@ export default function SimpleAdminDashboard() {
 
   useEffect(() => {
     fetchStats();
-    const interval = setInterval(fetchStats, 12000);
+    const interval = setInterval(fetchStats, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   const handleOrderStatusUpdate = async (orderId, newStatus) => {
+    // 1. Optimistic update in UI immediately
+    setStats(prev => {
+      if (!prev) return prev;
+      const updatedOrders = (prev.recentOrders || []).map(o => {
+        if (o._id === orderId || o.orderId === orderId) {
+          return { ...o, status: newStatus };
+        }
+        return o;
+      });
+      return { ...prev, recentOrders: updatedOrders };
+    });
+
+    if (selectedOrder && (selectedOrder._id === orderId || selectedOrder.orderId === orderId)) {
+      setSelectedOrder(prev => ({ ...prev, status: newStatus }));
+    }
+
     const token = localStorage.getItem('venthulir_token');
     try {
       const res = await fetch(`/api/orders/${orderId}`, {
@@ -81,16 +121,14 @@ export default function SimpleAdminDashboard() {
 
       if (res.ok) {
         toast.success(`Order status updated to "${newStatus}"!`);
-        fetchStats();
-        if (selectedOrder && (selectedOrder._id === orderId || selectedOrder.orderId === orderId)) {
-          const updated = await res.json();
-          setSelectedOrder(updated.order || { ...selectedOrder, status: newStatus });
-        }
+        await fetchStats();
       } else {
         toast.error('Failed to update order status.');
+        await fetchStats();
       }
     } catch {
       toast.error('Network error updating status.');
+      await fetchStats();
     }
   };
 
@@ -249,7 +287,7 @@ export default function SimpleAdminDashboard() {
           </Link>
 
           <a
-            href="/"
+            href="/home"
             target="_blank"
             rel="noopener noreferrer"
             style={{

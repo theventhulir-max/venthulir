@@ -8,10 +8,10 @@ import { sendEmail } from '@/lib/email';
 export async function POST(request) {
   try {
     await connectDB();
-    const { email, password } = await request.json();
+    const { email } = await request.json();
 
-    if (!email || !password) {
-      return NextResponse.json({ msg: 'Email and password are required.' }, { status: 400 });
+    if (!email) {
+      return NextResponse.json({ msg: 'Email is required.' }, { status: 400 });
     }
 
     let cleanEmail = email.toLowerCase().trim();
@@ -22,11 +22,6 @@ export async function POST(request) {
       return NextResponse.json({
         msg: 'No account found with this email. Please click "Create Account" tab above to register.'
       }, { status: 404 });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return NextResponse.json({ msg: 'Incorrect password. Please check your password or click "Forgot?".' }, { status: 401 });
     }
 
     // Generate 6-digit OTP

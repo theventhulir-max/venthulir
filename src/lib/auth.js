@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'venthulir_royal_reserves_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'venthulir_jwt_secret_key_2026';
 
 export function signToken(payload, expiresIn = '7d') {
   return jwt.sign(payload, JWT_SECRET, { expiresIn });

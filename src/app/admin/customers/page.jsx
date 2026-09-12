@@ -21,15 +21,16 @@ export default function AdminCustomersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('customer'); // 'customer' | 'admin' | 'all'
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const fetchCustomerData = async () => {
+  const fetchCustomerData = async (role = roleFilter) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('venthulir_token');
       const [userRes, orderRes] = await Promise.all([
-        fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`/api/admin/users?role=${role}`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/orders', { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
@@ -47,8 +48,8 @@ export default function AdminCustomersPage() {
   };
 
   useEffect(() => {
-    fetchCustomerData();
-  }, []);
+    fetchCustomerData(roleFilter);
+  }, [roleFilter]);
 
   // Compute stats per customer
   const customerAnalytics = customers.map((c) => {
@@ -95,21 +96,51 @@ export default function AdminCustomersPage() {
 
         <button
           className="admin-btn admin-btn-secondary"
-          onClick={fetchCustomerData}
-          title="Refresh Customer Data"
+          onClick={() => fetchCustomerData(roleFilter)}
+          title="Refresh Data"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           <span>Refresh</span>
         </button>
       </div>
 
-      {/* Search Bar */}
-      <div className="admin-card" style={{ padding: '14px 18px', marginBottom: '20px' }}>
-        <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+      {/* Filter Tabs & Search Bar */}
+      <div className="admin-card" style={{ padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+        
+        {/* Role Toggle Pills */}
+        <div style={{ display: 'flex', gap: '8px', background: '#f1f5f3', padding: '4px', borderRadius: '10px' }}>
+          <button
+            type="button"
+            className={`admin-btn admin-btn-sm ${roleFilter === 'customer' ? 'admin-btn-primary' : 'admin-btn-secondary'}`}
+            style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '12.5px', fontWeight: 700 }}
+            onClick={() => setRoleFilter('customer')}
+          >
+            👥 Customers Only
+          </button>
+          <button
+            type="button"
+            className={`admin-btn admin-btn-sm ${roleFilter === 'admin' ? 'admin-btn-primary' : 'admin-btn-secondary'}`}
+            style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '12.5px', fontWeight: 700 }}
+            onClick={() => setRoleFilter('admin')}
+          >
+            🛡️ Admins & Staff
+          </button>
+          <button
+            type="button"
+            className={`admin-btn admin-btn-sm ${roleFilter === 'all' ? 'admin-btn-primary' : 'admin-btn-secondary'}`}
+            style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '12.5px', fontWeight: 700 }}
+            onClick={() => setRoleFilter('all')}
+          >
+            All Accounts
+          </button>
+        </div>
+
+        {/* Search */}
+        <div style={{ position: 'relative', width: '100%', maxWidth: '340px' }}>
           <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#788c81' }} />
           <input
             type="text"
-            placeholder="Search customer by name, email or phone..."
+            placeholder="Search by name, email or phone..."
             className="admin-input"
             style={{ paddingLeft: '34px' }}
             value={searchTerm}

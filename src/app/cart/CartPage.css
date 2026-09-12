@@ -56,7 +56,7 @@
   gap: 6px;
   font-size: 0.88rem;
   font-weight: 750;
-  color: #b45309;
+  color: #114529;
   text-decoration: none;
   transition: all 0.2s;
 }
@@ -115,7 +115,7 @@
 
 .shipping-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #d98e1e 0%, #16a34a 100%);
+  background: linear-gradient(90deg, #114529 0%, #16a34a 100%);
   border-radius: 9999px;
   transition: width 0.4s ease;
 }
@@ -298,7 +298,10 @@
   .cart-row-remove-btn {
     position: absolute;
     top: 14px;
-    right: 0;
+    right: 12px;
+    padding: 8px;
+    background: #fef2f2;
+    color: #ef4444;
   }
 }
 
@@ -437,19 +440,20 @@
   font-size: 1rem;
   font-weight: 850;
   color: #ffffff;
-  background: linear-gradient(135deg, #d98e1e 0%, #b45309 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #c9922c 0%, #b47a1b 50%, #926010 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 9999px;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.24s ease;
-  box-shadow: 0 6px 20px rgba(180, 83, 9, 0.35);
+  box-shadow: 0 6px 22px rgba(180, 122, 27, 0.38);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .btn-proceed-checkout:hover {
-  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  background: linear-gradient(135deg, #dfa83e 0%, #c9922c 50%, #b47a1b 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(180, 83, 9, 0.45);
+  box-shadow: 0 10px 28px rgba(180, 122, 27, 0.5);
 }
 
 /* Trust Perks in Cart */

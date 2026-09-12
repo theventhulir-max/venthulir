@@ -88,7 +88,7 @@ export default function AdminTopNav({
 
         {/* View Storefront button */}
         <Link
-          href="/"
+          href="/home"
           target="_blank"
           className="admin-header-btn"
           title="Open Live Customer Storefront"

@@ -20,17 +20,28 @@ import {
   Mail, 
   Banknote,
   QrCode,
-  PackageCheck
+  PackageCheck,
+  Plus
 } from 'lucide-react';
+import { PRESET_COUPONS } from '@/data/constants';
 import './CheckoutPage.css';
 
 const SHIPPING_FREE_THRESHOLD = 499;
 const SHIPPING_FEE = 60;
 
-const PRESET_COUPONS = {
-  FIRST10:   { type: 'percent', value: 10, label: '10% OFF Welcome Discount' },
-  VENTHULIR: { type: 'flat',    value: 50, label: '₹50 OFF Harvest Privilege' },
-  ORGANIC20: { type: 'percent', value: 20, label: '20% OFF Organic Fest' },
+const getFallbackImage = (name = '', category = '') => {
+  const lowerName = (name || '').toLowerCase();
+  const lowerCat = (category || '').toLowerCase();
+
+  if (lowerName.includes('turmeric') || lowerName.includes('manjal') || lowerName.includes('yellow') || lowerName.includes('turm')) return '/assets/hero/turmeric.png';
+  if (lowerName.includes('chilli') || lowerName.includes('chili') || lowerName.includes('red') || lowerName.includes('milagai')) return '/assets/hero/chilli.png';
+  if (lowerName.includes('coriander') || lowerName.includes('mallie') || lowerName.includes('dhaniya') || lowerName.includes('kothamalli')) return '/assets/hero/coriander.png';
+  if (lowerName.includes('sambar') || lowerName.includes('masala') || lowerName.includes('garam') || lowerName.includes('rasam')) return '/assets/hero/sambar.png';
+  if (lowerName.includes('coconut') || lowerName.includes('thengai')) return '/assets/hero/oil_coconut.png';
+  if (lowerName.includes('groundnut') || lowerName.includes('kadalai')) return '/assets/hero/oil_groundnut.png';
+  if (lowerName.includes('gingelly') || lowerName.includes('sesame') || lowerName.includes('nallennai') || lowerName.includes('til')) return '/assets/hero/oil_gingelly.png';
+  if (lowerName.includes('oil') || lowerCat.includes('oil')) return '/assets/hero/oil_sunflower.png';
+  return '/assets/hero/turmeric.png';
 };
 
 function CheckoutContent() {
@@ -92,19 +103,26 @@ function CheckoutContent() {
 
     // Try server coupon verification
     try {
-      const res = await fetch(`/api/coupons/validate?code=${encodeURIComponent(code)}`);
+      const res = await fetch('/api/coupons/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
       if (res.ok) {
         const data = await res.json();
+        const discountType = data.discountType || 'percent';
+        const discountVal = data.discountValue || data.discountPercentage || 10;
         setAppliedCoupon({
           code,
-          type: data.discountType || 'flat',
-          value: data.discountValue || 50,
-          label: `${data.discountValue}${data.discountType === 'percent' ? '%' : '₹'} OFF`
+          type: discountType,
+          value: discountVal,
+          label: `${discountVal}${discountType === 'percent' ? '%' : '₹'} OFF`
         });
         setCouponMsg({ type: 'success', text: `✓ Coupon ${code} applied successfully!` });
       } else {
+        const errData = await res.json().catch(() => ({}));
         setAppliedCoupon(null);
-        setCouponMsg({ type: 'error', text: 'Invalid or expired coupon code.' });
+        setCouponMsg({ type: 'error', text: errData.error || 'Invalid or expired coupon code.' });
       }
     } catch {
       setAppliedCoupon(null);
@@ -142,6 +160,26 @@ function CheckoutContent() {
 
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('venthulir_token') : null;
+      let razorpayOrderId = null;
+      let razorpayPaymentId = null;
+
+      // Online payment handling
+      if (paymentMethod === 'UPI / QR Pay' || paymentMethod === 'Online') {
+        try {
+          const payRes = await fetch('/api/payment/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: finalPayable })
+          });
+          if (payRes.ok) {
+            const payData = await payRes.json();
+            razorpayOrderId = payData.orderId || payData.id;
+          }
+        } catch (e) {
+          console.warn('Razorpay order creation fallback:', e);
+        }
+      }
+
       const orderPayload = {
         customerName: formData.name.trim(),
         customerEmail: formData.email.trim() || user?.email || 'patron@venthulir.com',
@@ -165,7 +203,9 @@ function CheckoutContent() {
         couponCode: appliedCoupon ? appliedCoupon.code : null,
         shippingCharge,
         totalAmount: finalPayable,
-        paymentMethod
+        paymentMethod,
+        razorpayOrderId,
+        razorpayPaymentId
       };
 
       const res = await fetch('/api/orders', {
@@ -444,6 +484,44 @@ function CheckoutContent() {
                   <p className="payment-method-desc">GPay, PhonePe, Paytm, or BHIM scan on delivery.</p>
                 </div>
               </div>
+
+              {/* Mobile Bottom Submit Button */}
+              <div className="checkout-mobile-submit-wrapper">
+                {orderError && (
+                  <div style={{
+                    fontSize: '0.84rem',
+                    fontWeight: 650,
+                    color: '#b91c1c',
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    marginBottom: '14px',
+                    textAlign: 'center'
+                  }}>
+                    {orderError}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  className="btn-confirm-place-order"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <span>Securing Your Order...</span>
+                  ) : (
+                    <>
+                      <span>Confirm & Place Order • ₹{finalPayable}</span>
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.76rem', color: '#557262', marginTop: '12px' }}>
+                  <ShieldCheck size={14} color="#166534" />
+                  <span>Zero Risk • Authenticity Guaranteed</span>
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -451,11 +529,33 @@ function CheckoutContent() {
           {/* ── RIGHT COLUMN: SUMMARY & CONFIRMATION ── */}
           <div className="checkout-right-col">
             <div className="checkout-card order-summary-card">
-              <div className="checkout-card-header">
-                <div className="checkout-card-icon-wrap">
-                  <ShoppingBag size={20} />
+              <div className="checkout-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div className="checkout-card-icon-wrap">
+                    <ShoppingBag size={20} />
+                  </div>
+                  <h2 className="checkout-card-title">Order Summary ({cartItems.reduce((s, i) => s + i.quantity, 0)} Items)</h2>
                 </div>
-                <h2 className="checkout-card-title">Order Summary ({cartItems.reduce((s, i) => s + i.quantity, 0)} Items)</h2>
+                <Link 
+                  href="/products" 
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    fontSize: '0.78rem',
+                    fontWeight: 750,
+                    color: '#0f3d2a',
+                    background: '#edf6f1',
+                    border: '1px solid #b8dfc8',
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <Plus size={14} />
+                  <span>Add Products</span>
+                </Link>
               </div>
 
               {/* Items Mini List */}
@@ -464,11 +564,14 @@ function CheckoutContent() {
                   <div key={item.key} className="summary-single-item">
                     <div className="summary-item-left">
                       <div className="summary-item-thumb">
-                        {item.image ? (
-                          <img src={item.image} alt={item.name} />
-                        ) : (
-                          <span>🌿</span>
-                        )}
+                        <img 
+                          src={item.image || getFallbackImage(item.name, item.category)} 
+                          alt={item.name} 
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = getFallbackImage(item.name, item.category);
+                          }}
+                        />
                       </div>
                       <div className="summary-item-details">
                         <h5>{item.name}</h5>
@@ -480,6 +583,31 @@ function CheckoutContent() {
                     </div>
                   </div>
                 ))}
+
+                <div style={{ paddingTop: '8px', marginTop: '8px' }}>
+                  <Link 
+                    href="/products" 
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      width: '100%',
+                      padding: '10px 14px',
+                      fontSize: '0.82rem',
+                      fontWeight: 750,
+                      color: '#0f3d2a',
+                      background: '#f0f9f4',
+                      border: '1.5px dashed #86efac',
+                      borderRadius: '10px',
+                      textDecoration: 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Plus size={15} />
+                    <span>+ Add More Items to Your Order</span>
+                  </Link>
+                </div>
               </div>
 
               {/* Coupon Box */}

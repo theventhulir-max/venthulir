@@ -41,10 +41,42 @@
   align-items: start;
 }
 
+.checkout-mobile-submit-wrapper {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .checkout-page-root {
+    padding: 16px 12px 60px;
+  }
+  .checkout-top-header {
+    margin-bottom: 16px;
+  }
+  .checkout-top-title {
+    font-size: 1.8rem;
+  }
   .checkout-layout-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .checkout-right-col {
+    order: -1;
+    width: 100%;
+  }
+  .checkout-left-col {
+    order: 1;
+    width: 100%;
+  }
+  .order-summary-card {
+    position: static !important;
+    margin-bottom: 0 !important;
+  }
+  .checkout-mobile-submit-wrapper {
+    display: block;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #edf2ee;
   }
 }
 
@@ -109,7 +141,7 @@
 
 .checkout-auth-alert a {
   font-weight: 750;
-  color: #b45309;
+  color: #114529;
   text-decoration: underline;
 }
 
@@ -174,6 +206,12 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
+}
+
+@media (max-width: 580px) {
+  .payment-methods-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .payment-method-card {
@@ -363,18 +401,19 @@
   font-size: 1rem;
   font-weight: 850;
   color: #ffffff;
-  background: linear-gradient(135deg, #d98e1e 0%, #b45309 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #c9922c 0%, #b47a1b 50%, #926010 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 9999px;
   cursor: pointer;
   transition: all 0.24s ease;
-  box-shadow: 0 6px 20px rgba(180, 83, 9, 0.35);
+  box-shadow: 0 6px 22px rgba(180, 122, 27, 0.38);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .btn-confirm-place-order:hover:not(:disabled) {
-  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  background: linear-gradient(135deg, #dfa83e 0%, #c9922c 50%, #b47a1b 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(180, 83, 9, 0.45);
+  box-shadow: 0 10px 28px rgba(180, 122, 27, 0.5);
 }
 
 .btn-confirm-place-order:disabled {

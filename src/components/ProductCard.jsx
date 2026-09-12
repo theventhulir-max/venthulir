@@ -21,7 +21,21 @@ export default function ProductCard({ product, onQuickView, onBuyNow }) {
   const originalPrice = product.originalPrice || Math.round(price * 1.25);
   const savings = Math.max(0, originalPrice - price);
   const discountPercent = product.discountPercent || (originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 20);
-  const imageUrl = product.images?.[0] || product.imageUrl;
+  const getFallbackImg = (p) => {
+    const name = (p?.name || '').toLowerCase();
+    const cat = (p?.category || '').toLowerCase();
+    if (name.includes('turmeric') || name.includes('manjal') || name.includes('yellow') || name.includes('turm')) return '/assets/hero/turmeric.png';
+    if (name.includes('chilli') || name.includes('chili') || name.includes('red')) return '/assets/hero/chilli.png';
+    if (name.includes('coriander') || name.includes('mallie')) return '/assets/hero/coriander.png';
+    if (name.includes('sambar') || name.includes('masala') || name.includes('garam')) return '/assets/hero/sambar.png';
+    if (name.includes('coconut')) return '/assets/hero/oil_coconut.png';
+    if (name.includes('groundnut')) return '/assets/hero/oil_groundnut.png';
+    if (name.includes('gingelly') || name.includes('sesame')) return '/assets/hero/oil_gingelly.png';
+    if (name.includes('oil') || cat.includes('oil')) return '/assets/hero/oil_sunflower.png';
+    return '/assets/hero/turmeric.png';
+  };
+
+  const imageUrl = product.images?.[0] || product.imageUrl || getFallbackImg(product);
   const hasVariants = product.variants?.length > 0;
 
   const handleAdd = (e) => {
@@ -76,13 +90,16 @@ export default function ProductCard({ product, onQuickView, onBuyNow }) {
 
         {/* Large Product Pouch Image */}
         <div className="product-img-box">
-          {imageUrl ? (
-            <img src={imageUrl} alt={product.name} className="product-img" loading="lazy" />
-          ) : (
-            <div className="product-fallback-avatar">
-              <span>{product.name?.[0] || 'V'}</span>
-            </div>
-          )}
+          <img 
+            src={imageUrl} 
+            alt={product.name} 
+            className="product-img" 
+            loading="lazy" 
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = getFallbackImg(product);
+            }}
+          />
         </div>
 
         {/* Quick View Button on Hover */}

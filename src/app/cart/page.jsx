@@ -18,16 +18,11 @@ import {
   CheckCircle2, 
   Sparkles 
 } from 'lucide-react';
+import { PRESET_COUPONS } from '@/data/constants';
 import './CartPage.css';
 
 const SHIPPING_FREE_THRESHOLD = 499;
 const SHIPPING_FEE = 60;
-
-const PRESET_COUPONS = {
-  FIRST10:   { type: 'percent', value: 10, label: '10% OFF Welcome Bonus' },
-  VENTHULIR: { type: 'flat',    value: 50, label: '₹50 OFF Harvest Privilege' },
-  ORGANIC20: { type: 'percent', value: 20, label: '20% OFF Organic Fest' },
-};
 
 function CartPageContent() {
   const router = useRouter();
@@ -50,19 +45,26 @@ function CartPageContent() {
     }
 
     try {
-      const res = await fetch(`/api/coupons/validate?code=${encodeURIComponent(code)}`);
+      const res = await fetch('/api/coupons/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
       if (res.ok) {
         const data = await res.json();
+        const discountType = data.discountType || 'percent';
+        const discountVal = data.discountValue || data.discountPercentage || 10;
         setAppliedCoupon({
           code,
-          type: data.discountType || 'flat',
-          value: data.discountValue || 50,
-          label: `${data.discountValue}${data.discountType === 'percent' ? '%' : '₹'} OFF`
+          type: discountType,
+          value: discountVal,
+          label: `${discountVal}${discountType === 'percent' ? '%' : '₹'} OFF`
         });
         setCouponMsg({ type: 'success', text: `✓ Coupon ${code} applied successfully!` });
       } else {
+        const errData = await res.json().catch(() => ({}));
         setAppliedCoupon(null);
-        setCouponMsg({ type: 'error', text: 'Invalid or expired coupon code.' });
+        setCouponMsg({ type: 'error', text: errData.error || 'Invalid or expired coupon code.' });
       }
     } catch {
       setAppliedCoupon(null);
@@ -175,11 +177,14 @@ function CartPageContent() {
                       {/* 1. Product Info */}
                       <div className="cart-row-product">
                         <div className="cart-row-img-box">
-                          {item.image ? (
-                            <img src={item.image} alt={item.name} />
-                          ) : (
-                            <span style={{ fontSize: '1.4rem' }}>🌿</span>
-                          )}
+                          <img 
+                            src={item.image || '/assets/hero/coriander.png'} 
+                            alt={item.name} 
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = '/assets/hero/coriander.png';
+                            }}
+                          />
                         </div>
                         <div className="cart-row-details">
                           <h4>{item.name}</h4>

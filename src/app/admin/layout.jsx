@@ -14,18 +14,24 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        if (typeof window === 'undefined') return;
         const token = localStorage.getItem('venthulir_token');
-        if (!token) return;
+        const savedUserStr = localStorage.getItem('venthulir_user');
+        if (!token || !savedUserStr) return;
+
+        const savedUser = JSON.parse(savedUserStr);
+        if (!savedUser?.isAdmin) return;
 
         const res = await fetch('/api/admin/stats', {
           headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setStats(data);
+        }).catch(() => null);
+
+        if (res && res.ok) {
+          const data = await res.json().catch(() => null);
+          if (data) setStats(data);
         }
       } catch (err) {
-        console.error('Failed to load admin stats in layout:', err);
+        console.warn('Admin layout stats sync will retry in background');
       }
     };
 

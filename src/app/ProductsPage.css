@@ -238,7 +238,7 @@
 
 .btn-reset-catalog {
   margin-top: 16px;
-  background: linear-gradient(135deg, #c97a18 0%, #b45309 100%);
+  background: linear-gradient(135deg, #c9922c 0%, #b47a1b 100%);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 10px 24px;
@@ -247,13 +247,12 @@
   font-weight: 750;
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.22);
+  box-shadow: 0 4px 14px rgba(180, 122, 27, 0.25);
 }
 
 .btn-reset-catalog:hover {
-  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  background: linear-gradient(135deg, #b47a1b 0%, #926010 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(180, 83, 9, 0.32);
 }
 
 /* Trust Strip */

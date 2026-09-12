@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
@@ -43,7 +44,7 @@ const ANNOUNCEMENTS = [
   { text: '🌿 100% Certified Organic & Single-Origin Direct from Farms', icon: ShieldCheck },
   { text: '🚚 Free Express Delivery Across India on Orders Above ₹499', icon: Truck },
   { text: '🎁 Flat 15% OFF On 1st Order — Code: FIRSTPURE', icon: Gift },
-  { text: '💬 Instant WhatsApp Order & Support: +91 98765 43210', icon: PhoneCall },
+  { text: '💬 Instant WhatsApp Order & Support: +91 87784 76414', icon: PhoneCall },
 ];
 
 const TRENDING_SEARCHES = [
@@ -68,12 +69,32 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [tickerIndex, setTickerIndex] = useState(0);
   const [addedItemKey, setAddedItemKey] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   const dropRef = useRef(null);
   const catDropRef = useRef(null);
   const searchContainerRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   const handleAuthClick = () => {
     setMenuOpen(false);
@@ -151,10 +172,12 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
 
   // Instant live search submit handler
   const handleSearchSubmit = (e) => {
-    e?.preventDefault();
-    if (!searchQuery.trim()) return;
-    setSearchFocused(false);
-    router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setSearchFocused(false);
+      setMenuOpen(false);
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   const handleProductSelect = (product) => {
@@ -176,33 +199,31 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
     setActiveCategory(cat.id);
     setCategoryDropOpen(false);
     setMenuOpen(false);
-
-    if (cat.id === 'all') {
-      router.push('/products');
-    } else if (cat.filter) {
+    if (cat.filter) {
       router.push(`/products?category=${encodeURIComponent(cat.filter)}`);
     } else {
       router.push('/products');
     }
   };
 
-  const navigateToSection = (targetId, fallbackPath) => {
+  const navigateToSection = (sectionId, fallbackUrl) => {
     setMenuOpen(false);
-    if (pathname === '/' || pathname === '/home' || !pathname) {
-      if (targetId === 'home') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
-      const el = document.getElementById(targetId);
+    if (sectionId === 'offers') {
+      router.push('/products');
+      return;
+    }
+    if (pathname === '/home' || pathname === '/') {
+      const el = document.getElementById(sectionId);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
         return;
       }
     }
-    router.push(fallbackPath || `/#${targetId}`);
+    router.push(fallbackUrl || '/home');
   };
 
-  const ActiveIcon = ANNOUNCEMENTS[tickerIndex].icon;
+  const activeAnnouncement = ANNOUNCEMENTS[tickerIndex];
+  const AnnouncementIcon = activeAnnouncement.icon;
 
   return (
     <header className={`site-header-wrapper ${scrolled ? 'is-scrolled' : ''}`}>
@@ -210,26 +231,16 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
       {/* ── 1. Top High-Trust Announcement Ticker Strip ── */}
       <div className="top-announcement-strip">
         <div className="container announcement-inner">
-          <div className="announcement-badge-pill">OFFER</div>
           <div className="announcement-content">
-            <ActiveIcon size={13} className="ticker-icon" />
-            <span className="ticker-text">{ANNOUNCEMENTS[tickerIndex].text}</span>
+            <AnnouncementIcon size={14} className="ticker-icon" />
+            <span className="ticker-text">{activeAnnouncement.text}</span>
           </div>
           <div className="announcement-quick-links">
-            <button 
-              type="button" 
-              className="quick-link-btn"
-              onClick={() => navigateToSection('faq', '/#faq')}
-            >
-              Help & WhatsApp
-            </button>
+            <span className="announcement-badge-pill">100% PURE</span>
             <span className="divider">|</span>
-            <Link 
-              href="/products" 
-              className="quick-link-btn highlight"
-            >
-              Daily Deals
-            </Link>
+            <button type="button" className="quick-link-btn" onClick={() => router.push('/products')}>Shop Fresh Harvest</button>
+            <span className="divider">|</span>
+            <a href="https://wa.me/918778476414" target="_blank" rel="noreferrer" className="quick-link-btn highlight">WhatsApp Order</a>
           </div>
         </div>
       </div>
@@ -239,102 +250,106 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
         <div className="container navbar-content-row">
           
           {/* Brand Logo */}
-          <Link href="/" className="navbar-brand" onClick={() => setMenuOpen(false)}>
-            <img
-              src="/logo.png"
-              alt="Venthulir"
-              className="brand-logo-img"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-              }}
-            />
-            <div className="brand-text-block">
+          <Link href="/home" className="navbar-brand-link" onClick={() => setMenuOpen(false)}>
+            <div className="brand-badge-crest">
+              <img
+                src="/logo.png"
+                alt="Venthulir"
+                className="brand-logo-img"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+            <div className="brand-text-stack">
               <span className="brand-name">VENTHULIR</span>
-              <span className="brand-tagline">Pure Taste of Nature</span>
+              <span className="brand-tagline">100% PURE ORGANIC HARVEST</span>
             </div>
           </Link>
 
           {/* High-Converting Integrated Omnisearch with Live Autocomplete Dropdown */}
           <div className="nav-omnisearch-container" ref={searchContainerRef}>
-            <form className="nav-omnisearch-form" onSubmit={handleSearchSubmit}>
-              <div className="search-input-wrapper">
-                <Search size={16} className="search-leading-icon" />
-                <input
-                  type="text"
-                  placeholder="Search turmeric, cold-pressed oils, sambar masala..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setSearchFocused(true);
-                  }}
-                  onFocus={() => setSearchFocused(true)}
-                  onClick={() => setSearchFocused(true)}
-                  className="omnisearch-input"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    className="search-clear"
-                    onClick={() => setSearchQuery('')}
-                  >
-                    <X size={13} />
-                  </button>
-                )}
-              </div>
-              <button type="submit" className="omnisearch-submit-btn" aria-label="Submit search">
-                <ArrowRight size={15} />
+            <form className={`omnisearch-form ${searchFocused ? 'focused' : ''}`} onSubmit={handleSearchSubmit}>
+              <Search size={16} className="search-lead-icon" />
+              <input
+                type="text"
+                placeholder="Search turmeric, cold-pressed oils, sambar masala..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSearchFocused(true);
+                }}
+                onFocus={() => setSearchFocused(true)}
+                onClick={() => setSearchFocused(true)}
+                className="omnisearch-input"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  onClick={() => setSearchQuery('')}
+                >
+                  <X size={14} />
+                </button>
+              )}
+              <button type="submit" className="search-submit-btn" aria-label="Submit search">
+                <span>Search</span>
               </button>
             </form>
 
             {/* ── LIVE SEARCH RESULTS DROPDOWN ── */}
             {searchFocused && (
-              <div className="search-live-dropdown">
+              <div className="search-instant-dropdown">
                 
                 {/* 1. When user typed query and has results */}
                 {searchQuery.trim() && searchResults.length > 0 && (
-                  <div className="search-results-section">
+                  <div className="search-results-list">
                     <div className="search-results-header">
-                      <span>Products ({searchResults.length})</span>
-                      <span className="header-hint">Press Enter to view all</span>
+                      <span>Matching Organic Harvest ({searchResults.length})</span>
                     </div>
 
-                    <div className="search-results-list">
-                      {searchResults.slice(0, 5).map((p) => {
-                        const img = p.images?.[0] || p.imageUrl;
-                        const isAdded = addedItemKey === p._id;
-                        return (
-                          <div 
-                            key={p._id} 
-                            className="search-result-item"
-                            onClick={() => handleProductSelect(p)}
-                          >
-                            <div className="result-img-box">
-                              {img ? <img src={img} alt={p.name} /> : <span>{p.name[0]}</span>}
-                            </div>
+                    {searchResults.slice(0, 6).map((p) => {
+                      const img = p.images?.[0] || p.imageUrl || p.image;
+                      const isAdded = addedItemKey === p._id;
+                      return (
+                        <div 
+                          key={p._id || p.id} 
+                          className="search-item-row"
+                          onClick={() => handleProductSelect(p)}
+                        >
+                          <div className="search-item-thumb">
+                            {img ? <img src={img} alt={p.name} /> : <span>{p.name[0]}</span>}
+                          </div>
 
-                            <div className="result-details">
-                              <span className="result-category">{p.category}</span>
-                              <h4 className="result-name">{p.name}</h4>
-                              <div className="result-meta">
-                                <span className="result-price">₹{p.price}</span>
-                                {p.badge && <span className="result-badge">{p.badge}</span>}
-                              </div>
-                            </div>
+                          <div className="search-item-info">
+                            <span className="search-item-cat">{p.category || 'Farm Harvest'}</span>
+                            <span className="search-item-name">{p.name}</span>
+                          </div>
 
-                            <button 
-                              className={`result-add-btn ${isAdded ? 'is-added' : ''}`}
+                          <div className="search-item-actions">
+                            <span className="search-item-price">₹{p.price}</span>
+                            <button
+                              type="button"
+                              className={`search-item-add-btn ${isAdded ? 'added' : ''}`}
                               onClick={(e) => handleQuickAdd(e, p)}
                               title="Add to Cart"
-                              type="button"
                             >
-                              {isAdded ? <Check size={13} /> : <Plus size={13} />}
-                              <span>{isAdded ? 'Added' : 'Add'}</span>
+                              {isAdded ? (
+                                <>
+                                  <Check size={12} />
+                                  <span>Added</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Plus size={13} />
+                                  <span>Add</span>
+                                </>
+                              )}
                             </button>
                           </div>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      );
+                    })}
 
                     <Link 
                       href={`/products?search=${encodeURIComponent(searchQuery)}`}
@@ -401,11 +416,11 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
           {/* Desktop Navigation Links */}
           <div className="navbar-nav-group">
             <Link 
-              href="/"
+              href="/home"
               className="nav-item-btn"
               onClick={(e) => { 
                 setMenuOpen(false); 
-                if (pathname === '/' || pathname === '/home') {
+                if (pathname === '/home' || pathname === '/') {
                   e.preventDefault();
                   window.scrollTo({ top: 0, behavior: 'smooth' }); 
                 }
@@ -417,7 +432,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
             <Link 
               href="/products"
               className="nav-item-btn"
-              onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onClick={() => { setMenuOpen(false); }}
             >
               All Products
             </Link>
@@ -448,12 +463,9 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
                   {QUICK_CATEGORIES.map(cat => (
                     <Link
                       key={cat.id}
-                      href={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.filter || cat.name)}`}
+                      href={cat.filter ? `/products?category=${encodeURIComponent(cat.filter)}` : '/products'}
                       className="flyout-item"
-                      onClick={() => {
-                        setCategoryDropOpen(false);
-                        setMenuOpen(false);
-                      }}
+                      onClick={() => setCategoryDropOpen(false)}
                     >
                       <span className="flyout-emoji">{cat.emoji}</span>
                       <span className="flyout-name">{cat.name}</span>
@@ -464,14 +476,14 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
             </div>
 
             {/* High-Converting Offer Pill */}
-            <Link 
-              href="/products"
+            <button 
+              type="button" 
               className="nav-offer-pill"
-              onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onClick={() => navigateToSection('offers', '/home#offers')}
             >
               <Flame size={13} className="flame-icon" />
-              <span>Flat 20% OFF</span>
-            </Link>
+              <span>Festive Offers</span>
+            </button>
           </div>
 
           {/* User Actions (Wishlist, Cart, Profile) */}
@@ -492,6 +504,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
               className="nav-action-cart-btn" 
               onClick={() => setIsCartOpen(true)}
               title="Shopping Cart"
+              aria-label="Open Shopping Cart"
             >
               <div className="cart-icon-wrapper">
                 <ShoppingBag size={18} />
@@ -502,121 +515,12 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
 
             {/* Auth / Account Profile */}
             {isAuthenticated ? (
-              <div className="user-profile-menu" ref={dropRef}>
-                <button 
-                  className="user-profile-btn" 
-                  onClick={() => setUserOpen(v => !v)}
-                  type="button"
-                >
-                  <div className="user-avatar-initial">
-                    {user?.name?.[0]?.toUpperCase() || <User size={14} />}
-                  </div>
-                  <span className="user-firstname">{user?.name?.split(' ')[0] || 'Account'}</span>
-                  <ChevronDown size={13} />
-                </button>
-
-                {userOpen && (
-                  <div className="profile-flyout">
-                    <div className="flyout-user-header">
-                      <div className="flyout-user-avatar">
-                        {user?.name?.[0]?.toUpperCase() || 'V'}
-                      </div>
-                      <div className="flyout-user-info">
-                        <p className="user-name-bold">{user?.name || 'Customer'}</p>
-                        <p className="user-email-muted">{user?.email || user?.phone}</p>
-                        <div className="flyout-patron-badge">
-                          <ShieldCheck size={11} />
-                          <span>Verified Organic Patron</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flyout-divider" />
-
-                    <div className="flyout-links-list">
-                      {/* 1. Your Cart */}
-                      <Link href="/cart" className="flyout-link-item" onClick={() => setUserOpen(false)}>
-                        <div className="flyout-icon-box cart-icon">
-                          <ShoppingBag size={16} />
-                        </div>
-                        <div className="flyout-item-text">
-                          <span className="flyout-item-title">Your Cart</span>
-                          <span className="flyout-item-sub">Review basket items</span>
-                        </div>
-                        {cartCount > 0 && <span className="flyout-pill-badge">{cartCount}</span>}
-                      </Link>
-
-                      {/* 2. My Orders & Live Tracking */}
-                      <Link href="/profile" className="flyout-link-item" onClick={() => setUserOpen(false)}>
-                        <div className="flyout-icon-box orders-icon">
-                          <Package size={16} />
-                        </div>
-                        <div className="flyout-item-text">
-                          <span className="flyout-item-title">My Orders & Tracking</span>
-                          <span className="flyout-item-sub">Track active delivery</span>
-                        </div>
-                      </Link>
-
-                      {/* 3. Delivery Addresses */}
-                      <Link href="/profile" className="flyout-link-item" onClick={() => setUserOpen(false)}>
-                        <div className="flyout-icon-box address-icon">
-                          <MapPin size={16} />
-                        </div>
-                        <div className="flyout-item-text">
-                          <span className="flyout-item-title">Saved Addresses</span>
-                          <span className="flyout-item-sub">Manage shipping places</span>
-                        </div>
-                      </Link>
-
-                      {/* 4. Personal Profile */}
-                      <Link href="/profile" className="flyout-link-item" onClick={() => setUserOpen(false)}>
-                        <div className="flyout-icon-box profile-icon">
-                          <User size={16} />
-                        </div>
-                        <div className="flyout-item-text">
-                          <span className="flyout-item-title">Account Details</span>
-                          <span className="flyout-item-sub">Edit name & mobile</span>
-                        </div>
-                      </Link>
-
-                      {/* 5. Wishlist */}
-                      <Link href="/products" className="flyout-link-item" onClick={() => setUserOpen(false)}>
-                        <div className="flyout-icon-box wish-icon">
-                          <Heart size={16} />
-                        </div>
-                        <div className="flyout-item-text">
-                          <span className="flyout-item-title">Saved Wishlist</span>
-                          <span className="flyout-item-sub">Favorites & bookmarks</span>
-                        </div>
-                      </Link>
-
-                      {/* Admin Dashboard if applicable */}
-                      {(user?.isAdmin || user?.role === 'admin') && (
-                        <Link href="/admin" className="flyout-link-item admin-link" onClick={() => setUserOpen(false)}>
-                          <div className="flyout-icon-box admin-icon">
-                            <ShieldCheck size={16} />
-                          </div>
-                          <div className="flyout-item-text">
-                            <span className="flyout-item-title">Admin Dashboard</span>
-                            <span className="flyout-item-sub">Inventory & management</span>
-                          </div>
-                        </Link>
-                      )}
-                    </div>
-
-                    <div className="flyout-divider" />
-
-                    <button 
-                      onClick={() => { logout(); setUserOpen(false); }} 
-                      className="flyout-logout-row"
-                      type="button"
-                    >
-                      <LogOut size={15} />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                )}
-              </div>
+              <Link href="/profile" className="user-profile-btn" style={{textDecoration: 'none'}}>
+                <div className="user-avatar-initial">
+                  {user?.name?.[0]?.toUpperCase() || <User size={14} />}
+                </div>
+                <span className="user-firstname">{user?.name?.split(' ')[0] || 'Account'}</span>
+              </Link>
             ) : (
               <Link 
                 href="/login"
@@ -643,13 +547,13 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
         </div>
       </nav>
 
-      {/* ── 3. Mobile Drawer Menu ── */}
-      {menuOpen && (
+      {/* ── 3. Mobile Drawer Menu via Portal ── */}
+      {menuOpen && mounted && typeof document !== 'undefined' && createPortal(
         <div className="mobile-nav-backdrop" onClick={() => setMenuOpen(false)}>
           <div className="mobile-nav-panel" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-panel-header">
               <span className="mobile-brand-title">VENTHULIR</span>
-              <button className="mobile-close-btn" onClick={() => setMenuOpen(false)}>
+              <button className="mobile-close-btn" onClick={() => setMenuOpen(false)} aria-label="Close menu">
                 <X size={20} />
               </button>
             </div>
@@ -659,7 +563,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
               <Search size={15} className="mobile-search-icon" />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search organic products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -686,11 +590,26 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
             {/* Mobile Nav Links */}
             <div className="mobile-menu-section">
               <span className="mobile-section-label">Navigation</span>
-              <button className="mobile-nav-row" onClick={() => navigateToSection('home', '/')}>Home</button>
-              <button className="mobile-nav-row" onClick={() => { setMenuOpen(false); router.push('/products'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>All Products</button>
-              <button className="mobile-nav-row" onClick={() => navigateToSection('story', '/#story')}>Our Story</button>
-              <button className="mobile-nav-row" onClick={() => navigateToSection('reviews', '/#reviews')}>Customer Reviews</button>
-              <button className="mobile-nav-row" onClick={() => navigateToSection('faq', '/#faq')}>Help & Contact</button>
+              <button type="button" className="mobile-nav-row" onClick={() => navigateToSection('home', '/home')}>
+                <span>Home</span>
+                <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', color: '#94a3b8' }} />
+              </button>
+              <button type="button" className="mobile-nav-row" onClick={() => { setMenuOpen(false); router.push('/products'); }}>
+                <span>All Products</span>
+                <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', color: '#94a3b8' }} />
+              </button>
+              <button type="button" className="mobile-nav-row" onClick={() => navigateToSection('story', '/home#story')}>
+                <span>Our Story</span>
+                <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', color: '#94a3b8' }} />
+              </button>
+              <button type="button" className="mobile-nav-row" onClick={() => navigateToSection('reviews', '/home#reviews')}>
+                <span>Customer Reviews</span>
+                <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', color: '#94a3b8' }} />
+              </button>
+              <button type="button" className="mobile-nav-row" onClick={() => navigateToSection('faq', '/home#faq')}>
+                <span>Help &amp; Contact</span>
+                <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', color: '#94a3b8' }} />
+              </button>
             </div>
 
             {/* Mobile Auth Button */}
@@ -705,18 +624,31 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
                   <span>Sign In / Register</span>
                 </Link>
               ) : (
-                <button 
-                  className="mobile-auth-cta logout" 
-                  onClick={() => { logout(); setMenuOpen(false); }}
-                >
-                  <LogOut size={16} />
-                  <span>Sign Out</span>
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <Link
+                    href="/profile"
+                    className="mobile-auth-cta"
+                    onClick={() => setMenuOpen(false)}
+                    style={{ background: '#0f3d2a' }}
+                  >
+                    <User size={16} />
+                    <span>My Profile &amp; Orders</span>
+                  </Link>
+                  <button 
+                    type="button"
+                    className="mobile-auth-cta logout" 
+                    onClick={() => { logout(); setMenuOpen(false); }}
+                  >
+                    <LogOut size={16} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
               )}
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </header>

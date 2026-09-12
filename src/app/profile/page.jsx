@@ -9,13 +9,12 @@ import {
   Package, 
   MapPin, 
   LogOut, 
-  ShoppingBag, 
+  Gift, 
   Clock, 
   CheckCircle2, 
   Truck, 
   AlertCircle,
   Edit3,
-  Save,
   ChevronRight,
   ShieldCheck,
   Calendar,
@@ -23,82 +22,35 @@ import {
   Mail,
   Loader2,
   Tag,
-  Copy,
-  Check,
   Headphones,
   Send,
   MessageSquare,
   Sparkles,
-  ExternalLink,
-  ShieldAlert,
   ArrowRight,
   RotateCcw,
   RefreshCw,
-  Gift
+  Edit2,
+  Lock,
+  HelpCircle,
+  Leaf,
+  XCircle,
+  ShoppingBag,
+  Check,
+  ClipboardCheck,
+  Box,
+  Home
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import './ProfilePage.css';
-
-const DEFAULT_COUPONS = [
-  { code: 'VENTHULIR', discountType: 'flat', discountValue: 50, minOrder: 399, desc: '₹50 OFF on your authentic farm order' },
-  { code: 'ORGANIC20', discountType: 'percent', discountValue: 20, minOrder: 699, desc: '20% OFF on all cold-pressed oils & spices' },
-  { code: 'FIRST10', discountType: 'percent', discountValue: 10, minOrder: 299, desc: '10% Welcome Bonus on your first harvest basket' },
-];
 
 export default function ProfilePage() {
   const { user, isAuthenticated, loading: authLoading, logout, updateUser } = useAuth();
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'address' | 'profile' | 'coupons' | 'support'
+  const [activeOrderTab, setActiveOrderTab] = useState('current'); // 'current' | 'past' | 'cancelled'
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
-
-  // Coupons state
-  const [coupons, setCoupons] = useState(DEFAULT_COUPONS);
-  const [copiedCode, setCopiedCode] = useState('');
-
-  // Support inquiry state
-  const [supportSubject, setSupportSubject] = useState('');
-  const [supportMessage, setSupportMessage] = useState('');
-  const [sendingSupport, setSendingSupport] = useState(false);
-  const [supportSuccess, setSupportSuccess] = useState(false);
-
-  // Address edit state
-  const [addressForm, setAddressForm] = useState({
-    address: '',
-    city: '',
-    state: 'Tamil Nadu',
-    zipCode: ''
-  });
-  const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [savingAddress, setSavingAddress] = useState(false);
-
-  // Profile edit state
-  const [profileForm, setProfileForm] = useState({
-    name: '',
-    phone: '',
-    currentPassword: '',
-    newPassword: ''
-  });
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [savingProfile, setSavingProfile] = useState(false);
-
-  // Sync initial user data
-  useEffect(() => {
-    if (user) {
-      setProfileForm(prev => ({
-        ...prev,
-        name: user.name || '',
-        phone: user.phone || ''
-      }));
-      setAddressForm({
-        address: user.deliveryAddress?.address || '',
-        city: user.deliveryAddress?.city || '',
-        state: user.deliveryAddress?.state || 'Tamil Nadu',
-        zipCode: user.deliveryAddress?.zipCode || ''
-      });
-    }
-  }, [user]);
 
   // Fetch real-time user orders
   const fetchOrders = async () => {
@@ -127,1032 +79,766 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
+    let isMounted = true;
+    let timer = setTimeout(() => {
+      if (isMounted) setOrdersLoading(false);
+    }, 3000);
+
     if (isAuthenticated) {
-      fetchOrders();
+      fetchOrders().finally(() => {
+        if (isMounted) clearTimeout(timer);
+      });
     } else if (!authLoading) {
       setOrdersLoading(false);
+      clearTimeout(timer);
     }
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
   }, [isAuthenticated, authLoading]);
 
-  // Copy coupon code helper
-  const handleCopyCoupon = (code) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    toast.success(`Coupon code ${code} copied to clipboard!`);
-    setTimeout(() => setCopiedCode(''), 2500);
-  };
+  // Saved Address State & Handlers
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [addressForm, setAddressForm] = useState({
+    address: user?.deliveryAddress?.address || '',
+    city: user?.deliveryAddress?.city || '',
+    state: user?.deliveryAddress?.state || 'Tamil Nadu',
+    zipCode: user?.deliveryAddress?.zipCode || '',
+    phone: user?.phone || ''
+  });
+  const [addressSaving, setAddressSaving] = useState(false);
+  const [addressMessage, setAddressMessage] = useState(null);
 
-  // Handle Save Address
+  // Profile Account Details State & Handlers
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || '',
+    phone: user?.phone || ''
+  });
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileMessage, setProfileMessage] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      setAddressForm({
+        address: user?.deliveryAddress?.address || '',
+        city: user?.deliveryAddress?.city || '',
+        state: user?.deliveryAddress?.state || 'Tamil Nadu',
+        zipCode: user?.deliveryAddress?.zipCode || '',
+        phone: user?.phone || ''
+      });
+      setProfileForm({
+        name: user?.name || '',
+        phone: user?.phone || ''
+      });
+    }
+  }, [user]);
+
   const handleSaveAddress = async (e) => {
     e.preventDefault();
+    setAddressSaving(true);
+    setAddressMessage(null);
     const token = typeof window !== 'undefined' ? localStorage.getItem('venthulir_token') : null;
-    if (!token) return;
 
-    if (!addressForm.address.trim() || !addressForm.city.trim() || !addressForm.zipCode.trim()) {
-      toast.error('Please fill in complete street address, city, and pincode.');
-      return;
-    }
-
-    setSavingAddress(true);
     try {
-      const res = await fetch('/api/auth/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+      if (token) {
+        await fetch('/api/auth/address', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            address: addressForm.address,
+            city: addressForm.city,
+            state: addressForm.state,
+            zipCode: addressForm.zipCode
+          })
+        });
+
+        if (addressForm.phone && addressForm.phone !== user?.phone) {
+          await fetch('/api/auth/profile', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ phone: addressForm.phone })
+          });
+        }
+      }
+
+      updateUser({
+        deliveryAddress: {
+          address: addressForm.address,
+          city: addressForm.city,
+          state: addressForm.state,
+          zipCode: addressForm.zipCode
         },
-        body: JSON.stringify({
-          deliveryAddress: addressForm
-        })
+        phone: addressForm.phone || user?.phone
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        if (updateUser) updateUser(data.user);
-        setIsEditingAddress(false);
-        toast.success('✨ Shipping address updated successfully!');
-      } else {
-        toast.error(data.msg || 'Could not update delivery address.');
-      }
-    } catch {
-      toast.error('Server connection error. Please try again.');
+      setAddressMessage({ type: 'success', text: 'Address updated successfully!' });
+      setIsEditingAddress(false);
+    } catch (err) {
+      console.error('Error updating address:', err);
+      setAddressMessage({ type: 'error', text: 'Failed to save address.' });
     } finally {
-      setSavingAddress(false);
+      setAddressSaving(false);
     }
   };
 
-  // Handle Save Profile
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+    setProfileSaving(true);
+    setProfileMessage(null);
     const token = typeof window !== 'undefined' ? localStorage.getItem('venthulir_token') : null;
-    if (!token) return;
 
-    if (!profileForm.name.trim()) {
-      toast.error('Name cannot be empty.');
-      return;
-    }
-
-    setSavingProfile(true);
     try {
-      const payload = {
-        name: profileForm.name.trim(),
-        phone: profileForm.phone.trim()
-      };
-      if (profileForm.newPassword) {
-        if (profileForm.newPassword.length < 6) {
-          toast.error('New password must be at least 6 characters.');
-          setSavingProfile(false);
-          return;
-        }
-        payload.currentPassword = profileForm.currentPassword;
-        payload.newPassword = profileForm.newPassword;
+      if (token) {
+        await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            name: profileForm.name,
+            phone: profileForm.phone
+          })
+        });
       }
 
-      const res = await fetch('/api/auth/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
+      updateUser({
+        name: profileForm.name,
+        phone: profileForm.phone
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        if (updateUser) updateUser(data.user);
-        setIsEditingProfile(false);
-        setProfileForm(prev => ({ ...prev, currentPassword: '', newPassword: '' }));
-        toast.success('🎉 Profile information updated successfully!');
-      } else {
-        toast.error(data.msg || 'Could not update profile.');
-      }
-    } catch {
-      toast.error('Server connection error. Please try again.');
+      setProfileMessage({ type: 'success', text: 'Account details updated successfully!' });
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setProfileMessage({ type: 'error', text: 'Failed to save account details.' });
     } finally {
-      setSavingProfile(false);
-    }
-  };
-
-  // Handle Cancel Order (Pending orders only)
-  const handleCancelOrder = async (orderId) => {
-    if (!window.confirm('Are you sure you want to cancel this pending order?')) return;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('venthulir_token') : null;
-    if (!token) return;
-
-    try {
-      const res = await fetch(`/api/orders/${orderId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: 'Cancelled' })
-      });
-      if (res.ok) {
-        toast.success('Order cancelled successfully.');
-        fetchOrders();
-      } else {
-        const data = await res.json();
-        toast.error(data.msg || 'Failed to cancel order.');
-      }
-    } catch {
-      toast.error('Network error. Please try again.');
-    }
-  };
-
-  // Handle Submit Concierge Support Inquiry
-  const handleSupportSubmit = async (e) => {
-    e.preventDefault();
-    if (!supportMessage.trim()) {
-      toast.error('Please write your message or inquiry.');
-      return;
-    }
-
-    setSendingSupport(true);
-    try {
-      const res = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: user?.name || 'Venthulir Patron',
-          email: user?.email || 'customer@venthulir.com',
-          phone: user?.phone || '',
-          subject: supportSubject.trim() || 'Member Priority Inquiry',
-          message: supportMessage.trim()
-        })
-      });
-
-      if (res.ok) {
-        setSupportSuccess(true);
-        setSupportSubject('');
-        setSupportMessage('');
-        toast.success('Priority inquiry dispatched! Our farm concierge will reply within 4 hours.');
-      } else {
-        toast.error('Could not send message. Please contact via WhatsApp.');
-      }
-    } catch {
-      toast.error('Network error. Please try again.');
-    } finally {
-      setSendingSupport(false);
+      setProfileSaving(false);
     }
   };
 
   if (authLoading) {
     return (
-      <div className="lounge-loading-screen">
-        <div className="lounge-spinner-pod">
-          <Loader2 size={32} className="lounge-spin-icon" />
-          <p>Opening Your Royal Patron Lounge...</p>
-        </div>
+      <div style={{minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <Loader2 size={32} className="lounge-spin-icon" color="#114529" />
       </div>
     );
   }
 
   if (!isAuthenticated && !user) {
     return (
-      <div className="lounge-guest-screen">
-        <div className="lounge-guest-card">
-          <div className="guest-icon-emblem">
-            <User size={36} />
-          </div>
-          <h2>Royal Member Authentication Required</h2>
-          <p>Please sign in to access your order dispatch tracker, verified address book, and exclusive farm harvest perks.</p>
-          <div className="guest-cta-row">
-            <Link href="/login" className="btn-lounge-primary">
-              <User size={16} />
-              <span>Sign In to Member Lounge</span>
-            </Link>
-            <Link href="/products" className="btn-lounge-secondary">
-              <span>Explore Farm Catalog</span>
-              <ArrowRight size={15} />
-            </Link>
-          </div>
-        </div>
+      <div style={{minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+        <h2>Sign In Required</h2>
+        <Link href="/login" style={{marginTop: '16px', padding: '10px 20px', background: '#114529', color: '#fff', borderRadius: '8px', textDecoration: 'none'}}>Sign In</Link>
       </div>
     );
   }
 
   const activeOrdersCount = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
-  const deliveredOrdersCount = orders.filter(o => o.status === 'Delivered').length;
-
+  const pastOrdersCount = orders.filter(o => o.status === 'Delivered').length;
+  const cancelledOrdersCount = orders.filter(o => o.status === 'Cancelled').length;
+  
+  const filteredOrders = orders.filter(o => {
+    if (activeOrderTab === 'current') return o.status !== 'Delivered' && o.status !== 'Cancelled';
+    if (activeOrderTab === 'past') return o.status === 'Delivered';
+    if (activeOrderTab === 'cancelled') return o.status === 'Cancelled';
+    return true;
+  });
   return (
     <div className="lounge-page-root">
       
-      {/* ── 1. LUXURY HERO PATRON HEADER ── */}
-      <section className="lounge-hero-section">
-        <div className="container">
-          
-          <div className="lounge-hero-card">
-            <div className="lounge-hero-ambient-glow" />
-
-            <div className="lounge-hero-content-grid">
-              
-              {/* Left Identity Pod */}
-              <div className="lounge-identity-pod">
-                <div className="lounge-avatar-frame">
-                  <div className="lounge-avatar-initial">
-                    {user?.name?.[0]?.toUpperCase() || 'V'}
-                  </div>
-                  <div className="lounge-verified-orb" title="Certified Organic Patron">
-                    <ShieldCheck size={14} />
-                  </div>
-                </div>
-
-                <div className="lounge-identity-details">
-                  <div className="lounge-rank-pill">
-                    <Sparkles size={12} className="rank-sparkle" />
-                    <span>{user?.isAdmin ? 'EXECUTIVE MASTER ADMINISTRATOR' : 'VERIFIED ROYAL PATRON'}</span>
-                  </div>
-                  <h1 className="lounge-patron-name">{user?.name || 'Honored Patron'}</h1>
-                  <div className="lounge-contact-badges">
-                    <span className="contact-badge">
-                      <Mail size={13} />
-                      {user?.email}
-                    </span>
-                    {user?.phone && (
-                      <span className="contact-badge">
-                        <Phone size={13} />
-                        {user?.phone}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Quick Metric Highlights */}
-              <div className="lounge-kpi-cluster">
-                <div className="lounge-kpi-item" onClick={() => setActiveTab('orders')}>
-                  <div className="kpi-icon-box orders">
-                    <Package size={18} />
-                  </div>
-                  <div className="kpi-meta">
-                    <span className="kpi-val">{orders.length}</span>
-                    <span className="kpi-lbl">Total Harvests</span>
-                  </div>
-                </div>
-
-                <div className="lounge-kpi-item" onClick={() => setActiveTab('orders')}>
-                  <div className="kpi-icon-box active">
-                    <Truck size={18} />
-                  </div>
-                  <div className="kpi-meta">
-                    <span className="kpi-val">{activeOrdersCount}</span>
-                    <span className="kpi-lbl">Active Dispatch</span>
-                  </div>
-                </div>
-
-                <div className="lounge-kpi-item" onClick={() => setActiveTab('coupons')}>
-                  <div className="kpi-icon-box perks">
-                    <Gift size={18} />
-                  </div>
-                  <div className="kpi-meta">
-                    <span className="kpi-val">{coupons.length}</span>
-                    <span className="kpi-lbl">VIP Vouchers</span>
-                  </div>
-                </div>
-
-                {user?.isAdmin && (
-                  <Link href="/admin" className="lounge-admin-switch-btn" title="Open Executive Operations Console">
-                    <ShieldCheck size={16} />
-                    <span>Executive Admin Panel →</span>
-                  </Link>
-                )}
-              </div>
-
+      {/* ── 1. ACCOUNT BANNER ── */}
+      <div className="account-banner">
+        <div className="account-banner-overlay" />
+        
+        <div className="banner-content-left">
+          <div className="banner-avatar-wrapper">
+            <div className="banner-avatar">
+              {user?.name?.[0]?.toUpperCase() || 'G'}
             </div>
+            <div className="banner-avatar-edit">
+              <Edit2 size={12} />
+            </div>
+          </div>
+          
+          <div className="banner-user-info">
+            <h1 className="banner-user-name">{user?.name || 'Gokulraj N'}</h1>
+            <p className="banner-customer-since">Customer Since {new Date().getFullYear()}</p>
+            
+            <div className="banner-contact-row">
+              <div className="banner-contact-item">
+                <Mail size={16} color="#0d3b23" strokeWidth={2.2} />
+                {user?.email || 'gokulrajofficial123@gmail.com'}
+              </div>
+              <div className="banner-contact-item">
+                <Phone size={16} color="#0d3b23" strokeWidth={2.2} />
+                {user?.phone || '+91 87784 76414'}
+              </div>
+            </div>
+            
+            <div className="banner-tagline">
+              Naturally better choices for a healthier you <Leaf size={16} color="#2e7d32" strokeWidth={2.2} />
+            </div>
+          </div>
+        </div>
 
+        <div className="banner-content-right">
+          <div className="banner-stat-item">
+            <div className="stat-icon-wrap stat-blue">
+              <Package size={20} className="stat-icon" />
+            </div>
+            <p className="stat-value">{orders.length}</p>
+            <span className="stat-label">Total Orders</span>
+          </div>
+          <div className="banner-stat-item">
+            <div className="stat-icon-wrap stat-amber">
+              <Truck size={20} className="stat-icon" />
+            </div>
+            <p className="stat-value">{activeOrdersCount}</p>
+            <span className="stat-label">Active Dispatch</span>
+          </div>
+          <div className="banner-stat-item">
+            <div className="stat-icon-wrap stat-purple">
+              <Gift size={20} className="stat-icon" />
+            </div>
+            <p className="stat-value">3</p>
+            <span className="stat-label">VIP Vouchers</span>
+          </div>
+          <div className="banner-stat-item">
+            <div className="stat-icon-wrap stat-gold">
+              <Sparkles size={20} className="stat-icon" />
+            </div>
+            <p className="stat-value">4.9</p>
+            <span className="stat-label">Your Rating</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 2. THREE COLUMN LAYOUT ── */}
+      <div className="profile-3col-layout">
+        
+        {/* Left Sidebar */}
+        <aside>
+          <div className="sidebar-nav-menu">
+            <button className={`sidebar-nav-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+              <div className="nav-btn-left">
+                <span className="nav-icon-badge nav-indigo"><Package size={17} /></span>
+                My Orders
+              </div>
+              <ChevronRight size={16} className="nav-btn-chevron" />
+            </button>
+            <button className={`sidebar-nav-btn ${activeTab === 'address' ? 'active' : ''}`} onClick={() => setActiveTab('address')}>
+              <div className="nav-btn-left">
+                <span className="nav-icon-badge nav-teal"><MapPin size={17} /></span>
+                Saved Addresses
+              </div>
+              <ChevronRight size={16} className="nav-btn-chevron" />
+            </button>
+            <button className={`sidebar-nav-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
+              <div className="nav-btn-left">
+                <span className="nav-icon-badge nav-amber"><User size={17} /></span>
+                Account Details
+              </div>
+              <ChevronRight size={16} className="nav-btn-chevron" />
+            </button>
+            <button className={`sidebar-nav-btn ${activeTab === 'coupons' ? 'active' : ''}`} onClick={() => setActiveTab('coupons')}>
+              <div className="nav-btn-left">
+                <span className="nav-icon-badge nav-purple"><Tag size={17} /></span>
+                My Vouchers
+              </div>
+              <span className="nav-btn-badge">3</span>
+            </button>
+            <button className={`sidebar-nav-btn ${activeTab === 'support' ? 'active' : ''}`} onClick={() => setActiveTab('support')}>
+              <div className="nav-btn-left">
+                <span className="nav-icon-badge nav-blue"><Headphones size={17} /></span>
+                Help & Support
+              </div>
+              <ChevronRight size={16} className="nav-btn-chevron" />
+            </button>
+            <button className={`sidebar-nav-btn`} onClick={() => { logout(); router.push('/home'); }}>
+              <div className="nav-btn-left">
+                <span className="nav-icon-badge nav-rose"><LogOut size={17} /></span>
+                Sign Out
+              </div>
+              <ChevronRight size={16} className="nav-btn-chevron" />
+            </button>
           </div>
 
-        </div>
-      </section>
-
-      {/* ── 2. MAIN LOUNGE WORKSPACE (Tabs + Dynamic Content) ── */}
-      <section className="lounge-workspace-section">
-        <div className="container">
-          
-          <div className="lounge-layout-grid">
-            
-            {/* ── Left Navigation Sidebar Bar ── */}
-            <aside className="lounge-nav-sidebar">
-              <div className="lounge-nav-card">
-                
-                <div className="nav-card-header">
-                  <span>PATRON SUITE NAVIGATION</span>
-                </div>
-
-                <nav className="lounge-nav-menu">
-                  <button
-                    type="button"
-                    className={`lounge-nav-btn ${activeTab === 'orders' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('orders')}
-                  >
-                    <div className="nav-btn-icon">
-                      <Package size={17} />
-                    </div>
-                    <span className="nav-btn-text">My Orders &amp; Tracking</span>
-                    {orders.length > 0 && <span className="nav-btn-counter">{orders.length}</span>}
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`lounge-nav-btn ${activeTab === 'address' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('address')}
-                  >
-                    <div className="nav-btn-icon">
-                      <MapPin size={17} />
-                    </div>
-                    <span className="nav-btn-text">Shipping Hub &amp; Address</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`lounge-nav-btn ${activeTab === 'profile' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('profile')}
-                  >
-                    <div className="nav-btn-icon">
-                      <User size={17} />
-                    </div>
-                    <span className="nav-btn-text">Account Identity &amp; Security</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`lounge-nav-btn ${activeTab === 'coupons' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('coupons')}
-                  >
-                    <div className="nav-btn-icon">
-                      <Tag size={17} />
-                    </div>
-                    <span className="nav-btn-text">Harvest Vouchers &amp; Perks</span>
-                    <span className="nav-btn-badge-gold">Offer</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`lounge-nav-btn ${activeTab === 'support' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('support')}
-                  >
-                    <div className="nav-btn-icon">
-                      <Headphones size={17} />
-                    </div>
-                    <span className="nav-btn-text">Farm Concierge Priority</span>
-                  </button>
-                </nav>
-
-                <div className="lounge-nav-divider" />
-
-                {/* Direct WhatsApp Quick Connect */}
-                <div className="lounge-sidebar-support-box">
-                  <div className="support-box-header">
-                    <Sparkles size={13} color="#c9922c" />
-                    <strong>Direct Farm WhatsApp</strong>
-                  </div>
-                  <p>Need urgent delivery updates or bulk spice orders?</p>
-                  <a
-                    href="https://wa.me/918778476414?text=Hi%20Venthulir%20Team,%20I%20need%20assistance%20with%20my%20order."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-sidebar-whatsapp"
-                  >
-                    <MessageSquare size={14} />
-                    <span>WhatsApp Concierge</span>
-                  </a>
-                </div>
-
-                <div className="lounge-nav-divider" />
-
-                <button
-                  type="button"
-                  className="lounge-logout-btn"
-                  onClick={() => {
-                    logout();
-                    router.push('/');
-                  }}
-                >
-                  <LogOut size={16} />
-                  <span>Sign Out of Account</span>
-                </button>
-
+          <div className="whatsapp-support-box">
+            <div className="wa-box-content">
+              <span className="wa-box-title">Direct Farm WhatsApp</span>
+              <span className="wa-box-desc">Need urgent delivery updates<br/>or bulk orders?</span>
+            </div>
+            <a href="https://wa.me/918778476414" target="_blank" rel="noreferrer" style={{textDecoration: 'none'}}>
+              <div className="wa-box-icon">
+                <ArrowRight size={14} />
               </div>
-            </aside>
+            </a>
+          </div>
+        </aside>
 
-            {/* ── Right Main Workspace Pane ── */}
-            <main className="lounge-main-viewport">
-              
-              {/* ─────────────────────────────────────────────────────────────
-                  TAB 1: ORDERS & LIVE TRACKING
-              ───────────────────────────────────────────────────────────── */}
-              {activeTab === 'orders' && (
-                <div className="lounge-tab-pane animate-fade-in">
-                  
-                  <div className="pane-header-row">
-                    <div>
-                      <h2 className="pane-headline">Order History &amp; Live Tracking</h2>
-                      <p className="pane-subtext">Track your freshly cold-pressed oils and stone-ground spices from harvest to doorstep.</p>
-                    </div>
-                    <button
-                      type="button"
-                      className="pane-refresh-btn"
-                      onClick={fetchOrders}
-                      title="Refresh Orders"
-                    >
-                      <RefreshCw size={15} />
-                      <span>Refresh</span>
-                    </button>
+        {/* Center Workspace */}
+        <main>
+          <div className="main-workspace-card animate-fade-in">
+            {activeTab === 'orders' && (
+              <>
+                <div className="workspace-header">
+                  <div className="workspace-header-title">
+                    <Leaf size={24} color="#114529" />
+                    Your Orders &amp; Tracking
                   </div>
+                  <button className="btn-refresh" onClick={fetchOrders}>
+                    <RefreshCw size={14} />
+                    Refresh
+                  </button>
+                </div>
+                <p className="workspace-subtext">Track your fresh, natural and healthy products from our farm to your doorstep.</p>
 
-                  {ordersLoading ? (
-                    <div className="lounge-empty-box">
-                      <Loader2 size={32} className="lounge-spin-icon" />
-                      <p>Fetching real-time dispatch status...</p>
+                <div className="orders-tabs-row">
+                  <button className={`order-tab-btn tab-current ${activeOrderTab === 'current' ? 'active' : ''}`} onClick={() => setActiveOrderTab('current')}>
+                    <Calendar size={14} />
+                    Current Orders
+                    <span className="tab-count-badge">{activeOrdersCount}</span>
+                  </button>
+                  <button className={`order-tab-btn tab-past ${activeOrderTab === 'past' ? 'active' : ''}`} onClick={() => setActiveOrderTab('past')}>
+                    <Package size={14} />
+                    Past Orders
+                    <span className="tab-count-badge">{pastOrdersCount}</span>
+                  </button>
+                  <button className={`order-tab-btn tab-cancelled ${activeOrderTab === 'cancelled' ? 'active' : ''}`} onClick={() => setActiveOrderTab('cancelled')}>
+                    <XCircle size={14} />
+                    Cancelled
+                    <span className="tab-count-badge">{cancelledOrdersCount}</span>
+                  </button>
+                </div>
+
+                {ordersLoading ? (
+                  <div className="empty-state-wrapper">
+                    <Loader2 size={32} className="lounge-spin-icon" color="#114529" style={{marginBottom: '16px'}} />
+                    <p>Loading your orders...</p>
+                  </div>
+                ) : filteredOrders.length === 0 ? (
+                  <div className="empty-state-wrapper animate-fade-in">
+                    <div className="empty-state-icon">
+                      <Package size={72} color="#0f3d2a" strokeWidth={1} style={{fill: '#dcfce7'}} />
                     </div>
-                  ) : orders.length === 0 ? (
-                    <div className="lounge-empty-orders-card">
-                      <div className="empty-orders-illustration">
-                        <ShoppingBag size={48} />
-                      </div>
-                      <h3>No Harvest Orders Placed Yet</h3>
-                      <p>Experience genuine Vaagai wood-pressed oils and aromatic stone-ground spices cultivated in Tamil Nadu farms.</p>
-                      <Link href="/products" className="btn-empty-shop">
-                        <Sparkles size={16} />
-                        <span>Explore Organic Catalog</span>
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="orders-cards-stream">
-                      {orders.map((order) => {
-                        const status = (order.status || 'Pending').toLowerCase();
-                        const isPending = status === 'pending';
-                        const isConfirmed = status === 'confirmed';
-                        const isShipped = status === 'shipped';
-                        const isDelivered = status === 'delivered';
-                        const isCancelled = status === 'cancelled';
+                    <h3 className="empty-state-title">No Orders Found</h3>
+                    <p className="empty-state-desc">Looks like you haven't placed any {activeOrderTab} orders yet.<br/>Explore our fresh and natural products!</p>
+                    <Link href="/products" className="btn-start-shopping">
+                      <ShoppingBag size={18} />
+                      Start Shopping <ArrowRight size={18} />
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="orders-grid animate-fade-in">
+                    {filteredOrders.map(order => {
+                      const backendStatus = (order.status || 'pending').toLowerCase();
+                      const isCancelled = backendStatus === 'cancelled';
+                      
+                      const orderSteps = [
+                        { key: 'pending', label: 'Placed', icon: ClipboardCheck },
+                        { key: 'confirmed', label: 'Confirmed', icon: CheckCircle2 },
+                        { key: 'shipped', label: 'Shipped', icon: Truck },
+                        { key: 'delivered', label: 'Delivered', icon: Home }
+                      ];
 
-                        const stepIndex = isCancelled ? -1 : isDelivered ? 3 : isShipped ? 2 : isConfirmed ? 1 : 0;
+                      // Map backend statuses to the 4 milestone steps
+                      let currentStepIndex = 0;
+                      if (backendStatus === 'confirmed' || backendStatus === 'processing') currentStepIndex = 1;
+                      else if (backendStatus === 'shipped' || backendStatus === 'out_for_delivery') currentStepIndex = 2;
+                      else if (backendStatus === 'delivered') currentStepIndex = 3;
 
-                        return (
-                          <div key={order._id} className={`order-master-card status-${status}`}>
-                            
-                            {/* Card Top Strip */}
-                            <div className="order-master-header">
-                              <div className="order-id-group">
-                                <span className="order-ref-badge">
-                                  #{order._id.slice(-8).toUpperCase()}
-                                </span>
-                                <span className="order-date-text">
-                                  <Calendar size={13} />
-                                  {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                                    day: 'numeric',
-                                    month: 'short',
-                                    year: 'numeric'
-                                  })}
-                                </span>
-                              </div>
+                      // Derive user-friendly current status message
+                      let statusMessage = 'We have received your order.';
+                      if (isCancelled) statusMessage = 'This order has been cancelled.';
+                      else if (backendStatus === 'confirmed') statusMessage = 'Your order is confirmed and will be processed soon.';
+                      else if (backendStatus === 'processing') statusMessage = 'We are packing your items with care.';
+                      else if (backendStatus === 'shipped') statusMessage = 'Your order has been shipped and is on the way.';
+                      else if (backendStatus === 'out_for_delivery') statusMessage = 'Your order is out for delivery and will reach you today.';
+                      else if (backendStatus === 'delivered') statusMessage = 'Your order was successfully delivered. Enjoy!';
 
-                              <div className="order-status-cluster">
-                                <span className={`order-status-pill ${status}`}>
-                                  {order.status || 'Pending'}
-                                </span>
-                              </div>
+                      return (
+                        <div className="order-card tracking-card" key={order._id}>
+                          {/* Top Header Section */}
+                          <div className="tracking-card-header">
+                            <div className="tracking-header-left">
+                              <span className="tracking-order-id">#{order._id.substring(0, 8)}</span>
+                              <span className="tracking-order-date">
+                                {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </span>
                             </div>
+                            <span className={`tracking-status-badge ${backendStatus}`}>
+                              {backendStatus === 'out_for_delivery' ? 'Out for Delivery' : order.status || 'Pending'}
+                            </span>
+                          </div>
 
-                            {/* Visual Timeline Stepper */}
-                            {!isCancelled && (
-                              <div className="order-stepper-track">
-                                <div className="stepper-line-bg" />
-                                <div 
-                                  className="stepper-line-fill" 
-                                  style={{ width: `${(stepIndex / 3) * 100}%` }} 
-                                />
+                          {/* Product Summary */}
+                          <div className="tracking-product-summary">
+                            <div className="tracking-product-name">
+                              {order.items?.length > 0 ? (
+                                <span>
+                                  <strong>{order.items[0].name}</strong>
+                                  {order.items.length > 1 && <span className="more-items"> + {order.items.length - 1} more items</span>}
+                                </span>
+                              ) : (
+                                <span>No items found</span>
+                              )}
+                            </div>
+                            <div className="tracking-total-amount">
+                              ₹{order.totalAmount}
+                            </div>
+                          </div>
 
-                                <div className={`stepper-node ${stepIndex >= 0 ? 'completed' : ''} ${stepIndex === 0 ? 'active' : ''}`}>
-                                  <div className="node-icon-circle">
-                                    <Clock size={13} />
-                                  </div>
-                                  <span className="node-label">Order Placed</span>
-                                </div>
-
-                                <div className={`stepper-node ${stepIndex >= 1 ? 'completed' : ''} ${stepIndex === 1 ? 'active' : ''}`}>
-                                  <div className="node-icon-circle">
-                                    <CheckCircle2 size={13} />
-                                  </div>
-                                  <span className="node-label">Confirmed</span>
-                                </div>
-
-                                <div className={`stepper-node ${stepIndex >= 2 ? 'completed' : ''} ${stepIndex === 2 ? 'active' : ''}`}>
-                                  <div className="node-icon-circle">
-                                    <Truck size={13} />
-                                  </div>
-                                  <span className="node-label">Dispatched</span>
-                                </div>
-
-                                <div className={`stepper-node ${stepIndex >= 3 ? 'completed' : ''} ${stepIndex === 3 ? 'active' : ''}`}>
-                                  <div className="node-icon-circle">
-                                    <ShieldCheck size={13} />
-                                  </div>
-                                  <span className="node-label">Delivered</span>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Items List Breakdown */}
-                            <div className="order-items-grid">
-                              {order.items?.map((item, idx) => (
-                                <div key={idx} className="order-item-unit">
-                                  <div className="order-item-thumb">
-                                    {item.image || item.imageUrl ? (
-                                      <img src={item.image || item.imageUrl} alt={item.name} />
-                                    ) : (
-                                      <span>{item.name?.[0] || 'V'}</span>
+                          {/* Stepper / Progress Tracker (Hide if cancelled) */}
+                          {!isCancelled && (
+                            <div className="tracking-stepper-wrapper">
+                              {orderSteps.map((step, index) => {
+                                const isDelivered = backendStatus === 'delivered';
+                                const isCompleted = isDelivered || index <= currentStepIndex;
+                                const isCurrent = !isDelivered && index === currentStepIndex;
+                                const isConnectorActive = isDelivered || index < currentStepIndex;
+                                const StepIcon = step.icon;
+                                
+                                return (
+                                  <div className={`tracking-step step-${step.key} ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isDelivered ? 'delivered-all' : ''}`} key={step.key}>
+                                    <div className="step-icon-container">
+                                      <StepIcon size={16} strokeWidth={isCompleted ? 2.5 : 2} />
+                                    </div>
+                                    <span className="step-label">{step.label}</span>
+                                    {index < orderSteps.length - 1 && (
+                                      <div className={`step-connector ${isConnectorActive ? 'active' : ''}`} />
                                     )}
                                   </div>
-                                  <div className="order-item-info">
-                                    <h4 className="item-title">{item.name}</h4>
-                                    <div className="item-meta-row">
-                                      {item.variant && <span className="item-variant-tag">{item.variant}</span>}
-                                      <span className="item-qty-tag">Qty: {item.quantity}</span>
-                                      <span className="item-price-tag">₹{item.price * item.quantity}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
-
-                            {/* Order Footer & Actions */}
-                            <div className="order-master-footer">
-                              <div className="order-shipping-summary">
-                                <MapPin size={14} className="pin-icon" />
-                                <span>
-                                  {order.deliveryAddress?.address ? `${order.deliveryAddress.address}, ${order.deliveryAddress.city} - ${order.deliveryAddress.zipCode}` : 'Standard Shipping Address'}
-                                </span>
-                              </div>
-
-                              <div className="order-cost-actions-row">
-                                <div className="order-cost-pod">
-                                  <span className="cost-lbl">Total Paid:</span>
-                                  <span className="cost-val">₹{order.totalAmount}</span>
-                                </div>
-
-                                <div className="order-action-buttons">
-                                  {isPending && (
-                                    <button
-                                      type="button"
-                                      className="btn-cancel-order"
-                                      onClick={() => handleCancelOrder(order._id)}
-                                    >
-                                      Cancel Order
-                                    </button>
-                                  )}
-                                  <Link href="/products" className="btn-reorder-harvest">
-                                    <RotateCcw size={13} />
-                                    <span>Buy Again</span>
-                                  </Link>
-                                </div>
-                              </div>
-                            </div>
-
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                </div>
-              )}
-
-              {/* ─────────────────────────────────────────────────────────────
-                  TAB 2: SHIPPING HUB & ADDRESS
-              ───────────────────────────────────────────────────────────── */}
-              {activeTab === 'address' && (
-                <div className="lounge-tab-pane animate-fade-in">
-                  
-                  <div className="pane-header-row">
-                    <div>
-                      <h2 className="pane-headline">Shipping Hub &amp; Delivery Places</h2>
-                      <p className="pane-subtext">Manage verified delivery destinations for express doorstep delivery.</p>
-                    </div>
-                    {!isEditingAddress && (
-                      <button
-                        type="button"
-                        className="btn-pane-action"
-                        onClick={() => setIsEditingAddress(true)}
-                      >
-                        <Edit3 size={15} />
-                        <span>Edit Address</span>
-                      </button>
-                    )}
-                  </div>
-
-                  {!isEditingAddress ? (
-                    <div className="address-display-card">
-                      <div className="address-card-top">
-                        <div className="address-chip default">
-                          <CheckCircle2 size={13} />
-                          <span>Primary Delivery Address</span>
-                        </div>
-                        <span className="address-state-badge">100% Express Route</span>
-                      </div>
-
-                      <div className="address-details-body">
-                        <h3 className="recipient-name">{user?.name || 'Valued Patron'}</h3>
-                        <p className="street-line">
-                          {user?.deliveryAddress?.address || 'No street address saved yet.'}
-                        </p>
-                        <p className="city-line">
-                          {user?.deliveryAddress?.city ? `${user.deliveryAddress.city}, ${user.deliveryAddress.state || 'Tamil Nadu'} - ${user.deliveryAddress.zipCode}` : 'Click edit below to add city & pincode.'}
-                        </p>
-                        <div className="phone-line">
-                          <Phone size={14} />
-                          <span>{user?.phone || 'Add phone number in profile'}</span>
-                        </div>
-                      </div>
-
-                      <div className="address-card-bottom">
-                        <button
-                          type="button"
-                          className="btn-edit-inline"
-                          onClick={() => setIsEditingAddress(true)}
-                        >
-                          <Edit3 size={14} />
-                          <span>Update Address Details</span>
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleSaveAddress} className="lounge-form-card">
-                      <div className="form-card-title">
-                        <MapPin size={18} />
-                        <span>Update Delivery Destination</span>
-                      </div>
-
-                      <div className="lounge-form-grid">
-                        <div className="form-group full">
-                          <label>Full Door / Street Address *</label>
-                          <textarea
-                            rows={3}
-                            required
-                            placeholder="Door No, Street Name, Landmark"
-                            value={addressForm.address}
-                            onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })}
-                          />
-                        </div>
-
-                        <div className="form-group">
-                          <label>City / Town *</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="e.g. Coimbatore"
-                            value={addressForm.city}
-                            onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
-                          />
-                        </div>
-
-                        <div className="form-group">
-                          <label>Pincode / Postal Code *</label>
-                          <input
-                            type="text"
-                            required
-                            maxLength={6}
-                            placeholder="641001"
-                            value={addressForm.zipCode}
-                            onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value.replace(/\D/g, '') })}
-                          />
-                        </div>
-
-                        <div className="form-group full">
-                          <label>State</label>
-                          <input
-                            type="text"
-                            value={addressForm.state}
-                            onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-actions-bar">
-                        <button
-                          type="button"
-                          className="btn-form-cancel"
-                          onClick={() => setIsEditingAddress(false)}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="btn-form-submit"
-                          disabled={savingAddress}
-                        >
-                          {savingAddress ? (
-                            <>
-                              <Loader2 size={16} className="lounge-spin-icon" />
-                              <span>Saving Address...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Save size={16} />
-                              <span>Save Delivery Address</span>
-                            </>
                           )}
-                        </button>
-                      </div>
-                    </form>
-                  )}
 
-                </div>
-              )}
-
-              {/* ─────────────────────────────────────────────────────────────
-                  TAB 3: ACCOUNT IDENTITY & SECURITY
-              ───────────────────────────────────────────────────────────── */}
-              {activeTab === 'profile' && (
-                <div className="lounge-tab-pane animate-fade-in">
-                  
-                  <div className="pane-header-row">
-                    <div>
-                      <h2 className="pane-headline">Account Identity &amp; Security</h2>
-                      <p className="pane-subtext">Manage your verified member identity and account credentials.</p>
-                    </div>
-                  </div>
-
-                  <form onSubmit={handleSaveProfile} className="lounge-form-card">
-                    <div className="form-card-title">
-                      <User size={18} />
-                      <span>Personal Identity Details</span>
-                    </div>
-
-                    <div className="lounge-form-grid">
-                      <div className="form-group">
-                        <label>Full Name *</label>
-                        <input
-                          type="text"
-                          required
-                          value={profileForm.name}
-                          onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                        />
-                      </div>
-
-                      <div className="form-group">
-                        <label>Contact Mobile Number</label>
-                        <input
-                          type="tel"
-                          placeholder="+91 98765 43210"
-                          value={profileForm.phone}
-                          onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                        />
-                      </div>
-
-                      <div className="form-group full">
-                        <label>Registered Email Address</label>
-                        <input
-                          type="email"
-                          disabled
-                          value={user?.email || ''}
-                          style={{ background: '#f8faf9', cursor: 'not-allowed', color: '#6b7280' }}
-                        />
-                        <span className="field-hint">Email address is permanently linked to your verified patron profile.</span>
-                      </div>
-                    </div>
-
-                    <div className="lounge-form-divider" />
-
-                    <div className="form-card-title">
-                      <ShieldCheck size={18} />
-                      <span>Security &amp; Password (Optional)</span>
-                    </div>
-
-                    <div className="lounge-form-grid">
-                      <div className="form-group">
-                        <label>Current Password</label>
-                        <input
-                          type="password"
-                          placeholder="Enter to authorize password update"
-                          value={profileForm.currentPassword}
-                          onChange={(e) => setProfileForm({ ...profileForm, currentPassword: e.target.value })}
-                        />
-                      </div>
-
-                      <div className="form-group">
-                        <label>New Password</label>
-                        <input
-                          type="password"
-                          placeholder="Min 6 characters"
-                          value={profileForm.newPassword}
-                          onChange={(e) => setProfileForm({ ...profileForm, newPassword: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-actions-bar">
-                      <button
-                        type="submit"
-                        className="btn-form-submit"
-                        disabled={savingProfile}
-                      >
-                        {savingProfile ? (
-                          <>
-                            <Loader2 size={16} className="lounge-spin-icon" />
-                            <span>Updating Profile...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Save size={16} />
-                            <span>Save Changes</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
-
-                </div>
-              )}
-
-              {/* ─────────────────────────────────────────────────────────────
-                  TAB 4: HARVEST VOUCHERS & PERKS
-              ───────────────────────────────────────────────────────────── */}
-              {activeTab === 'coupons' && (
-                <div className="lounge-tab-pane animate-fade-in">
-                  
-                  <div className="pane-header-row">
-                    <div>
-                      <h2 className="pane-headline">Member Harvest Vouchers &amp; Perks</h2>
-                      <p className="pane-subtext">Exclusive privilege codes valid for instant deductions on checkout.</p>
-                    </div>
-                  </div>
-
-                  <div className="vouchers-cards-grid">
-                    {coupons.map((coupon, idx) => (
-                      <div key={idx} className="voucher-ticket-card">
-                        
-                        <div className="voucher-left-stub">
-                          <span className="voucher-discount-val">
-                            {coupon.discountType === 'percent' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}`}
-                          </span>
-                          <span className="voucher-discount-tag">DISCOUNT</span>
-                        </div>
-
-                        <div className="voucher-ticket-divider" />
-
-                        <div className="voucher-right-body">
-                          <div className="voucher-header">
-                            <span className="voucher-code-badge">{coupon.code}</span>
-                            <span className="voucher-min-tag">Min ₹{coupon.minOrder || 299}</span>
-                          </div>
-                          
-                          <p className="voucher-desc-text">{coupon.desc || 'Applicable across all pure organic products.'}</p>
-                          
-                          <div className="voucher-actions-row">
-                            <span className="voucher-expiry-hint">✓ 100% Verified Valid</span>
-                            <button
-                              type="button"
-                              className={`btn-copy-voucher ${copiedCode === coupon.code ? 'copied' : ''}`}
-                              onClick={() => handleCopyCoupon(coupon.code)}
-                            >
-                              {copiedCode === coupon.code ? (
-                                <>
-                                  <Check size={13} />
-                                  <span>Copied</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Copy size={13} />
-                                  <span>Copy Code</span>
-                                </>
-                              )}
+                          {/* Current Status Message */}
+                          <div className="tracking-current-status-box">
+                            <div className="status-box-content">
+                              <Package size={20} color={isCancelled ? '#ef4444' : '#0f3d2a'} />
+                              <div className="status-text-stack">
+                                <strong>{isCancelled ? 'Order Cancelled' : orderSteps[currentStepIndex]?.label || 'Pending'}</strong>
+                                <p>{statusMessage}</p>
+                              </div>
+                            </div>
+                            <button className="btn-track-action">
+                              Track Package <ChevronRight size={16} />
                             </button>
                           </div>
                         </div>
-
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
+                )}
+              </>
+            )}
 
+            {activeTab === 'address' && (
+              <div className="tab-content-panel animate-fade-in">
+                <div className="tab-header">
+                  <h3>Saved Addresses</h3>
+                  {!isEditingAddress && (
+                    <button className="btn-add-new" onClick={() => setIsEditingAddress(true)}>
+                      + {user?.deliveryAddress?.address ? 'Edit Address' : 'Add New Address'}
+                    </button>
+                  )}
                 </div>
-              )}
 
-              {/* ─────────────────────────────────────────────────────────────
-                  TAB 5: FARM CONCIERGE & INQUIRY
-              ───────────────────────────────────────────────────────────── */}
-              {activeTab === 'support' && (
-                <div className="lounge-tab-pane animate-fade-in">
-                  
-                  <div className="pane-header-row">
-                    <div>
-                      <h2 className="pane-headline">Farm Concierge &amp; Priority Desk</h2>
-                      <p className="pane-subtext">Direct priority assistance for our valued organic patrons.</p>
-                    </div>
+                {addressMessage && (
+                  <div style={{
+                    padding: '10px 14px', 
+                    borderRadius: '8px', 
+                    marginBottom: '16px', 
+                    fontSize: '0.85rem',
+                    background: addressMessage.type === 'success' ? '#dcfce7' : '#fee2e2',
+                    color: addressMessage.type === 'success' ? '#14532d' : '#991b1b'
+                  }}>
+                    {addressMessage.text}
                   </div>
+                )}
 
-                  <div className="concierge-cards-grid">
-                    
-                    {/* Inquiry Form */}
-                    <form onSubmit={handleSupportSubmit} className="lounge-form-card concierge-form">
-                      <div className="form-card-title">
-                        <MessageSquare size={18} />
-                        <span>Send Message to Head Agronomist</span>
+                {isEditingAddress ? (
+                  <form className="account-details-form" onSubmit={handleSaveAddress}>
+                    <div className="form-group">
+                      <label>Street Address / Door No. / Area *</label>
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="e.g. 12, Main Road, Anna Nagar" 
+                        value={addressForm.address} 
+                        onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })} 
+                        className="form-input" 
+                      />
+                    </div>
+                    <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label>City / Town *</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="e.g. Coimbatore" 
+                          value={addressForm.city} 
+                          onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })} 
+                          className="form-input" 
+                        />
                       </div>
-
-                      {supportSuccess && (
-                        <div className="support-success-banner">
-                          <CheckCircle2 size={20} />
-                          <div>
-                            <strong>Inquiry Registered!</strong>
-                            <p>Our concierge team will respond directly via email or call within 4 hours.</p>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="lounge-form-grid">
-                        <div className="form-group full">
-                          <label>Inquiry Subject / Topic</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. Bulk Cold-Pressed Oil Order / Delivery Query"
-                            value={supportSubject}
-                            onChange={(e) => setSupportSubject(e.target.value)}
-                          />
-                        </div>
-
-                        <div className="form-group full">
-                          <label>Your Message / Requirement *</label>
-                          <textarea
-                            rows={4}
-                            required
-                            placeholder="Tell us how we can assist you with your organic harvest order..."
-                            value={supportMessage}
-                            onChange={(e) => setSupportMessage(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-actions-bar">
-                        <button
-                          type="submit"
-                          className="btn-form-submit"
-                          disabled={sendingSupport}
-                        >
-                          {sendingSupport ? (
-                            <>
-                              <Loader2 size={16} className="lounge-spin-icon" />
-                              <span>Sending Inquiry...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Send size={15} />
-                              <span>Send Priority Inquiry</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </form>
-
-                    {/* Direct Contact Cards */}
-                    <div className="concierge-direct-cluster">
-                      <div className="concierge-direct-card whatsapp">
-                        <div className="direct-card-icon">
-                          <MessageSquare size={24} />
-                        </div>
-                        <h3>Instant WhatsApp Chat</h3>
-                        <p>Direct priority line for instant dispatch tracking and wholesale inquiries.</p>
-                        <a
-                          href="https://wa.me/918778476414"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-direct-connect"
-                        >
-                          <span>Open WhatsApp (+91 87784 76414)</span>
-                          <ExternalLink size={14} />
-                        </a>
-                      </div>
-
-                      <div className="concierge-direct-card email">
-                        <div className="direct-card-icon">
-                          <Mail size={24} />
-                        </div>
-                        <h3>Email Farm Support</h3>
-                        <p>Write directly to our quality assurance and harvest operations team.</p>
-                        <a
-                          href="mailto:theventhulir@gmail.com"
-                          className="btn-direct-connect email"
-                        >
-                          <span>theventhulir@gmail.com</span>
-                          <ArrowRight size={14} />
-                        </a>
+                      <div>
+                        <label>State *</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="Tamil Nadu" 
+                          value={addressForm.state} 
+                          onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })} 
+                          className="form-input" 
+                        />
                       </div>
                     </div>
-
+                    <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label>Pincode / ZIP *</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="641001" 
+                          value={addressForm.zipCode} 
+                          onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })} 
+                          className="form-input" 
+                        />
+                      </div>
+                      <div>
+                        <label>Contact Phone Number *</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="9876543210" 
+                          value={addressForm.phone} 
+                          onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })} 
+                          className="form-input" 
+                        />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                      <button type="submit" disabled={addressSaving} className="btn-save-changes">
+                        {addressSaving ? 'Saving Address...' : 'Save Address'}
+                      </button>
+                      <button type="button" className="btn-cancel" onClick={() => setIsEditingAddress(false)} style={{
+                        padding: '10px 20px',
+                        background: '#f1f5f9',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}>
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : user?.deliveryAddress?.address ? (
+                  <div className="address-grid">
+                    <div className="address-card default-address">
+                      <div className="address-card-header">
+                        <span className="address-type-badge">Home (Default)</span>
+                        <div className="address-actions">
+                          <button className="icon-btn" onClick={() => setIsEditingAddress(true)} title="Edit Address">
+                            <Edit3 size={16}/>
+                          </button>
+                        </div>
+                      </div>
+                      <strong>{user?.name || 'Customer Name'}</strong>
+                      <p style={{ marginTop: '8px', lineHeight: '1.5' }}>
+                        {user.deliveryAddress.address}
+                        <br/>
+                        {[user.deliveryAddress.city, user.deliveryAddress.state].filter(Boolean).join(', ')}
+                        {user.deliveryAddress.zipCode ? ` - ${user.deliveryAddress.zipCode}` : ''}
+                      </p>
+                      <span className="address-phone" style={{ display: 'block', marginTop: '8px', fontWeight: '600', color: '#0f3d2a' }}>
+                        Ph: {user?.phone || 'Not provided'}
+                      </span>
+                    </div>
                   </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', border: '2px dashed #cbd5e1', borderRadius: '12px', background: '#fafafa' }}>
+                    <MapPin size={40} color="#64748b" style={{ marginBottom: '12px' }} />
+                    <h4 style={{ margin: '0 0 6px', color: '#1e293b' }}>No Saved Address Found</h4>
+                    <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: '0.88rem' }}>Please enter your delivery address so we can ship your harvest faster.</p>
+                    <button className="btn-add-new" onClick={() => setIsEditingAddress(true)}>+ Add Delivery Address</button>
+                  </div>
+                )}
+              </div>
+            )}
 
+            {activeTab === 'profile' && (
+              <div className="tab-content-panel animate-fade-in">
+                <div className="tab-header">
+                  <h3>Account Details</h3>
                 </div>
-              )}
 
-            </main>
+                {profileMessage && (
+                  <div style={{
+                    padding: '10px 14px', 
+                    borderRadius: '8px', 
+                    marginBottom: '16px', 
+                    fontSize: '0.85rem',
+                    background: profileMessage.type === 'success' ? '#dcfce7' : '#fee2e2',
+                    color: profileMessage.type === 'success' ? '#14532d' : '#991b1b'
+                  }}>
+                    {profileMessage.text}
+                  </div>
+                )}
 
+                <form className="account-details-form" onSubmit={handleSaveProfile}>
+                  <div className="form-group">
+                    <label>Full Name</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={profileForm.name} 
+                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} 
+                      className="form-input" 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email Address</label>
+                    <input type="email" value={user?.email || ''} readOnly className="form-input readonly-input" />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone Number</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={profileForm.phone} 
+                      onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} 
+                      className="form-input" 
+                    />
+                  </div>
+                  <button type="submit" disabled={profileSaving} className="btn-save-changes">
+                    {profileSaving ? 'Saving Changes...' : 'Save Changes'}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {(activeTab === 'vouchers' || activeTab === 'coupons') && (
+              <div className="tab-content-panel animate-fade-in">
+                <div className="tab-header">
+                  <h3>My Vouchers</h3>
+                </div>
+                <div className="vouchers-grid">
+                  <div className="voucher-card">
+                    <div className="voucher-left">
+                      <span className="voucher-code">WELCOME20</span>
+                      <span className="voucher-desc">Flat 20% off on your next order</span>
+                    </div>
+                    <button className="btn-copy-code">Copy</button>
+                  </div>
+                  <div className="voucher-card">
+                    <div className="voucher-left">
+                      <span className="voucher-code">FREESHIP</span>
+                      <span className="voucher-desc">Free shipping on orders above ₹999</span>
+                    </div>
+                    <button className="btn-copy-code">Copy</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'support' && (
+              <div className="tab-content-panel animate-fade-in">
+                <div className="tab-header">
+                  <h3>Help & Support</h3>
+                </div>
+                <div className="support-content">
+                  <p>Need help with your order or have a question about our organic products? We are always here to assist you.</p>
+                  <div className="support-contact-cards">
+                    <div className="contact-card">
+                      <HelpCircle size={24} color="#114529" />
+                      <strong>Email Support</strong>
+                      <span>support@venthulir.com</span>
+                    </div>
+                    <div className="contact-card whatsapp-card">
+                      <CheckCircle2 size={24} color="#25D366" />
+                      <strong>WhatsApp Support</strong>
+                      <span>+91 87784 76414</span>
+                      <a href="https://wa.me/918778476414" target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                        <button className="btn-whatsapp-chat">Chat on WhatsApp</button>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Right Sidebar */}
+        <aside className="right-sidebar-stack">
+          
+          <div className="right-card shipping-card">
+            <div className="shipping-card-left">
+              <Truck size={24} className="shipping-icon" />
+              <div className="shipping-text">
+                <strong>Free Shipping</strong>
+                <span>On orders above ₹999</span>
+              </div>
+            </div>
+            <div className="arrow-circle-btn">
+              <ArrowRight size={14} />
+            </div>
           </div>
 
-        </div>
-      </section>
+          <div className="right-card">
+            <h3 className="quick-links-title">Quick Links</h3>
+            <div className="quick-link-item" onClick={() => setActiveTab('address')}>
+              <div className="quick-link-left">
+                <span className="ql-icon-badge ql-teal"><MapPin size={15} /></span>
+                Update Address
+              </div>
+              <ChevronRight size={14} color="#94a3b8" />
+            </div>
+            <div className="quick-link-item" onClick={() => setActiveTab('profile')}>
+              <div className="quick-link-left">
+                <span className="ql-icon-badge ql-amber"><Lock size={15} /></span>
+                Change Password
+              </div>
+              <ChevronRight size={14} color="#94a3b8" />
+            </div>
+            <div className="quick-link-item" onClick={() => setActiveTab('coupons')}>
+              <div className="quick-link-left">
+                <span className="ql-icon-badge ql-purple"><Tag size={15} /></span>
+                View Vouchers (3)
+              </div>
+              <ChevronRight size={14} color="#94a3b8" />
+            </div>
+            <div className="quick-link-item" onClick={() => setActiveTab('support')}>
+              <div className="quick-link-left">
+                <span className="ql-icon-badge ql-blue"><HelpCircle size={15} /></span>
+                Need Help?
+              </div>
+              <ChevronRight size={14} color="#94a3b8" />
+            </div>
+          </div>
 
+          <div className="right-card brand-card">
+            <div className="brand-card-header">
+              <Sparkles size={18} color="#d97706" />
+              Pure. Fresh. Natural.
+            </div>
+            <p>From our farms to your home,<br/>with love and care.</p>
+          </div>
+
+        </aside>
+
+      </div>
     </div>
   );
 }

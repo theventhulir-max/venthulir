@@ -110,8 +110,7 @@ function MainApp() {
     setCheckoutData(cartSummary);
   };
 
-  const location = useLocation();
-  const hideFooter = ['/login', '/signin', '/register', '/auth', '/profile', '/account'].includes(location.pathname.toLowerCase().replace(/\/$/, ''));
+  const hideFooter = ['/login', '/signin', '/register', '/auth', '/profile', '/account', '/checkout'].includes(location.pathname.toLowerCase().replace(/\/$/, ''));
 
   return (
     <>

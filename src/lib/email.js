@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer';
 
 // Configure Nodemailer with Direct Gmail SMTP (Google SPF & DKIM Authenticated)
-const emailUser = (process.env.EMAIL_USER || 'theventhulir@gmail.com').trim();
-const emailPass = (process.env.EMAIL_PASS || 'wcky ijfw tqgx yivb').replace(/\s+/g, '');
+const emailUser = (process.env.EMAIL_USER || '').trim();
+const emailPass = (process.env.EMAIL_PASS || '').replace(/\s+/g, '');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',

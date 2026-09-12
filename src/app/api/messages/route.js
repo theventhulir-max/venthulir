@@ -31,7 +31,10 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     await connectDB();
-    const { customerName, customerEmail, message } = await request.json();
+    const body = await request.json();
+    const customerName = body.customerName || body.name;
+    const customerEmail = body.customerEmail || body.email;
+    const message = body.message;
 
     if (!customerName || !customerEmail || !message) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });

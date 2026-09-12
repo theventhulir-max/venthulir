@@ -10,3 +10,4 @@ dist/
 *backup*/
 .next/
 .env.local
+scratch/

@@ -90,22 +90,30 @@ export async function GET(request) {
         Product.countDocuments(query)
       ]);
 
-      // Map image fallbacks based on category/name if not provided
+      // Map image fallbacks based on category/name ONLY if image is missing
       const formattedProducts = products.map(p => {
-        let img = p.imageUrl || (p.images && p.images[0]);
-        if (!img) {
+        let rawImg = p.imageUrl || (p.images && p.images[0]);
+        let img = rawImg;
+        if (!img || (typeof img === 'string' && img.trim() === '')) {
+          const name = (p.name || '').toLowerCase();
           const cat = (p.category || '').toLowerCase();
-          if (cat.includes('oil')) img = '/assets/hero/oil_coconut.png';
-          else if (cat.includes('chilli')) img = '/assets/hero/chilli.png';
-          else if (cat.includes('coriander')) img = '/assets/hero/coriander.png';
-          else if (cat.includes('sambar')) img = '/assets/hero/sambar.png';
-          else if (cat.includes('garam') || cat.includes('masala')) img = '/assets/hero/garam_masala.png';
+          if (name.includes('turmeric') || name.includes('manjal') || name.includes('yellow')) img = '/assets/hero/turmeric.png';
+          else if (name.includes('chilli') || name.includes('chili') || name.includes('red')) img = '/assets/hero/chilli.png';
+          else if (name.includes('coriander') || name.includes('mallie')) img = '/assets/hero/coriander.png';
+          else if (name.includes('sambar') || name.includes('masala')) img = '/assets/hero/sambar.png';
+          else if (name.includes('coconut')) img = '/assets/hero/oil_coconut.png';
+          else if (name.includes('groundnut')) img = '/assets/hero/oil_groundnut.png';
+          else if (name.includes('gingelly') || name.includes('sesame')) img = '/assets/hero/oil_gingelly.png';
+          else if (name.includes('oil') || cat.includes('oil')) img = '/assets/hero/oil_sunflower.png';
           else img = '/assets/hero/turmeric.png';
         }
         return {
           ...p,
+          _id: p._id.toString(),
+          id: p._id.toString(),
           imageUrl: img,
-          images: p.images && p.images.length > 0 ? p.images : [img]
+          image: img,
+          images: [img]
         };
       });
 
@@ -125,7 +133,7 @@ export async function GET(request) {
       return NextResponse.json(responsePayload, {
         headers: {
           'X-Cache': 'MISS',
-          'Cache-Control': isPublicQuery ? 'public, s-maxage=60, stale-while-revalidate=300' : 'no-store'
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
       });
     }
