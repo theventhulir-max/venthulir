@@ -796,37 +796,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="right-card">
-            <h3 className="quick-links-title">Quick Links</h3>
-            <div className="quick-link-item" onClick={() => setActiveTab('address')}>
-              <div className="quick-link-left">
-                <span className="ql-icon-badge ql-teal"><MapPin size={15} /></span>
-                Update Address
-              </div>
-              <ChevronRight size={14} color="#94a3b8" />
-            </div>
-            <div className="quick-link-item" onClick={() => setActiveTab('profile')}>
-              <div className="quick-link-left">
-                <span className="ql-icon-badge ql-amber"><Lock size={15} /></span>
-                Change Password
-              </div>
-              <ChevronRight size={14} color="#94a3b8" />
-            </div>
-            <div className="quick-link-item" onClick={() => setActiveTab('coupons')}>
-              <div className="quick-link-left">
-                <span className="ql-icon-badge ql-purple"><Tag size={15} /></span>
-                View Vouchers (3)
-              </div>
-              <ChevronRight size={14} color="#94a3b8" />
-            </div>
-            <div className="quick-link-item" onClick={() => setActiveTab('support')}>
-              <div className="quick-link-left">
-                <span className="ql-icon-badge ql-blue"><HelpCircle size={15} /></span>
-                Need Help?
-              </div>
-              <ChevronRight size={14} color="#94a3b8" />
-            </div>
-          </div>
+
 
           <div className="right-card brand-card">
             <div className="brand-card-header">
