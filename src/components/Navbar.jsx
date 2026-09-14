@@ -34,10 +34,10 @@ import {
 import './Navbar.css';
 
 const QUICK_CATEGORIES = [
-  { id: 'all',          name: 'All Products',      emoji: '🌿' },
-  { id: 'spices',       name: 'Spice Powders',     emoji: '🌶️', filter: 'Spice Powders' },
-  { id: 'masalas',      name: 'Masala Blends',     emoji: '🍲', filter: 'Masala Blends' },
+  { id: 'all',          name: 'All Harvest',       emoji: '🌿' },
+  { id: 'spices',       name: 'Spices & Powders',  emoji: '🌶️', filter: 'Spices & Powders' },
   { id: 'oils',         name: 'Cold-Pressed Oils', emoji: '🛢️', filter: 'Cold-Pressed Oils' },
+  { id: 'masalas',      name: 'Heritage Masalas',  emoji: '🍲', filter: 'Masala Blends' },
 ];
 
 const ANNOUNCEMENTS = [
@@ -52,7 +52,8 @@ const TRENDING_SEARCHES = [
   'Red Chilli',
   'Cold-Pressed Gingelly Oil',
   'Sambar Powder',
-  'Coconut Oil'
+  'Groundnut Oil',
+  'powder'
 ];
 
 export default function Navbar({ onAuthOpen, onSearchOpen }) {
@@ -64,6 +65,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [categoryDropOpen, setCategoryDropOpen] = useState(false);
+  const [catalog, setCatalog] = useState(INITIAL_PRODUCTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -79,6 +81,14 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
 
   useEffect(() => {
     setMounted(true);
+    fetch('/api/products?limit=100', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.products) && data.products.length > 0) {
+          setCatalog(data.products);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -101,9 +111,9 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
     router.push('/login');
   };
 
-  // Enhanced fuzzy matching for instant search
+  // Enhanced fuzzy matching for instant search across live unified catalog
   const searchResults = searchQuery.trim()
-    ? INITIAL_PRODUCTS.filter((p) => {
+    ? catalog.filter((p) => {
         const query = searchQuery.toLowerCase().trim();
         const name = (p.name || '').toLowerCase();
         const cat = (p.category || '').toLowerCase();
@@ -629,7 +639,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
                     href="/profile"
                     className="mobile-auth-cta"
                     onClick={() => setMenuOpen(false)}
-                    style={{ background: '#0f3d2a' }}
+                    style={{ background: '#166534' }}
                   >
                     <User size={16} />
                     <span>My Profile &amp; Orders</span>

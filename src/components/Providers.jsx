@@ -9,15 +9,9 @@ import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import AuthModal from '@/components/AuthModal';
 import CheckoutModal from '@/components/CheckoutModal';
+import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Lenis from 'lenis';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 const UIModalContext = createContext();
 export const useUIModal = () => useContext(UIModalContext);
@@ -31,33 +25,7 @@ function ProvidersInner({ children }) {
   const isAdminRoute = pathname?.startsWith('/admin');
   const isProfileRoute = pathname?.startsWith('/profile') || pathname?.startsWith('/account');
 
-  useEffect(() => {
-    // Disable smooth-scroll hijacker on Admin and Profile dashboards so inner dual-pane scrolling works natively
-    if (isAdminRoute || isProfileRoute) {
-      return;
-    }
 
-    const lenis = new Lenis({
-      lerp: 0.08,
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      syncTouch: false,
-    });
-
-    lenis.on('scroll', ScrollTrigger.update);
-
-    const updateLenis = (time) => {
-      lenis.raf(time * 1000);
-    };
-
-    gsap.ticker.add(updateLenis);
-    gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      gsap.ticker.remove(updateLenis);
-      lenis.destroy();
-    };
-  }, [isAdminRoute, isProfileRoute]);
 
   const router = useRouter();
 
@@ -90,6 +58,8 @@ function ProvidersInner({ children }) {
       <main>{children}</main>
 
       {!hideFooter && <Footer />}
+
+      {!isAdminRoute && <FloatingWhatsApp />}
 
       {authOpen && (
         <AuthModal

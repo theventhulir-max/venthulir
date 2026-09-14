@@ -71,13 +71,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0f3d2a;
+  color: #166534;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .cart-close:hover { 
-  background: #0f3d2a; 
+  background: #166534; 
   color: #ffffff;
 }
 
@@ -163,7 +163,7 @@
   font-family: 'Outfit', sans-serif;
   font-size: 0.92rem; 
   font-weight: 800; 
-  color: #0d291c; 
+  color: #14422e; 
   margin-bottom: 2px; 
   white-space: nowrap; 
   overflow: hidden; 
@@ -180,7 +180,7 @@
 .cart-item-price { 
   font-size: 0.95rem; 
   font-weight: 850; 
-  color: #0f3d2a; 
+  color: #166534; 
 }
 
 .cart-item-actions { 
@@ -204,7 +204,7 @@
   background: transparent;
   border: none;
   padding: 6px 9px;
-  color: #0f3d2a;
+  color: #166534;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -220,7 +220,7 @@
   font-weight: 800; 
   min-width: 22px; 
   text-align: center; 
-  color: #0d291c;
+  color: #14422e;
 }
 
 .remove-btn {
@@ -256,7 +256,7 @@
   gap: 8px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #0f3d2a;
+  color: #166534;
   background: #edf6f1;
   border: 1px solid #cbe4d6;
   padding: 10px 14px;
@@ -285,20 +285,21 @@
 }
 
 .coupon-row button {
-  background: linear-gradient(135deg, #0f3d2a 0%, #175a3e 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: #ffffff;
   border: none;
   padding: 8px 18px;
   border-radius: var(--radius-full, 9999px);
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 850;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(15, 61, 42, 0.2);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
 }
 
 .coupon-row button:hover {
-  background: linear-gradient(135deg, #c9922c 0%, #a87317 100%);
+  background: linear-gradient(135deg, #fbbf24 0%, #ea580c 100%);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
 }
 
 .coupon-error   { font-size: 0.78rem; color: #dc2626; font-weight: 600; }

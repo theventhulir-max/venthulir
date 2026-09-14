@@ -84,17 +84,17 @@ function ProductsPageContent({ onCheckout }) {
       if (cat && cat !== 'All') params.set('category', cat);
       if (query && query.trim()) params.set('search', query.trim());
       if (sort) params.set('sort', sort);
-      params.set('limit', '48');
+      params.set('limit', '60');
 
       const res = await fetch(`${API}/products?${params.toString()}&_t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        if (data && Array.isArray(data.products) && data.products.length > 0) {
+        if (data && Array.isArray(data.products)) {
           setProducts(data.products);
         }
       }
     } catch (err) {
-      console.error('Catalog fetch fallback:', err);
+      console.error('Catalog fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -111,7 +111,7 @@ function ProductsPageContent({ onCheckout }) {
     }
   }, [activeCategory, searchQuery, sortBy, fetchCatalog]);
 
-  const categories = ['All', 'Spices', 'Cold-Pressed Oils', 'Masala Blends', 'Grains', 'Sweeteners', 'Herbal'];
+  const categories = ['All', 'Spices & Powders', 'Cold-Pressed Oils', 'Masala Blends', 'Grains', 'Sweeteners', 'Herbal'];
 
   const handleCategoryFilterClick = (catName) => {
     setActiveCategory(catName);
@@ -126,19 +126,14 @@ function ProductsPageContent({ onCheckout }) {
     .filter((p) => {
       let matchCategory = true;
       if (activeCategory && activeCategory !== 'All' && activeCategory !== 'all') {
-        const catLower = activeCategory.toLowerCase();
-        const pCatLower = (p.category || '').toLowerCase();
-        matchCategory = 
-          pCatLower === catLower ||
-          (catLower.includes('spice') && pCatLower.includes('spice')) ||
-          (catLower.includes('masala') && pCatLower.includes('masala')) ||
-          (catLower.includes('oil') && pCatLower.includes('oil'));
+        matchCategory = pMatchesCategory(activeCategory, p.category || '');
       }
 
       const matchSearch = !searchQuery || 
         p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()));
+        (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (p.badge && p.badge.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchCategory && matchSearch;
     })
     .sort((a, b) => {
@@ -146,7 +141,13 @@ function ProductsPageContent({ onCheckout }) {
       if (sortBy === 'price-desc') return (b.price || 0) - (a.price || 0);
       if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
       if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
-      return 0;
+      // Default: newest products first
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (timeA && timeB && timeA !== timeB) return timeB - timeA;
+      if (timeA && !timeB) return -1;
+      if (!timeA && timeB) return 1;
+      return (b._id || b.id || '').localeCompare(a._id || a.id || '');
     });
 
   const qvImages = quickViewProduct
@@ -222,8 +223,8 @@ function ProductsPageContent({ onCheckout }) {
           <div className="catalog-category-pills">
             {categories.map((cat) => {
               const isPillActive = 
-                activeCategory === cat || 
-                (cat !== 'All' && activeCategory && pMatchesCategory(cat, activeCategory));
+                (cat === 'All' && (activeCategory === 'All' || !activeCategory)) ||
+                (cat !== 'All' && activeCategory && activeCategory !== 'All' && pMatchesCategory(cat, activeCategory));
               return (
                 <button
                   key={cat}
@@ -483,9 +484,16 @@ function ProductsPageContent({ onCheckout }) {
 
 function pMatchesCategory(cat1, cat2) {
   if (!cat1 || !cat2) return false;
-  const c1 = cat1.toLowerCase();
-  const c2 = cat2.toLowerCase();
-  return c1 === c2 || (c1.includes('spice') && c2.includes('spice')) || (c1.includes('masala') && c2.includes('masala')) || (c1.includes('oil') && c2.includes('oil'));
+  const c1 = cat1.toLowerCase().trim();
+  const c2 = cat2.toLowerCase().trim();
+  if (c1 === c2 || c1 === 'all' || c2 === 'all') return true;
+  if ((c1.includes('spice') || c1.includes('powder')) && (c2.includes('spice') || c2.includes('powder'))) return true;
+  if (c1.includes('oil') && c2.includes('oil')) return true;
+  if (c1.includes('masala') && c2.includes('masala')) return true;
+  if ((c1.includes('grain') || c1.includes('rice') || c1.includes('millet')) && (c2.includes('grain') || c2.includes('rice') || c2.includes('millet'))) return true;
+  if ((c1.includes('sweet') || c1.includes('sugar') || c1.includes('jaggery') || c1.includes('honey')) && (c2.includes('sweet') || c2.includes('sugar') || c2.includes('jaggery') || c2.includes('honey'))) return true;
+  if (c1.includes('herb') && c2.includes('herb')) return true;
+  return false;
 }
 
 export default function ProductsPage(props) {

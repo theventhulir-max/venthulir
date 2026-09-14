@@ -7,7 +7,7 @@
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: radial-gradient(circle at 50% 45%, #0d2919 0%, #081a10 65%, #040d08 100%);
+  background: radial-gradient(circle at 50% 45%, #14532d 0%, #0f3d2a 60%, #09261a 100%);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -28,6 +28,7 @@ import {
 import OrderDetailModal from './components/OrderDetailModal';
 import RestockModal from './components/RestockModal';
 import ProductFormModal from './components/ProductFormModal';
+import ConfirmStatusModal from './components/ConfirmStatusModal';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/context/AuthContext';
 
@@ -43,6 +44,13 @@ export default function SimpleAdminDashboard() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [restockProduct, setRestockProduct] = useState(null);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [confirmStatusModal, setConfirmStatusModal] = useState({
+    isOpen: false,
+    order: null,
+    targetStatus: '',
+    isCancel: false
+  });
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const fetchStats = async () => {
     try {
@@ -91,13 +99,28 @@ export default function SimpleAdminDashboard() {
     return () => clearInterval(interval);
   }, [user]);
 
-  const handleOrderStatusUpdate = async (orderId, newStatus) => {
+  const promptOrderStatusUpdate = (order, newStatus, isCancel = false) => {
+    setConfirmStatusModal({
+      isOpen: true,
+      order,
+      targetStatus: newStatus,
+      isCancel
+    });
+  };
+
+  const executeOrderStatusUpdate = async () => {
+    const { order, targetStatus } = confirmStatusModal;
+    if (!order || !targetStatus) return;
+
+    const orderId = order._id || order.orderId;
+    setUpdatingStatus(true);
+
     // 1. Optimistic update in UI immediately
     setStats(prev => {
       if (!prev) return prev;
       const updatedOrders = (prev.recentOrders || []).map(o => {
         if (o._id === orderId || o.orderId === orderId) {
-          return { ...o, status: newStatus };
+          return { ...o, status: targetStatus };
         }
         return o;
       });
@@ -105,10 +128,10 @@ export default function SimpleAdminDashboard() {
     });
 
     if (selectedOrder && (selectedOrder._id === orderId || selectedOrder.orderId === orderId)) {
-      setSelectedOrder(prev => ({ ...prev, status: newStatus }));
+      setSelectedOrder(prev => ({ ...prev, status: targetStatus }));
     }
 
-    const token = localStorage.getItem('venthulir_token');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('venthulir_token') : null;
     try {
       const res = await fetch(`/api/orders/${orderId}`, {
         method: 'PUT',
@@ -116,12 +139,13 @@ export default function SimpleAdminDashboard() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: targetStatus })
       });
 
       if (res.ok) {
-        toast.success(`Order status updated to "${newStatus}"!`);
+        toast.success(`Order #${orderId.slice(-8).toUpperCase()} updated to "${targetStatus}"!`);
         await fetchStats();
+        setConfirmStatusModal({ isOpen: false, order: null, targetStatus: '', isCancel: false });
       } else {
         toast.error('Failed to update order status.');
         await fetchStats();
@@ -129,6 +153,8 @@ export default function SimpleAdminDashboard() {
     } catch {
       toast.error('Network error updating status.');
       await fetchStats();
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -583,16 +609,17 @@ export default function SimpleAdminDashboard() {
                       {status === 'pending' && (
                         <button
                           type="button"
-                          onClick={() => handleOrderStatusUpdate(ord._id || ord.orderId, 'Confirmed')}
+                          onClick={() => promptOrderStatusUpdate(ord, 'Confirmed')}
                           style={{
-                            background: '#0f3d2a',
+                            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
                             color: '#ffffff',
                             border: 'none',
-                            padding: '7px 14px',
+                            padding: '7px 15px',
                             borderRadius: '8px',
                             fontSize: '12px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)'
                           }}
                         >
                           Confirm
@@ -602,19 +629,20 @@ export default function SimpleAdminDashboard() {
                       {(status === 'confirmed' || status === 'processing') && (
                         <button
                           type="button"
-                          onClick={() => handleOrderStatusUpdate(ord._id || ord.orderId, 'Shipped')}
+                          onClick={() => promptOrderStatusUpdate(ord, 'Shipped')}
                           style={{
-                            background: '#7c3aed',
+                            background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
                             color: '#ffffff',
                             border: 'none',
                             padding: '7px 14px',
                             borderRadius: '8px',
                             fontSize: '12px',
-                            fontWeight: '600',
+                            fontWeight: '700',
                             cursor: 'pointer',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px'
+                            gap: '4px',
+                            boxShadow: '0 2px 6px rgba(139, 92, 246, 0.3)'
                           }}
                         >
                           <Truck size={13} />
@@ -625,19 +653,20 @@ export default function SimpleAdminDashboard() {
                       {status === 'shipped' && (
                         <button
                           type="button"
-                          onClick={() => handleOrderStatusUpdate(ord._id || ord.orderId, 'Delivered')}
+                          onClick={() => promptOrderStatusUpdate(ord, 'Delivered')}
                           style={{
-                            background: '#15803d',
+                            background: 'linear-gradient(135deg, #0284c7, #0369a1)',
                             color: '#ffffff',
                             border: 'none',
                             padding: '7px 14px',
                             borderRadius: '8px',
                             fontSize: '12px',
-                            fontWeight: '600',
+                            fontWeight: '700',
                             cursor: 'pointer',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px'
+                            gap: '4px',
+                            boxShadow: '0 2px 6px rgba(2, 132, 199, 0.3)'
                           }}
                         >
                           <Check size={13} />
@@ -839,7 +868,7 @@ export default function SimpleAdminDashboard() {
         <OrderDetailModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
-          onStatusChange={(newStatus) => handleOrderStatusUpdate(selectedOrder._id || selectedOrder.orderId, newStatus)}
+          onStatusChange={(newStatus, isCancel) => promptOrderStatusUpdate(selectedOrder, newStatus, isCancel)}
         />
       )}
 
@@ -856,6 +885,18 @@ export default function SimpleAdminDashboard() {
           product={null}
           onClose={() => setShowAddProductModal(false)}
           onSave={handleSaveNewProduct}
+        />
+      )}
+
+      {confirmStatusModal.isOpen && (
+        <ConfirmStatusModal
+          isOpen={confirmStatusModal.isOpen}
+          order={confirmStatusModal.order}
+          targetStatus={confirmStatusModal.targetStatus}
+          isCancel={confirmStatusModal.isCancel}
+          onConfirm={executeOrderStatusUpdate}
+          onClose={() => setConfirmStatusModal({ isOpen: false, order: null, targetStatus: '', isCancel: false })}
+          loading={updatingStatus}
         />
       )}
 

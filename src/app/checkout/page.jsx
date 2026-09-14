@@ -320,12 +320,29 @@ function CheckoutContent() {
     <div className="checkout-page-root">
       <div className="checkout-page-container">
         
-        {/* Top Header */}
+        {/* Top Header & Stepper */}
         <div className="checkout-top-header">
           <h1 className="checkout-top-title">Express Checkout</h1>
           <p className="checkout-top-subtext">
-            100% Secure Checkout • Authentic Farm Origin Guaranteed
+            100% Secure Checkout • Direct Farm Delivery
           </p>
+
+          <div className="checkout-stepper-bar">
+            <div className="step-item active">
+              <span className="step-num">1</span>
+              <span className="step-name">1. Delivery Location</span>
+            </div>
+            <div className="step-line" />
+            <div className="step-item">
+              <span className="step-num">2</span>
+              <span className="step-name">2. Payment</span>
+            </div>
+            <div className="step-line" />
+            <div className="step-item">
+              <span className="step-num">3</span>
+              <span className="step-name">3. Place Order</span>
+            </div>
+          </div>
         </div>
 
         {/* 2-Column Checkout Layout */}
@@ -534,7 +551,7 @@ function CheckoutContent() {
                   <div className="checkout-card-icon-wrap">
                     <ShoppingBag size={20} />
                   </div>
-                  <h2 className="checkout-card-title">Order Summary ({cartItems.reduce((s, i) => s + i.quantity, 0)} Items)</h2>
+                  <h2 className="checkout-card-title">3. Order Summary & Items ({cartItems.reduce((s, i) => s + i.quantity, 0)})</h2>
                 </div>
                 <Link 
                   href="/products" 

@@ -48,7 +48,7 @@ const CATEGORIES = [
     origin: 'Salem & Guntur Direct Farms',
     highlights: ['Salem Turmeric', 'Guntur Red Chilli', 'Erode Coriander', 'Black Pepper'],
     isFeatured: true,
-    accentGlow: 'rgba(220, 38, 38, 0.15)'
+    accentColor: '#166534'
   },
   { 
     id: 'oils',
@@ -64,7 +64,7 @@ const CATEGORIES = [
     origin: 'Native Tamil Nadu Chekku',
     highlights: ['Gingelly (Sesame)', 'Groundnut', 'Pure Coconut', 'Sunflower'],
     isFeatured: true,
-    accentGlow: 'rgba(217, 119, 6, 0.15)'
+    accentColor: '#166534'
   },
   { 
     id: 'masalas',
@@ -80,7 +80,7 @@ const CATEGORIES = [
     origin: 'Chettinad & Kongu Heritage',
     highlights: ['Traditional Sambar', 'Royal Garam Masala', 'Kongu Rasam Powder'],
     isFeatured: false,
-    accentGlow: 'rgba(180, 83, 9, 0.15)'
+    accentColor: '#166534'
   },
   { 
     id: 'rice',
@@ -95,7 +95,7 @@ const CATEGORIES = [
     origin: 'Thanjavur & Cauvery Delta',
     highlights: ['Karuppu Kavuni', 'Mappillai Samba', 'Poongar Rice', 'Native Millets'],
     isFeatured: false,
-    accentGlow: 'rgba(34, 197, 94, 0.15)'
+    accentColor: '#166534'
   },
   { 
     id: 'sweeteners',
@@ -110,7 +110,7 @@ const CATEGORIES = [
     origin: 'Tirunelveli Palm Groves',
     highlights: ['Palm Jaggery (Karupatti)', 'Country Sugar', 'Raw Forest Honey'],
     isFeatured: false,
-    accentGlow: 'rgba(234, 88, 12, 0.15)'
+    accentColor: '#166534'
   },
   { 
     id: 'herbal',
@@ -125,7 +125,7 @@ const CATEGORIES = [
     origin: 'Western Ghats Foothills',
     highlights: ['Avarampoo Infusion', 'Nilavembu Vitality', 'Tulsi Leaves', 'Moringa Powder'],
     isFeatured: false,
-    accentGlow: 'rgba(5, 150, 105, 0.15)'
+    accentColor: '#166534'
   },
 ];
 
@@ -200,9 +200,9 @@ const HERO_POWDERS = [
     tag: 'Authentic Ground Turmeric Roots',
     price: 'From ₹140',
     rating: '4.9 ★ (420+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fffef4 0%, #f6faf7 50%, #e2f0e8 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#166534',
-    auraGlow: 'rgba(22, 101, 52, 0.25)',
+    auraGlow: 'rgba(22, 101, 52, 0.15)',
   },
   {
     id: 'chilli-powder',
@@ -213,9 +213,9 @@ const HERO_POWDERS = [
     tag: 'Rich Heat & Zero Added Colors',
     price: 'From ₹150',
     rating: '4.9 ★ (380+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #fff7f5 0%, #fde0da 50%, #f8b8ab 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#991b1b',
-    auraGlow: 'rgba(153, 27, 27, 0.25)',
+    auraGlow: 'rgba(153, 27, 27, 0.15)',
   },
   {
     id: 'coriander-powder',
@@ -226,9 +226,9 @@ const HERO_POWDERS = [
     tag: 'Essential Daily Kitchen Aroma',
     price: 'From ₹130',
     rating: '4.8 ★ (310+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f5fcf7 0%, #dcf4e5 50%, #bae9cc 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#059669',
-    auraGlow: 'rgba(5, 150, 105, 0.25)',
+    auraGlow: 'rgba(5, 150, 105, 0.15)',
   },
   {
     id: 'garam-masala',
@@ -239,9 +239,9 @@ const HERO_POWDERS = [
     tag: 'Cardamom, Cinnamon, Cloves & Star Anise',
     price: 'From ₹180',
     rating: '5.0 ★ (290+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f9fdfa 0%, #edf7f2 50%, #d8ebd0 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#0f766e',
-    auraGlow: 'rgba(15, 118, 110, 0.25)',
+    auraGlow: 'rgba(15, 118, 110, 0.15)',
   },
   {
     id: 'sambar-powder',
@@ -252,9 +252,9 @@ const HERO_POWDERS = [
     tag: 'Rich Aroma & Perfect Homestyle Flavor',
     price: 'From ₹160',
     rating: '4.9 ★ (510+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f8fcf9 0%, #edf7f2 50%, #d8ebd0 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#047857',
-    auraGlow: 'rgba(4, 120, 87, 0.25)',
+    auraGlow: 'rgba(4, 120, 87, 0.15)',
   }
 ];
 
@@ -268,9 +268,9 @@ const HERO_OILS = [
     tag: 'Fresh Sun-Dried Copra Extraction',
     price: 'From ₹280',
     rating: '4.9 ★ (640+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f6fcf8 0%, #e3f5ea 50%, #c5ebd6 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#15803d',
-    auraGlow: 'rgba(21, 128, 61, 0.25)',
+    auraGlow: 'rgba(21, 128, 61, 0.15)',
   },
   {
     id: 'groundnut-oil',
@@ -281,9 +281,9 @@ const HERO_OILS = [
     tag: 'Slow Chekku Pressed Under 40°C',
     price: 'From ₹260',
     rating: '4.9 ★ (820+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f6fdf9 0%, #edf8f2 50%, #d4ede0 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#0f766e',
-    auraGlow: 'rgba(15, 118, 110, 0.25)',
+    auraGlow: 'rgba(15, 118, 110, 0.15)',
   },
   {
     id: 'gingelly-oil',
@@ -294,9 +294,9 @@ const HERO_OILS = [
     tag: 'Generations of Authentic Flavour',
     price: 'From ₹340',
     rating: '5.0 ★ (570+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f7fbf9 0%, #edf7f2 50%, #d6ecdf 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#166534',
-    auraGlow: 'rgba(22, 101, 52, 0.25)',
+    auraGlow: 'rgba(22, 101, 52, 0.15)',
   },
   {
     id: 'sunflower-oil',
@@ -307,9 +307,9 @@ const HERO_OILS = [
     tag: 'Fresh Seed Cold Extraction',
     price: 'From ₹240',
     rating: '4.8 ★ (390+)',
-    bgGradient: 'radial-gradient(ellipse at 50% 30%, #f6fcf8 0%, #edf8f2 50%, #d5eee0 100%)',
+    bgGradient: '#f4f8f5',
     spiceColor: '#0d9488',
-    auraGlow: 'rgba(13, 148, 136, 0.25)',
+    auraGlow: 'rgba(13, 148, 136, 0.15)',
   }
 ];
 
@@ -477,6 +477,7 @@ export default function HomePage({ onCheckout }) {
   const uiModal = useUIModal();
   const handleCheckout = onCheckout || uiModal?.openCheckout;
 
+  const homeRootRef = useRef(null);
   const [products, setProducts] = useState(INITIAL_CATALOG_PRODUCTS);
   const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -491,14 +492,29 @@ export default function HomePage({ onCheckout }) {
   const dragStartX = useRef(0);
   const dragEndX = useRef(0);
 
+  // Helper to ensure newest products are ALWAYS placed first
+  const sortNewestFirst = (list) => {
+    return [...list].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (timeA && timeB && timeA !== timeB) return timeB - timeA;
+      if (timeA && !timeB) return -1;
+      if (!timeA && timeB) return 1;
+      return (b._id || b.id || '').localeCompare(a._id || a.id || '');
+    });
+  };
+
   // Unique categories for filtering
   const categoryTabs = ['All', ...new Set(products.map((p) => p.category).filter(Boolean))];
 
   // Filter products by category and search
   const filteredProducts = products.filter((p) => {
-    const matchCategory = activeCategory === 'All' || p.category === activeCategory;
-    const matchSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchCategory = activeCategory === 'All' || 
+      (p.category && p.category.toLowerCase() === activeCategory.toLowerCase()) ||
+      (activeCategory === 'Spices & Powders' && /spice|powder/i.test(p.category || '')) ||
+      (activeCategory === 'Cold-Pressed Oils' && /oil/i.test(p.category || ''));
+    const matchSearch = !searchQuery || p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.description && p.description?.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchCategory && matchSearch;
   });
 
@@ -556,19 +572,37 @@ export default function HomePage({ onCheckout }) {
     }
   };
 
-  // Load products from API
-  useEffect(() => {
-    fetch(`${API}/products`)
+  // Load products from API (Fresh live fetch + newest first sort)
+  const fetchFreshProducts = useCallback(() => {
+    setLoading(true);
+    fetch(`${API}/products?limit=100&sort=newest&_t=${Date.now()}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         const list = Array.isArray(data) ? data : (data?.products || []);
         if (list.length > 0) {
-          setProducts(list);
+          setProducts(sortNewestFirst(list));
         }
       })
       .catch((err) => {
         console.error('API load failed, using catalog products:', err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
+  }, []);
+
+  useEffect(() => {
+    fetchFreshProducts();
+  }, [fetchFreshProducts]);
+
+  // Clean, lightweight ambient animations without hiding content
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Refresh scroll triggers if any
+    try {
+      ScrollTrigger.refresh();
+    } catch {}
   }, []);
 
   // Auto-advance hero slides every 4.5 seconds (pauses on hover/drag)
@@ -673,7 +707,7 @@ export default function HomePage({ onCheckout }) {
   };
 
   return (
-    <div className="home-page-root">
+    <div ref={homeRootRef} className="home-page-root">
       
       {/* ─────────────────────────────────────────────────────────────
           1. HERO SECTION (Warm Ivory Luxury Organic D2C Layout)
@@ -922,7 +956,8 @@ export default function HomePage({ onCheckout }) {
                     }}
                   >
                     <Sparkles size={14} className="switch-icon" />
-                    <span>Spice Powders · 5 Products</span>
+                    <span className="switcher-label-full">Spice Powders · 5 Products</span>
+                    <span className="switcher-label-short">Spices (5)</span>
                   </button>
                   <button 
                     type="button"
@@ -933,7 +968,8 @@ export default function HomePage({ onCheckout }) {
                     }}
                   >
                     <Droplets size={14} className="switch-icon" />
-                    <span>Cold-Pressed Oils · 4 Products</span>
+                    <span className="switcher-label-full">Cold-Pressed Oils · 4 Products</span>
+                    <span className="switcher-label-short">Oils (4)</span>
                   </button>
                 </div>
 
@@ -1004,7 +1040,7 @@ export default function HomePage({ onCheckout }) {
               <span className="section-eyebrow">Our Farm Catalog</span>
               <h2 className="section-headline">Pure Organic Staples</h2>
               <p className="products-section-sub">
-                Hand-pressed virgin oils &amp; stone-ground spices • Swipe or scroll horizontally
+                Hand-pressed virgin oils &amp; stone-ground spices directly from Tamil Nadu farms
               </p>
             </div>
 
@@ -1027,24 +1063,6 @@ export default function HomePage({ onCheckout }) {
                     <X size={15} />
                   </button>
                 )}
-              </div>
-
-              {/* GSAP Horizontal Nav Arrows */}
-              <div className="products-nav-arrows">
-                <button
-                  className="btn-product-arrow left"
-                  onClick={() => scrollProducts('prev')}
-                  aria-label="Previous products"
-                >
-                  <ChevronLeft size={19} />
-                </button>
-                <button
-                  className="btn-product-arrow right"
-                  onClick={() => scrollProducts('next')}
-                  aria-label="Next products"
-                >
-                  <ChevronRight size={19} />
-                </button>
               </div>
 
               {/* View All Products Button */}
@@ -1071,11 +1089,11 @@ export default function HomePage({ onCheckout }) {
             ))}
           </div>
 
-          {/* GSAP Horizontal Scrollable Container */}
+          {/* Responsive Product Grid */}
           {loading ? (
-            <div className="products-horizontal-track">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="product-skeleton-card product-horizontal-item" />
+            <div className="products-catalog-grid">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="product-skeleton-card" />
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
@@ -1094,53 +1112,19 @@ export default function HomePage({ onCheckout }) {
               </button>
             </div>
           ) : (
-            <div className="products-horizontal-wrapper">
-              <div 
-                className="products-horizontal-track"
-                ref={productsTrackRef}
-                onScroll={handleTrackScroll}
-              >
-                {filteredProducts.map((product) => (
-                  <div key={product._id} className="product-horizontal-item">
-                    <ProductCard
-                      product={product}
-                      onQuickView={handleOpenQuickView}
-                      onBuyNow={(prod, variant) => {
-                        addToCart(prod, variant, 1);
-                        setIsCartOpen(false);
-                        router.push('/checkout');
-                      }}
-                    />
-                  </div>
-                ))}
-
-                {/* Final Interactive "Explore All" Card */}
-                <div className="product-horizontal-item product-view-all-card-wrapper">
-                  <div 
-                    className="product-view-all-card"
-                    onClick={() => router.push('/products')}
-                  >
-                    <div className="view-all-icon-circle">
-                      <Sparkles size={24} color="#c9a84c" />
-                    </div>
-                    <h3>Explore All Products</h3>
-                    <p>Discover our full catalog of single-origin spices, native oils &amp; grains</p>
-                    <span className="btn-view-all-card-link">
-                      <span>View All ({products.length})</span>
-                      <ArrowRight size={16} />
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Visual Progress Bar */}
-              <div className="products-scroll-progress-container">
-                <div 
-                  className="products-scroll-progress-fill" 
-                  ref={progressFillRef}
-                  style={{ width: '12%' }} 
+            <div className="products-catalog-grid">
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  onQuickView={handleOpenQuickView}
+                  onBuyNow={(prod, variant) => {
+                    addToCart(prod, variant, 1);
+                    setIsCartOpen(false);
+                    router.push('/checkout');
+                  }}
                 />
-              </div>
+              ))}
             </div>
           )}
 

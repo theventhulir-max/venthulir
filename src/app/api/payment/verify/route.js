@@ -6,6 +6,7 @@ import Coupon from '@/models/Coupon';
 import Product from '@/models/Product';
 import { reduceStock } from '@/lib/inventory';
 import { sendEmail } from '@/lib/email';
+import { generatePaymentSuccessEmail } from '@/lib/emailTemplates';
 
 export async function POST(request) {
   try {
@@ -80,24 +81,22 @@ export async function POST(request) {
 
     await newOrder.save();
 
-    sendEmail({
-      to: customerEmail,
-      subject: `🌿 Payment Successful & Order Confirmed #${newOrder._id.toString().slice(-6).toUpperCase()}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
-          <div style="background: #0b3d2e; padding: 25px; text-align: center; color: #fff;">
-            <h1 style="color: #d4af37; margin: 0;">VENTHULIR</h1>
-            <p style="color: #a7f3d0; margin: 5px 0 0; font-size: 13px;">Payment Received via Razorpay</p>
-          </div>
-          <div style="padding: 25px;">
-            <h2 style="color: #0b3d2e;">Thank You for Your Order, ${customerName}!</h2>
-            <p><strong>Payment ID:</strong> ${razorpay_payment_id}</p>
-            <p><strong>Order ID:</strong> ${newOrder._id}</p>
-            <p><strong>Total Paid:</strong> ₹${totalAmount}</p>
-          </div>
-        </div>
-      `
-    }).catch(e => console.error('Payment email error:', e));
+    if (customerEmail) {
+      const orderRef = newOrder._id.toString().slice(-8).toUpperCase();
+      const emailHtml = generatePaymentSuccessEmail({
+        order: newOrder,
+        customerName: customerName || 'Valued Patron',
+        paymentId: razorpay_payment_id,
+        totalAmount
+      });
+
+      sendEmail({
+        to: customerEmail,
+        subject: `🌿 Payment Received & Order Confirmed #${orderRef} - Venthulir Organic`,
+        html: emailHtml,
+        text: `Hello ${customerName},\n\nYour payment of ₹${totalAmount} via Razorpay was successful (Transaction ID: ${razorpay_payment_id}).\nOrder Ref: #${orderRef}\n\nYour fresh farm order is now being packed!`
+      }).catch(e => console.error('Payment email error:', e));
+    }
 
     return NextResponse.json({
       msg: 'Payment verified and order created',

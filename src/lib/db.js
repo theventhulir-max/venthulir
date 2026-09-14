@@ -29,14 +29,21 @@ async function connectDB() {
     return cached.conn;
   }
 
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+    if (dns.setDefaultResultOrder) {
+      dns.setDefaultResultOrder('ipv4first');
+    }
+  } catch {}
+
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 15000,
       socketTimeoutMS: 45000,
       maxPoolSize: 20,
-      minPoolSize: 5,
+      minPoolSize: 2,
     };
 
     cached.promise = mongoose.connect(MONGO_URI, opts)

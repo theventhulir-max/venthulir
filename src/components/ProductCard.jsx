@@ -137,10 +137,10 @@ export default function ProductCard({ product, onQuickView, onBuyNow }) {
           {product.name}
         </h3>
 
-        {/* Variant Weight Selector */}
-        {hasVariants && (
-          <div className="product-variant-group">
-            {product.variants.map((v) => {
+        {/* Variant Weight Selector — Always render container for 100% uniform card height */}
+        <div className={`product-variant-group ${!hasVariants ? 'no-variants' : ''}`}>
+          {hasVariants ? (
+            product.variants.map((v) => {
               const isSelected = selectedVariant?.label === v.label;
               return (
                 <button
@@ -155,17 +155,23 @@ export default function ProductCard({ product, onQuickView, onBuyNow }) {
                   {v.label}
                 </button>
               );
-            })}
-          </div>
-        )}
+            })
+          ) : (
+            <span className="variant-single-pill">{product.weight || 'Standard Pack'}</span>
+          )}
+        </div>
 
         {/* Price & Savings Display */}
         <div className="product-pricing-box">
           <div className="price-tag-group">
             <span className="current-price">₹{price}</span>
-            <span className="strike-price">₹{originalPrice}</span>
+            {originalPrice > price && (
+              <span className="strike-price">₹{originalPrice}</span>
+            )}
           </div>
-          <span className="savings-badge">Save ₹{savings}</span>
+          {savings > 0 && (
+            <span className="savings-badge">Save ₹{savings}</span>
+          )}
         </div>
 
         {/* Clean Real-Time Action Buttons (NO TACKY LIGHTNING BOLT) */}

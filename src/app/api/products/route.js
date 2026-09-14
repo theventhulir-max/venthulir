@@ -16,7 +16,8 @@ export async function GET(request) {
     const sort = searchParams.get('sort') || 'newest';
     const isAdminQuery = searchParams.get('admin') === 'true';
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || (isAdminQuery ? '100' : '12'), 10)));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '100', 10)));
+    const noCache = searchParams.get('nocache') === 'true' || searchParams.has('_t');
 
     // Check if user is authenticated admin or requested admin mode
     let userIsAdmin = false;
@@ -28,14 +29,14 @@ export async function GET(request) {
     const isPublicQuery = !userIsAdmin && !isAdminQuery;
     const cacheKey = `products:list:cat:${category || 'all'}:b:${badge || 'none'}:s:${search || 'none'}:sort:${sort}:p:${page}:l:${limit}`;
 
-    // 1. Check in-memory cache for fast sub-50ms public responses
-    if (isPublicQuery) {
+    // 1. Check in-memory cache for fast public responses (skip if cache-busting)
+    if (isPublicQuery && !noCache) {
       const cached = cache.get(cacheKey);
       if (cached) {
         return NextResponse.json(cached, {
           headers: {
             'X-Cache': 'HIT',
-            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
           }
         });
       }
@@ -52,15 +53,34 @@ export async function GET(request) {
       let query = {};
 
       if (category && category !== 'All' && category !== 'all') {
-        query.category = { $regex: new RegExp(`^${category.trim()}$`, 'i') };
+        const catClean = category.trim();
+        const catLower = catClean.toLowerCase();
+
+        if (catLower.includes('spice')) {
+          query.category = { $regex: /spice/i };
+        } else if (catLower.includes('oil')) {
+          query.category = { $regex: /oil/i };
+        } else if (catLower.includes('masala')) {
+          query.category = { $regex: /masala/i };
+        } else if (catLower.includes('grain') || catLower.includes('rice')) {
+          query.category = { $regex: /grain|rice|millet/i };
+        } else if (catLower.includes('sweet') || catLower.includes('sugar') || catLower.includes('jaggery')) {
+          query.category = { $regex: /sweet|sugar|jaggery|honey/i };
+        } else if (catLower.includes('herb')) {
+          query.category = { $regex: /herb/i };
+        } else {
+          query.category = { $regex: new RegExp(catClean, 'i') };
+        }
       }
 
       if (search && search.trim()) {
         const cleanSearch = search.trim();
         query.$or = [
           { name: { $regex: cleanSearch, $options: 'i' } },
+          { category: { $regex: cleanSearch, $options: 'i' } },
           { productCode: { $regex: cleanSearch, $options: 'i' } },
-          { description: { $regex: cleanSearch, $options: 'i' } }
+          { description: { $regex: cleanSearch, $options: 'i' } },
+          { badge: { $regex: cleanSearch, $options: 'i' } }
         ];
       }
 
@@ -113,7 +133,9 @@ export async function GET(request) {
           id: p._id.toString(),
           imageUrl: img,
           image: img,
-          images: [img]
+          images: p.images && p.images.length > 0 ? p.images : [img],
+          inStock: (p.currentStock === undefined || p.currentStock > 0),
+          currentStock: p.currentStock !== undefined ? p.currentStock : 50
         };
       });
 
@@ -127,7 +149,7 @@ export async function GET(request) {
       };
 
       if (isPublicQuery && (formattedProducts.length > 0 || count > 0)) {
-        cache.set(cacheKey, responsePayload, 60); // 60s TTL
+        cache.set(cacheKey, responsePayload, 30); // 30s TTL
       }
 
       return NextResponse.json(responsePayload, {

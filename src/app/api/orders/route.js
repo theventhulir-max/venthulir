@@ -5,6 +5,7 @@ import Product from '@/models/Product';
 import Coupon from '@/models/Coupon';
 import { reduceStock } from '@/lib/inventory';
 import { sendEmail } from '@/lib/email';
+import { generateOrderEmail } from '@/lib/emailTemplates';
 import { requireAdmin } from '@/lib/auth';
 import { invalidateProductCache, invalidateStatsCache } from '@/lib/cache';
 
@@ -132,30 +133,24 @@ export async function POST(request) {
 
     // Send confirmation email safely
     if (customerEmail) {
+      const orderRef = newOrder._id.toString().slice(-8).toUpperCase();
+      const emailHtml = generateOrderEmail({
+        order: newOrder,
+        customerName: customerName || 'Valued Patron',
+        items: enrichedItems,
+        totalAmount: verifiedTotalAmount,
+        shippingCharge: verifiedShippingCharge,
+        discountAmount: verifiedDiscount,
+        couponUsed: (couponCode && typeof couponCode === 'string') ? couponCode.toUpperCase() : null,
+        deliveryAddress,
+        paymentMethod
+      });
+
       sendEmail({
         to: customerEmail,
-        subject: `🌿 Order Confirmation #${newOrder._id.toString().slice(-6).toUpperCase()} - Venthulir Organic`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
-            <div style="background: #0b3d2e; padding: 25px; text-align: center; color: #fff;">
-              <h1 style="color: #d4af37; margin: 0; letter-spacing: 2px;">VENTHULIR</h1>
-              <p style="color: #a7f3d0; margin: 5px 0 0; font-size: 13px;">Organic Harvest</p>
-            </div>
-            <div style="padding: 25px;">
-              <h2 style="color: #0b3d2e; margin-top: 0;">Thank You for Your Order, ${customerName}! 🌿</h2>
-              <p style="color: #4a5568;">Your order has been received and is being prepared with utmost care.</p>
-              <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0 0 8px;"><strong>Order ID:</strong> ${newOrder._id}</p>
-                <p style="margin: 0 0 8px;"><strong>Total Amount:</strong> ₹${verifiedTotalAmount}</p>
-                <p style="margin: 0 0 8px;"><strong>Payment Method:</strong> ${paymentMethod}</p>
-                <p style="margin: 0;"><strong>Delivery Address:</strong> ${deliveryAddress?.address || ''}, ${deliveryAddress?.city || ''} ${deliveryAddress?.zipCode || ''}</p>
-              </div>
-            </div>
-            <div style="background: #0b3d2e; padding: 15px; text-align: center; color: #a7f3d0; font-size: 12px;">
-              <p style="margin: 0;">Venthulir Organic | Pure & Authentic</p>
-            </div>
-          </div>
-        `
+        subject: `🌿 Order Confirmed #${orderRef} - Venthulir Organic Harvest`,
+        html: emailHtml,
+        text: `Thank you for your order, ${customerName}!\n\nOrder Ref: #${orderRef}\nTotal Amount: ₹${verifiedTotalAmount}\nPayment Method: ${paymentMethod}\nDelivery to: ${deliveryAddress?.address || ''}, ${deliveryAddress?.city || ''}\n\nWe are preparing your fresh farm harvest batch!`
       }).catch(e => console.error('Order email error:', e));
     }
 

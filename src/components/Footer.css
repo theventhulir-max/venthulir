@@ -1,150 +1,609 @@
-.footer { 
-  background: linear-gradient(180deg, #09261a 0%, #051810 100%); 
-  color: #ffffff; 
-  border-top: 2px solid rgba(201, 146, 44, 0.3);
+/* ==========================================================================
+   VENTHULIR LUXURY LIGHT MINIMALIST FOOTER (Warm Organic Ivory & Emerald)
+   ========================================================================== */
+
+.footer-luxury-root {
+  background-color: #f7f3ea;
+  color: #1e2922;
+  border-top: 1.5px solid #ebdccb;
+  font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding: 56px 0 28px;
 }
 
-.footer-main { 
-  padding: 72px 0 54px; 
+.footer-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-.footer-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 44px;
-}
-
-@media (min-width: 640px)  { .footer-grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 1024px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1.5fr; } }
-
-.footer-logo { 
-  height: 52px; 
-  width: auto; 
-  object-fit: contain; 
-  margin-bottom: 18px; 
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
-}
-
-.footer-logo-text {
-  font-family: 'Cinzel', 'Cinzel Decorative', Georgia, serif;
-  font-size: 1.55rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #d4af37;
-  margin-bottom: 14px;
-}
-
-.footer-tagline {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.72);
-  line-height: 1.75;
-  margin-bottom: 24px;
-  max-width: 360px;
-}
-
-.footer-socials { 
-  display: flex; 
-  gap: 12px; 
-}
-
-.footer-socials a {
-  width: 42px; 
-  height: 42px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
+/* ── 1. Top Newsletter Section (Warm Minimalist Capsule) ── */
+.footer-top-newsletter {
   display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 36px;
+}
+
+@media (min-width: 860px) {
+  .footer-top-newsletter {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.newsletter-text-block {
+  max-width: 520px;
+}
+
+.newsletter-eyebrow {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  color: #f4c96b;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 1.5px;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.newsletter-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+  font-weight: 700;
+  color: #14532d;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.newsletter-desc {
+  font-size: 0.86rem;
+  color: #526659;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.newsletter-form-block {
+  width: 100%;
+  max-width: 440px;
+}
+
+.newsletter-pill-form {
+  display: flex;
+  background: #ffffff;
+  border: 1.5px solid #ded3c3;
+  border-radius: 9999px;
+  padding: 4px 5px 4px 16px;
+  box-shadow: 0 4px 16px rgba(15, 61, 42, 0.05);
   transition: all 0.25s ease;
 }
 
-.footer-socials a:hover { 
-  background: #c9922c; 
-  color: #09261a; 
-  border-color: #c9922c;
-  transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 6px 16px rgba(201, 146, 44, 0.35);
+.newsletter-pill-form:focus-within {
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
 }
 
-.footer-col h4 {
-  font-family: 'Outfit', sans-serif;
+.newsletter-pill-form input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
   font-size: 0.86rem;
-  font-weight: 850;
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
-  color: #f4c96b;
-  margin-bottom: 20px;
+  color: #14422e;
+  padding: 8px 0;
+  font-family: inherit;
+  min-width: 0;
 }
 
-.footer-col ul { 
-  list-style: none; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 12px; 
+.newsletter-pill-form input::placeholder {
+  color: #8da598;
 }
 
-.footer-col ul li a {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  transition: all 0.2s ease;
-  display: inline-block;
-}
-
-.footer-col ul li a:hover { 
-  color: #ffffff; 
-  transform: translateX(4px); 
-  color: #f4c96b;
-}
-
-.footer-contact { 
-  gap: 14px !important; 
-}
-
-.footer-contact li {
-  display: flex;
+.btn-footer-subscribe {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.footer-contact li svg { 
-  color: #f4c96b; 
-  flex-shrink: 0; 
-}
-
-.footer-contact li a { 
-  color: rgba(255, 255, 255, 0.72); 
-  transition: color 0.2s ease; 
-}
-
-.footer-contact li a:hover { 
-  color: #ffffff; 
-}
-
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 24px 0;
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.footer-bottom-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-  text-align: center;
+  gap: 6px;
+  background-color: #d97706;
+  color: #ffffff;
+  border: 1px solid #b45309;
+  border-radius: 9999px;
+  padding: 9px 20px;
   font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.25);
+}
+
+.btn-footer-subscribe:hover:not(:disabled) {
+  background-color: #b45309;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.35);
+}
+
+.btn-footer-subscribe:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.newsletter-success-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #edfdf4;
+  border: 1.5px solid #bbf7d0;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  color: #15803d;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+/* Hairline Divider */
+.footer-hairline-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #e2d5c3 20%, #e2d5c3 80%, transparent 100%);
+  margin-bottom: 44px;
+}
+
+/* ── 2. Main 4-Column Minimalist Grid ── */
+.footer-main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px;
+  padding-bottom: 44px;
 }
 
 @media (min-width: 640px) {
-  .footer-bottom-inner { 
-    flex-direction: row; 
-    justify-content: space-between; 
-    text-align: left; 
+  .footer-main-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-main-grid {
+    grid-template-columns: 1.4fr 1fr 1.1fr 1.3fr;
+    gap: 40px;
+  }
+}
+
+/* Brand Column */
+.footer-col.brand-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-brand-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  margin-bottom: 14px;
+}
+
+.brand-logo-icon {
+  font-size: 1.3rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #edf6f0;
+  border: 1px solid #cce3d4;
+  border-radius: 10px;
+}
+
+.brand-title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 850;
+  letter-spacing: 2px;
+  color: #14532d;
+  line-height: 1;
+}
+
+.brand-tagline {
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 1.8px;
+  color: #b45309;
+  margin-top: 3px;
+}
+
+.footer-about-text {
+  font-size: 0.86rem;
+  color: #556c5e;
+  line-height: 1.65;
+  margin: 0 0 18px 0;
+  max-width: 320px;
+}
+
+.footer-social-pill-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.social-circle-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #ded3c4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #166534;
+  text-decoration: none;
+  transition: all 0.22s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.social-circle-btn:hover {
+  background: #166534;
+  color: #ffffff;
+  border-color: #166534;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.2);
+}
+
+.social-circle-btn.whatsapp:hover {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #22c55e;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+}
+
+/* Link Columns */
+.footer-heading {
+  font-size: 0.82rem;
+  font-weight: 850;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #14532d;
+  margin: 0 0 16px 0;
+}
+
+.footer-link-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-anchor-link,
+.footer-btn-link {
+  display: inline-flex;
+  align-items: center;
+  color: #4c6355;
+  font-size: 0.88rem;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.footer-anchor-link:hover,
+.footer-btn-link:hover {
+  color: #b45309;
+  transform: translateX(3px);
+}
+
+/* Contact Column */
+.contact-details-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.contact-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.contact-item-row:not(.static):hover .contact-icon-bubble {
+  background: #166534;
+  color: #ffffff;
+  border-color: #166534;
+}
+
+.contact-item-row:not(.static):hover .item-val {
+  color: #b45309;
+}
+
+.contact-icon-bubble {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #edf6f0;
+  border: 1px solid #cce3d4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #166534;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.contact-item-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-label {
+  font-size: 0.68rem;
+  color: #789082;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 800;
+}
+
+.item-val {
+  font-size: 0.86rem;
+  color: #1e2e25;
+  transition: color 0.2s ease;
+}
+
+.btn-whatsapp-direct {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #edfdf4;
+  border: 1.5px solid #bbf7d0;
+  color: #047857;
+  font-size: 0.82rem;
+  font-weight: 800;
+  border-radius: 8px;
+  padding: 8px 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-whatsapp-direct:hover {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #22c55e;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ── 3. Bottom Micro Bar ── */
+.footer-bottom-bar {
+  border-top: 1px solid #ebdccb;
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (min-width: 768px) {
+  .footer-bottom-bar {
+    flex-direction: row;
+  }
+}
+
+.footer-copyright-text {
+  font-size: 0.82rem;
+  color: #738a7c;
+  margin: 0;
+}
+
+.footer-copyright-text strong {
+  color: #0d291c;
+  font-weight: 700;
+}
+
+.footer-trust-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.trust-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 750;
+  color: #4b6253;
+  letter-spacing: 0.3px;
+}
+
+.trust-dot {
+  color: #b5c7bc;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .footer-luxury-root {
+    padding: 20px 0 14px;
+  }
+  .footer-container {
+    padding: 0 14px;
+  }
+  .footer-top-newsletter {
+    gap: 10px;
+    padding-bottom: 16px;
+  }
+  .newsletter-eyebrow {
+    font-size: 0.64rem;
+    padding: 2px 8px;
+    margin-bottom: 4px;
+  }
+  .newsletter-title {
+    font-size: 1.12rem;
+    margin-bottom: 2px;
+  }
+  .newsletter-desc {
+    display: none;
+  }
+  .newsletter-form-block {
+    max-width: 100%;
+  }
+  .newsletter-pill-form {
+    flex-direction: row;
+    padding: 3px 3px 3px 12px;
+    border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(15, 61, 42, 0.04);
+  }
+  .newsletter-pill-form input {
+    font-size: 0.78rem;
+    padding: 6px 0;
+  }
+  .btn-footer-subscribe {
+    width: auto;
+    padding: 6px 14px;
+    font-size: 0.76rem;
+  }
+  .footer-hairline-divider {
+    margin-bottom: 18px;
+  }
+
+  /* 2-Column Grid on Mobile: Brand full-width, Catalog & About side-by-side, Helpline full-width */
+  .footer-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 12px;
+    padding-bottom: 16px;
+  }
+  .footer-col.brand-col {
+    grid-column: 1 / -1;
+  }
+  .footer-brand-header {
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  .brand-logo-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+    border-radius: 7px;
+  }
+  .brand-name {
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+  }
+  .brand-tagline {
+    font-size: 0.55rem;
+  }
+  .footer-about-text {
+    display: none;
+  }
+  .footer-social-pill-row {
+    gap: 6px;
+  }
+  .social-circle-btn {
+    width: 30px;
+    height: 30px;
+  }
+  .social-circle-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .footer-heading {
+    font-size: 0.74rem;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .footer-link-list {
+    gap: 6px;
+  }
+  .footer-anchor-link,
+  .footer-btn-link {
+    font-size: 0.76rem;
+    line-height: 1.25;
+  }
+
+  /* Farm Helpline */
+  .footer-col.contact-col {
+    grid-column: 1 / -1;
+  }
+  .contact-details-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .contact-item-row {
+    padding: 6px 8px;
+    background: #ffffff;
+    border: 1px solid #ebdccb;
+    border-radius: 8px;
+    gap: 6px;
+  }
+  .contact-item-row.static {
+    grid-column: 1 / -1;
+  }
+  .contact-icon-bubble {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+  .contact-icon-bubble svg {
+    width: 12px;
+    height: 12px;
+  }
+  .item-label {
+    font-size: 0.58rem;
+  }
+  .item-val {
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+  .btn-whatsapp-direct {
+    width: 100%;
+    justify-content: center;
+    padding: 7px 12px;
+    font-size: 0.76rem;
+  }
+
+  /* Bottom Bar */
+  .footer-bottom-bar {
+    padding-top: 12px;
+    gap: 6px;
+    text-align: center;
+  }
+  .footer-copyright-text {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+  .footer-trust-chips {
+    justify-content: center;
+    gap: 6px;
+  }
+  .trust-chip {
+    font-size: 0.65rem;
   }
 }

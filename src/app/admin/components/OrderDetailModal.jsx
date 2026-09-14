@@ -17,6 +17,7 @@ import {
   Tag,
   Loader2
 } from 'lucide-react';
+import ConfirmStatusModal from './ConfirmStatusModal';
 
 export default function OrderDetailModal({
   order,
@@ -25,22 +26,31 @@ export default function OrderDetailModal({
   onStatusChange
 }) {
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [confirmTarget, setConfirmTarget] = useState(null); // { targetStatus, isCancel }
 
   if (!order) return null;
 
   const currentStatus = order.status || order.orderStatus || 'Pending';
 
-  const handleUpdateStatus = async (newStatus, isCancel = false) => {
-    if (isCancel && !window.confirm('Are you sure you want to cancel this order? This will restore product inventory back to warehouse.')) {
+  const promptStatusChange = (newStatus, isCancel = false) => {
+    if (newStatus.toLowerCase() === currentStatus.toLowerCase()) return;
+    setConfirmTarget({ targetStatus: newStatus, isCancel });
+  };
+
+  const executeStatusChange = async () => {
+    if (!confirmTarget) return;
+    const { targetStatus, isCancel } = confirmTarget;
+
+    const handler = onStatusUpdate || onStatusChange;
+    if (!handler) {
+      setConfirmTarget(null);
       return;
     }
 
-    const handler = onStatusUpdate || onStatusChange;
-    if (!handler) return;
-
     try {
       setUpdatingStatus(true);
-      await handler(order._id || order.orderId, newStatus, isCancel);
+      await handler(order._id || order.orderId, targetStatus, isCancel);
+      setConfirmTarget(null);
     } catch (err) {
       console.error('Status update failed:', err);
     } finally {
@@ -122,8 +132,17 @@ export default function OrderDetailModal({
               <button
                 type="button"
                 className={`adm-btn-secondary ${currentStatus.toLowerCase() === 'pending' ? 'active' : ''}`}
-                style={{ padding: '6px 12px', fontSize: '12px', background: currentStatus.toLowerCase() === 'pending' ? '#0f3d2a' : '#ffffff', color: currentStatus.toLowerCase() === 'pending' ? '#ffffff' : '#334155' }}
-                onClick={() => handleUpdateStatus('Pending')}
+                style={{ 
+                  padding: '6px 14px', 
+                  fontSize: '12px', 
+                  fontWeight: 700,
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  background: currentStatus.toLowerCase() === 'pending' ? '#475569' : '#ffffff', 
+                  color: currentStatus.toLowerCase() === 'pending' ? '#ffffff' : '#334155',
+                  cursor: 'pointer'
+                }}
+                onClick={() => promptStatusChange('Pending')}
                 disabled={updatingStatus || currentStatus.toLowerCase() === 'cancelled'}
               >
                 1. Pending
@@ -132,8 +151,17 @@ export default function OrderDetailModal({
               <button
                 type="button"
                 className={`adm-btn-secondary`}
-                style={{ padding: '6px 12px', fontSize: '12px', background: currentStatus.toLowerCase() === 'confirmed' ? '#0f3d2a' : '#ffffff', color: currentStatus.toLowerCase() === 'confirmed' ? '#ffffff' : '#334155' }}
-                onClick={() => handleUpdateStatus('Confirmed')}
+                style={{ 
+                  padding: '6px 14px', 
+                  fontSize: '12px', 
+                  fontWeight: 700,
+                  borderRadius: '8px',
+                  border: '1px solid #f59e0b',
+                  background: currentStatus.toLowerCase() === 'confirmed' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : '#fffbeb', 
+                  color: currentStatus.toLowerCase() === 'confirmed' ? '#ffffff' : '#b45309',
+                  cursor: 'pointer'
+                }}
+                onClick={() => promptStatusChange('Confirmed')}
                 disabled={updatingStatus || currentStatus.toLowerCase() === 'cancelled'}
               >
                 2. Confirm Order
@@ -142,8 +170,17 @@ export default function OrderDetailModal({
               <button
                 type="button"
                 className={`adm-btn-secondary`}
-                style={{ padding: '6px 12px', fontSize: '12px', background: currentStatus.toLowerCase() === 'shipped' ? '#7c3aed' : '#ffffff', color: currentStatus.toLowerCase() === 'shipped' ? '#ffffff' : '#334155' }}
-                onClick={() => handleUpdateStatus('Shipped')}
+                style={{ 
+                  padding: '6px 14px', 
+                  fontSize: '12px', 
+                  fontWeight: 700,
+                  borderRadius: '8px',
+                  border: '1px solid #8b5cf6',
+                  background: currentStatus.toLowerCase() === 'shipped' ? 'linear-gradient(135deg, #8b5cf6, #7c3aed)' : '#f5f3ff', 
+                  color: currentStatus.toLowerCase() === 'shipped' ? '#ffffff' : '#6d28d9',
+                  cursor: 'pointer'
+                }}
+                onClick={() => promptStatusChange('Shipped')}
                 disabled={updatingStatus || currentStatus.toLowerCase() === 'cancelled'}
               >
                 3. Mark Shipped
@@ -152,8 +189,17 @@ export default function OrderDetailModal({
               <button
                 type="button"
                 className={`adm-btn-secondary`}
-                style={{ padding: '6px 12px', fontSize: '12px', background: currentStatus.toLowerCase() === 'delivered' ? '#16a34a' : '#ffffff', color: currentStatus.toLowerCase() === 'delivered' ? '#ffffff' : '#334155' }}
-                onClick={() => handleUpdateStatus('Delivered')}
+                style={{ 
+                  padding: '6px 14px', 
+                  fontSize: '12px', 
+                  fontWeight: 700,
+                  borderRadius: '8px',
+                  border: '1px solid #0284c7',
+                  background: currentStatus.toLowerCase() === 'delivered' ? 'linear-gradient(135deg, #0284c7, #0369a1)' : '#f0f9ff', 
+                  color: currentStatus.toLowerCase() === 'delivered' ? '#ffffff' : '#0369a1',
+                  cursor: 'pointer'
+                }}
+                onClick={() => promptStatusChange('Delivered')}
                 disabled={updatingStatus || currentStatus.toLowerCase() === 'cancelled'}
               >
                 4. Mark Delivered
@@ -162,8 +208,18 @@ export default function OrderDetailModal({
               {currentStatus.toLowerCase() !== 'cancelled' && (
                 <button
                   type="button"
-                  style={{ marginLeft: 'auto', background: '#fee2e2', color: '#dc2626', border: '1px solid #fecaca', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-                  onClick={() => handleUpdateStatus('Cancelled', true)}
+                  style={{ 
+                    marginLeft: 'auto', 
+                    background: '#fee2e2', 
+                    color: '#dc2626', 
+                    border: '1px solid #fecaca', 
+                    padding: '6px 14px', 
+                    borderRadius: '8px', 
+                    fontSize: '12px', 
+                    fontWeight: 700, 
+                    cursor: 'pointer' 
+                  }}
+                  onClick={() => promptStatusChange('Cancelled', true)}
                   disabled={updatingStatus}
                 >
                   Cancel Order
@@ -172,7 +228,7 @@ export default function OrderDetailModal({
             </div>
 
             {updatingStatus && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px', fontSize: '12px', color: '#0f3d2a' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px', fontSize: '12px', color: '#b45309' }}>
                 <Loader2 size={14} className="spin" /> Updating order status...
               </div>
             )}
@@ -190,42 +246,37 @@ export default function OrderDetailModal({
                   <Mail size={13} /> {order.customerEmail || 'Registered Member'}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                  <Phone size={13} /> {order.phone || order.shippingAddress?.phone || 'Standard Contact'}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '11.5px', marginTop: '2px' }}>
-                  <Calendar size={12} /> {order.createdAt ? new Date(order.createdAt).toLocaleString('en-IN') : 'Recent'}
+                  <Phone size={13} /> {order.phone || order.shippingAddress?.phone || 'No phone provided'}
                 </div>
               </div>
             </div>
 
-            {/* Shipping Address */}
+            {/* Delivery Address */}
             <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px' }}>
               <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f3d2a', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <MapPin size={14} /> Delivery Address
               </div>
-              <div style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5 }}>
-                <div>{order.deliveryAddress?.address || order.shippingAddress?.address || 'Standard Address'}</div>
-                <div>
-                  {[order.deliveryAddress?.city || order.shippingAddress?.city, order.deliveryAddress?.state || order.shippingAddress?.state, order.deliveryAddress?.zipCode || order.shippingAddress?.zipCode].filter(Boolean).join(', ')}
-                </div>
+              <div style={{ fontSize: '13px', color: '#334155', lineHeight: 1.4 }}>
+                {order.deliveryAddress?.address || order.shippingAddress?.address || order.shippingAddress?.street || 'Farm Origin Order'}
+                <br />
+                {order.deliveryAddress?.city || order.shippingAddress?.city || ''} {order.deliveryAddress?.state || order.shippingAddress?.state || ''} - {order.deliveryAddress?.zipCode || order.shippingAddress?.pincode || ''}
               </div>
             </div>
           </div>
 
-          {/* Line Items */}
+          {/* Items Table */}
           <div style={{ marginBottom: '20px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '8px', color: '#0f172a' }}>
-              Purchased Products ({items.length})
+            <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f3d2a', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Package size={14} /> Purchased Harvest Items ({items.length})
             </div>
-
-            <div className="adm-table-wrapper">
-              <table className="adm-table">
+            <div className="admin-table-container" style={{ border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+              <table className="admin-table" style={{ fontSize: '13px' }}>
                 <thead>
                   <tr>
-                    <th>Item</th>
+                    <th>Product</th>
                     <th>Qty</th>
-                    <th>Price</th>
-                    <th style={{ textAlign: 'right' }}>Subtotal</th>
+                    <th>Unit Price</th>
+                    <th style={{ textAlign: 'right' }}>Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -272,6 +323,19 @@ export default function OrderDetailModal({
           </button>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmTarget && (
+        <ConfirmStatusModal
+          isOpen={Boolean(confirmTarget)}
+          order={order}
+          targetStatus={confirmTarget.targetStatus}
+          isCancel={confirmTarget.isCancel}
+          onConfirm={executeStatusChange}
+          onClose={() => setConfirmTarget(null)}
+          loading={updatingStatus}
+        />
+      )}
     </div>
   );
 }

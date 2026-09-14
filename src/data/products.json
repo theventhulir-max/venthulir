@@ -1,0 +1,404 @@
+[
+  {
+    "_id": "6aa2ae47262a13cd57da0858",
+    "id": "6aa2ae47262a13cd57da0858",
+    "productCode": "VNT-1001",
+    "name": "Mara Chekku Cold-Pressed Groundnut Oil",
+    "category": "Wood Pressed Oils",
+    "badge": "Bestseller",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 320,
+    "originalPrice": 390,
+    "discountPercent": 18,
+    "imageUrl": "/images/oil_groundnut.png",
+    "images": [
+      "/images/oil_groundnut.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "100% Traditional Mara Chekku cold-pressed virgin groundnut oil extracted using Vaagai wood press. Unrefined, chemical-free, nutrient-rich with an authentic nutty aroma.",
+    "variants": [
+      {
+        "label": "500 ml",
+        "price": 170,
+        "contents": "Half Litre Bottle"
+      },
+      {
+        "label": "1 Litre",
+        "price": 320,
+        "contents": "Standard Glass/Food-grade Bottle"
+      },
+      {
+        "label": "5 Litres",
+        "price": 1550,
+        "contents": "Family Tin Pack"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 210,
+    "initialStock": 250,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa2ae47262a13cd57da0859",
+    "id": "6aa2ae47262a13cd57da0859",
+    "productCode": "VNT-1002",
+    "name": "Mara Chekku Cold-Pressed Gingelly / Sesame Oil",
+    "category": "Wood Pressed Oils",
+    "badge": "Heritage Recipe",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 390,
+    "originalPrice": 470,
+    "discountPercent": 17,
+    "imageUrl": "/images/oil_gingelly.png",
+    "images": [
+      "/images/oil_gingelly.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "Traditional wood-pressed gingelly oil sweetened naturally with organic palm jaggery (Karupatti). Rich in calcium, zinc, and natural antioxidants for daily health.",
+    "variants": [
+      {
+        "label": "500 ml",
+        "price": 210,
+        "contents": "Half Litre Bottle"
+      },
+      {
+        "label": "1 Litre",
+        "price": 390,
+        "contents": "Standard Bottle"
+      },
+      {
+        "label": "5 Litres",
+        "price": 1900,
+        "contents": "Family Pack"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 180,
+    "initialStock": 200,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa2ae47262a13cd57da085a",
+    "id": "6aa2ae47262a13cd57da085a",
+    "productCode": "VNT-1003",
+    "name": "Mara Chekku Virgin Coconut Oil",
+    "category": "Wood Pressed Oils",
+    "badge": "100% Pure Copra",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 340,
+    "originalPrice": 410,
+    "discountPercent": 17,
+    "imageUrl": "/images/oil_coconut.png",
+    "images": [
+      "/images/oil_coconut.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "Sun-dried sulfur-free copra cold pressed at low temperatures without heat or chemicals. Ideal for cooking, raw consumption, hair nourishment, and infant skin care.",
+    "variants": [
+      {
+        "label": "500 ml",
+        "price": 180,
+        "contents": "Half Litre Bottle"
+      },
+      {
+        "label": "1 Litre",
+        "price": 340,
+        "contents": "Standard Bottle"
+      },
+      {
+        "label": "5 Litres",
+        "price": 1650,
+        "contents": "Value Pack"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 145,
+    "initialStock": 180,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa2ae47262a13cd57da085b",
+    "id": "6aa2ae47262a13cd57da085b",
+    "productCode": "VNT-1004",
+    "name": "Pure Cold-Pressed Sunflower Oil",
+    "category": "Wood Pressed Oils",
+    "badge": "Heart Healthy",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 260,
+    "originalPrice": 320,
+    "discountPercent": 19,
+    "imageUrl": "/images/oil_sunflower.png",
+    "images": [
+      "/images/oil_sunflower.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "Light, non-greasy sunflower oil extracted cold from high quality seeds. Rich in natural Vitamin E and polyunsaturated fatty acids without any bleaching.",
+    "variants": [
+      {
+        "label": "1 Litre",
+        "price": 260,
+        "contents": "Standard Bottle"
+      },
+      {
+        "label": "5 Litres",
+        "price": 1250,
+        "contents": "Family Pack"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 120,
+    "initialStock": 150,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa2ae47262a13cd57da085c",
+    "id": "6aa2ae47262a13cd57da085c",
+    "productCode": "VNT-1005",
+    "name": "Single-Origin Pure Turmeric Powder",
+    "category": "Single Origin Spices",
+    "badge": "High Curcumin 5%+",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 140,
+    "originalPrice": 180,
+    "discountPercent": 22,
+    "imageUrl": "/images/turmeric_powder_model-removebg-preview.png",
+    "images": [
+      "/images/turmeric_powder_model-removebg-preview.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "Naturally cultivated Salem & Erode turmeric finger roots slow stone-ground to preserve volatile oils and high medicinal curcumin. Free from artificial colors.",
+    "variants": [
+      {
+        "label": "250 g",
+        "price": 75,
+        "contents": "Zipper Pouch"
+      },
+      {
+        "label": "500 g",
+        "price": 140,
+        "contents": "Eco Pouch"
+      },
+      {
+        "label": "1 kg",
+        "price": 270,
+        "contents": "Family Value Pack"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 275,
+    "initialStock": 300,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa2ae47262a13cd57da085d",
+    "id": "6aa2ae47262a13cd57da085d",
+    "productCode": "VNT-1006",
+    "name": "Organic Guntur & Byadgi Red Chilli Powder",
+    "category": "Single Origin Spices",
+    "badge": "Natural Vibrant Color",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 160,
+    "originalPrice": 200,
+    "discountPercent": 20,
+    "imageUrl": "/images/chili-removebg-preview.png",
+    "images": [
+      "/images/chili-removebg-preview.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "Sun-dried whole stemless red chillies pounded traditionally. Rich fiery color with a rounded balanced heat and zero artificial food colorants.",
+    "variants": [
+      {
+        "label": "250 g",
+        "price": 85,
+        "contents": "Zipper Pouch"
+      },
+      {
+        "label": "500 g",
+        "price": 160,
+        "contents": "Eco Pouch"
+      },
+      {
+        "label": "1 kg",
+        "price": 310,
+        "contents": "Family Value Pack"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 215,
+    "initialStock": 250,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa2ae47262a13cd57da085e",
+    "id": "6aa2ae47262a13cd57da085e",
+    "productCode": "VNT-1007",
+    "name": "Aromatic Stone-Ground Coriander Powder",
+    "category": "Single Origin Spices",
+    "badge": "Farm Fresh Aroma",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 130,
+    "originalPrice": 165,
+    "discountPercent": 21,
+    "imageUrl": "/images/coriander_powder-removebg-preview.png",
+    "images": [
+      "/images/coriander_powder-removebg-preview.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "Handpicked fresh coriander seeds roasted on low heat and ground using stone mills to seal in tantalizing herbal aroma and essential minerals.",
+    "variants": [
+      {
+        "label": "250 g",
+        "price": 70,
+        "contents": "Zipper Pouch"
+      },
+      {
+        "label": "500 g",
+        "price": 130,
+        "contents": "Eco Pouch"
+      },
+      {
+        "label": "1 kg",
+        "price": 250,
+        "contents": "Family Value Pack"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 195,
+    "initialStock": 220,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa2ae47262a13cd57da085f",
+    "id": "6aa2ae47262a13cd57da085f",
+    "productCode": "VNT-1008",
+    "name": "Grandma's Heritage Sambar Masala Powder",
+    "category": "Heritage Masalas",
+    "badge": "Authentic 14-Spice Blend",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 180,
+    "originalPrice": 230,
+    "discountPercent": 22,
+    "imageUrl": "/images/sambar-removebg-preview.png",
+    "images": [
+      "/images/sambar-removebg-preview.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "Authentic South Indian heirloom recipe crafted with 14 slow-roasted farm spices, toor dal, and chana dal. Delivers the signature authentic wedding sambar flavor.",
+    "variants": [
+      {
+        "label": "250 g",
+        "price": 95,
+        "contents": "Aroma-Lock Pouch"
+      },
+      {
+        "label": "500 g",
+        "price": 180,
+        "contents": "Value Pouch"
+      },
+      {
+        "label": "1 kg",
+        "price": 350,
+        "contents": "Kitchen Saver Box"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 260,
+    "initialStock": 280,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa2ae47262a13cd57da0860",
+    "id": "6aa2ae47262a13cd57da0860",
+    "productCode": "VNT-1009",
+    "name": "Royal Artisan Garam Masala Powder",
+    "category": "Heritage Masalas",
+    "badge": "Slow Roasted Whole Spices",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 210,
+    "originalPrice": 270,
+    "discountPercent": 22,
+    "imageUrl": "/images/garam_masala-removebg-preview.png",
+    "images": [
+      "/images/garam_masala-removebg-preview.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "Hand-selected whole spices including green cardamom, star anise, mace, cloves, and Ceylon cinnamon slow roasted and stone pulverized.",
+    "variants": [
+      {
+        "label": "100 g",
+        "price": 90,
+        "contents": "Glass Jar / Sealed Pouch"
+      },
+      {
+        "label": "250 g",
+        "price": 210,
+        "contents": "Freshness Pouch"
+      },
+      {
+        "label": "500 g",
+        "price": 400,
+        "contents": "Chef Pack"
+      }
+    ],
+    "inStock": true,
+    "currentStock": 170,
+    "initialStock": 190,
+    "createdAt": "2026-09-10T13:19:03.892Z"
+  },
+  {
+    "_id": "6aa3ab5292499031b7d57d46",
+    "id": "6aa3ab5292499031b7d57d46",
+    "productCode": "VNT-939748",
+    "name": "powder",
+    "category": "Spices",
+    "badge": "Organic",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "price": 300,
+    "originalPrice": 400,
+    "discountPercent": 25,
+    "imageUrl": "/uploads/prod-powder-1789368494219.png",
+    "images": [
+      "/uploads/prod-powder-1789368494219.png"
+    ],
+    "origin": "Tamil Nadu Farms",
+    "process": "Traditional stone-ground / cold-pressed",
+    "description": "powder",
+    "variants": [
+      {
+        "_id": "6aa3ab5292499031b7d57d47",
+        "label": "200",
+        "price": 100,
+        "contents": ""
+      },
+      {
+        "_id": "6aa3ab5292499031b7d57d48",
+        "label": "500",
+        "price": 300,
+        "contents": ""
+      }
+    ],
+    "inStock": true,
+    "currentStock": 47,
+    "initialStock": 50,
+    "createdAt": "2026-09-11T07:18:42.947Z"
+  }
+]
