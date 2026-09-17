@@ -301,7 +301,7 @@ function CartPageContent() {
                 <div style={{
                   fontSize: '0.82rem',
                   fontWeight: 650,
-                  color: couponMsg.type === 'success' ? '#166534' : '#b91c1c',
+                  color: couponMsg.type === 'success' ? '#1B5E2F' : '#b91c1c',
                   marginBottom: '14px'
                 }}>
                   {couponMsg.text}
@@ -326,7 +326,7 @@ function CartPageContent() {
                   <span>Estimated Delivery</span>
                   <span>
                     {isFreeShipping ? (
-                      <strong style={{ color: '#166534' }}>FREE</strong>
+                      <strong style={{ color: '#1B5E2F' }}>FREE</strong>
                     ) : (
                       `₹${shippingFee}`
                     )}

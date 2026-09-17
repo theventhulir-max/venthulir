@@ -20,7 +20,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Leaf
+  Leaf,
+  X
 } from 'lucide-react';
 
 export default function AdminSidebar({
@@ -138,6 +139,14 @@ export default function AdminSidebar({
               </div>
             )}
           </Link>
+
+          <button
+            className="admin-sidebar-mobile-close"
+            onClick={() => setMobileOpen(false)}
+            title="Close menu"
+          >
+            <X size={18} />
+          </button>
 
           <button
             className="admin-sidebar-toggle"

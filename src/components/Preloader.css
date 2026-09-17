@@ -7,7 +7,7 @@
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: radial-gradient(circle at 50% 45%, #14532d 0%, #0f3d2a 60%, #09261a 100%);
+  background: radial-gradient(circle at 50% 45%, var(--accent-dark) 0%, #0f3d2a 60%, #09261a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,7 +60,7 @@
   height: 4px;
   border-radius: 50%;
   background: #86efac;
-  box-shadow: 0 0 10px #4ade80, 0 0 20px #22c55e;
+  box-shadow: 0 0 10px #4ade80, 0 0 20px var(--accent-light);
   opacity: 0;
   animation: floatSpore 2.5s ease-in infinite;
 }
@@ -134,7 +134,7 @@
 
 /* 1. Base Soil Ripple */
 .soil-ripple {
-  fill: #166534;
+  fill: var(--accent);
   opacity: 0;
   transform-origin: 100px 210px;
   animation: soilAwaken 0.6s ease-out 0.1s forwards;
@@ -334,7 +334,7 @@
   left: 0;
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #22c55e 0%, #86efac 50%, #facc15 100%);
+  background: linear-gradient(90deg, var(--accent-light) 0%, #86efac 50%, #facc15 100%);
   border-radius: 10px;
   animation: progressFill 2.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

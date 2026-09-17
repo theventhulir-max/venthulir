@@ -99,6 +99,50 @@ export default function SimpleAdminDashboard() {
     return () => clearInterval(interval);
   }, [user]);
 
+  const handleAdminOrderStatusUpdate = async (orderId, newStatus, isCancel, extras) => {
+    const orderToUpdate = selectedOrder?._id === orderId ? selectedOrder : stats?.recentOrders?.find(o => o._id === orderId || o.orderId === orderId);
+    const id = orderToUpdate?._id || orderId;
+
+    const token = typeof window !== 'undefined' ? localStorage.getItem('venthulir_token') : null;
+    try {
+      const res = await fetch(`/api/orders/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          action: isCancel ? 'cancel' : undefined,
+          trackingNumber: extras?.trackingNumber,
+          courierPartner: extras?.courierPartner
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const updated = data.order || { ...orderToUpdate, status: newStatus };
+        if (selectedOrder && (selectedOrder._id === id || selectedOrder.orderId === id)) {
+          setSelectedOrder(updated);
+        }
+        setStats(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            recentOrders: (prev.recentOrders || []).map(o => (o._id === id || o.orderId === id) ? updated : o)
+          };
+        });
+        toast.success(`Order #${(id || '').toString().slice(-8).toUpperCase()} updated to "${newStatus}"!`);
+        fetchStats();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || 'Failed to update status.');
+      }
+    } catch {
+      toast.error('Network error updating status.');
+    }
+  };
+
   const promptOrderStatusUpdate = (order, newStatus, isCancel = false) => {
     setConfirmStatusModal({
       isOpen: true,
@@ -357,7 +401,7 @@ export default function SimpleAdminDashboard() {
       </div>
 
       {/* ── 2. BIG CLEAR STAT CARDS ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+      <div className="admin-stats-grid">
         
         {/* Card 1: Revenue */}
         <div style={{
@@ -469,7 +513,7 @@ export default function SimpleAdminDashboard() {
       </div>
 
       {/* ── 3. MAIN WORKSPACE (TWO COLUMNS) ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 360px', gap: '24px', alignItems: 'start' }}>
+      <div className="admin-dashboard-workspace">
         
         {/* LEFT COLUMN: LIVE ORDERS ACTION BOARD */}
         <div style={{
@@ -868,7 +912,7 @@ export default function SimpleAdminDashboard() {
         <OrderDetailModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
-          onStatusChange={(newStatus, isCancel) => promptOrderStatusUpdate(selectedOrder, newStatus, isCancel)}
+          onStatusUpdate={handleAdminOrderStatusUpdate}
         />
       )}
 

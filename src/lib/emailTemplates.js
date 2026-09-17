@@ -47,8 +47,12 @@ function getEmailFooter() {
  */
 export function generateOtpEmail({ otp, type = 'login', userName = '' }) {
   const isRegister = type === 'register';
-  const title = isRegister ? 'Welcome to Venthulir' : 'Sign-In Verification';
-  const subtext = isRegister
+  const isReset = type === 'reset';
+  const title = isReset ? 'Reset Your Password' : isRegister ? 'Welcome to Venthulir' : 'Sign-In Verification';
+  const badge = isReset ? 'Password Reset Code' : isRegister ? 'New Member Verification' : 'Secure Sign In';
+  const subtext = isReset
+    ? `Hello ${userName ? userName : 'Valued Patron'}, we received a request to reset your Venthulir account password. Enter the 6-digit verification code below to set your new password:`
+    : isRegister
     ? 'Enter the 6-digit verification code below to activate your member account and complete registration:'
     : `Hello ${userName ? userName : 'Valued Patron'}, enter the 6-digit verification code below to access your account:`;
 
@@ -80,7 +84,7 @@ export function generateOtpEmail({ otp, type = 'login', userName = '' }) {
               <!-- Subtle Badge -->
               <div style="display: inline-block; background-color: #fef7ed; border: 1px solid #fed7aa; border-radius: 30px; padding: 4px 14px; margin-bottom: 18px;">
                 <span style="font-size: 11px; font-weight: 700; color: #b45309; letter-spacing: 1px; text-transform: uppercase;">
-                  ${isRegister ? 'New Member Verification' : 'Secure Sign In'}
+                  ${badge}
                 </span>
               </div>
 
@@ -291,10 +295,13 @@ export function generateOrderEmail({
               </div>
 
               <!-- Track Button -->
-              <div style="text-align: center; margin-bottom: 10px;">
-                <a href="${BASE_URL}/profile" style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #c2410c 100%); color: #ffffff; font-size: 13.5px; font-weight: 800; text-decoration: none; padding: 13px 30px; border-radius: 50px; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35); text-shadow: 0 1px 2px rgba(0,0,0,0.15);">
-                  View Order Status →
+              <div style="text-align: center; margin-bottom: 12px;">
+                <a href="${BASE_URL}/profile" style="display: inline-block; background: linear-gradient(135deg, #166534 0%, #14532d 100%); color: #ffffff; font-size: 14px; font-weight: 800; text-decoration: none; padding: 14px 34px; border-radius: 50px; box-shadow: 0 4px 14px rgba(20, 83, 45, 0.35); letter-spacing: 0.3px;">
+                  🚚 Track Live Order Status →
                 </a>
+                <div style="font-size: 11.5px; color: #788c81; margin-top: 8px;">
+                  Monitor farm packing, dispatch, and courier tracking updates in real time.
+                </div>
               </div>
 
             </td>
@@ -399,24 +406,200 @@ export function generateWelcomeEmail({
 }
 
 /**
- * 5. Payment Success & Order Confirmation Template
+ * 6. Order Status Update Email Template (Confirmed, Shipped, Delivered, Cancelled)
  */
-export function generatePaymentSuccessEmail({
+export function generateOrderStatusEmail({
   order,
-  customerName = 'Valued Patron',
-  paymentId = '',
-  totalAmount = 0
+  newStatus = 'Confirmed',
+  trackingNumber = '',
+  courierPartner = '',
+  customerName = 'Valued Patron'
 }) {
-  return generateOrderEmail({
-    order,
-    customerName,
-    items: order?.items || [],
-    totalAmount: totalAmount || order?.totalAmount || 0,
-    shippingCharge: order?.shippingCharge || 0,
-    discountAmount: order?.discountAmount || 0,
-    couponUsed: order?.couponUsed,
-    deliveryAddress: order?.deliveryAddress || {},
-    paymentMethod: `Razorpay Online (${paymentId ? `ID: ${paymentId}` : 'Prepaid'})`
-  });
+  const orderRef = (order?.orderId || order?._id || 'ORDER').toString().slice(-8).toUpperCase();
+  const totalAmount = order?.totalAmount || order?.amount || 0;
+  const items = order?.items || order?.orderItems || [];
+  const addressObj = order?.deliveryAddress || order?.shippingAddress || {};
+  const addressLine = [
+    addressObj.address || addressObj.street,
+    addressObj.city,
+    addressObj.state,
+    addressObj.zipCode
+  ].filter(Boolean).join(', ') || 'Address on file';
+
+  const statusLower = (newStatus || 'confirmed').toLowerCase();
+
+  let badgeText = 'Order Confirmed';
+  let badgeColor = '#b45309';
+  let badgeBg = '#fef7ed';
+  let badgeBorder = '#fed7aa';
+  let headline = 'Your Order is Confirmed';
+  let submessage = 'Your order has been verified and is currently being hand-packed at our farm origin.';
+
+  if (statusLower === 'shipped') {
+    badgeText = 'Order Dispatched';
+    badgeColor = '#6d28d9';
+    badgeBg = '#f5f3ff';
+    badgeBorder = '#ddd6fe';
+    headline = 'Your Harvest is on its Way!';
+    submessage = 'Your order has been handed over to our express courier partner and is en route to your doorstep.';
+  } else if (statusLower === 'delivered') {
+    badgeText = 'Successfully Delivered';
+    badgeColor = '#15803d';
+    badgeBg = '#f0fdf4';
+    badgeBorder = '#bbf7d0';
+    headline = 'Your Order Has Arrived!';
+    submessage = 'Your farm-fresh harvest package has been delivered. We hope you enjoy the wholesome goodness of certified organic living.';
+  } else if (statusLower === 'cancelled') {
+    badgeText = 'Order Cancelled';
+    badgeColor = '#b91c1c';
+    badgeBg = '#fef2f2';
+    badgeBorder = '#fecaca';
+    headline = 'Order Cancellation Notice';
+    submessage = 'Your order has been cancelled. If you have questions regarding your order or refund status, please contact our support team.';
+  }
+
+  // Items table rows
+  const itemsHtml = items.map((item) => {
+    const itemPrice = Number(item.price) || 0;
+    const itemQty = Number(item.quantity) || 1;
+    const itemTotal = itemPrice * itemQty;
+    const itemName = item.name || 'Organic Harvest Item';
+    const variantLabel = item.variant?.label || item.variant || item.selectedWeight || '';
+
+    return `
+      <tr>
+        <td style="padding: 10px 0; border-bottom: 1px solid #f2ede4; vertical-align: middle;">
+          <div style="font-weight: 700; font-size: 13px; color: #1a3325; line-height: 1.3;">
+            ${itemName}
+          </div>
+          ${variantLabel ? `<div style="font-size: 11px; color: #b47a1b; font-weight: 600; margin-top: 2px;">Variant: ${variantLabel}</div>` : ''}
+        </td>
+        <td style="padding: 10px 10px; border-bottom: 1px solid #f2ede4; text-align: center; font-size: 12.5px; color: #52665a; font-weight: 600; vertical-align: middle;">
+          ×${itemQty}
+        </td>
+        <td style="padding: 10px 0; border-bottom: 1px solid #f2ede4; text-align: right; font-weight: 700; font-size: 13.5px; color: #1a3325; vertical-align: middle;">
+          ₹${itemTotal}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const trackingBox = (statusLower === 'shipped' && (trackingNumber || courierPartner)) ? `
+    <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; margin: 18px 0 22px; text-align: left;">
+      <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">
+        Tracking Information
+      </div>
+      ${courierPartner ? `<div style="font-size: 13px; color: #1e293b; margin-bottom: 4px;"><strong>Courier:</strong> ${courierPartner}</div>` : ''}
+      ${trackingNumber ? `<div style="font-size: 13px; color: #1e293b;"><strong>Tracking Number / AWB:</strong> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${trackingNumber}</code></div>` : ''}
+    </div>
+  ` : '';
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${headline} - #${orderRef}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f7f5f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f7f5f0; padding: 36px 12px;">
+    <tr>
+      <td align="center">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #ffffff; border-radius: 18px; overflow: hidden; border: 1px solid #e8e0d5; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
+          
+          <!-- Header -->
+          <tr>
+            <td>
+              ${getEmailHeader('AUTHENTIC FARM DIRECT HARVEST')}
+            </td>
+          </tr>
+
+          <!-- Main Body -->
+          <tr>
+            <td style="padding: 32px 30px 24px;">
+              
+              <!-- Status Capsule Badge -->
+              <div style="display: inline-block; background-color: ${badgeBg}; border: 1px solid ${badgeBorder}; border-radius: 30px; padding: 4px 14px; margin-bottom: 14px;">
+                <span style="font-size: 11px; font-weight: 700; color: ${badgeColor}; letter-spacing: 1px; text-transform: uppercase;">
+                  ${badgeText}
+                </span>
+              </div>
+
+              <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid #f0eae1; padding-bottom: 16px; margin-bottom: 18px;">
+                <h1 style="font-family: 'Cinzel', Georgia, serif; font-size: 22px; font-weight: 700; color: #1a3325; margin: 0;">
+                  ${headline}
+                </h1>
+                <div style="font-family: monospace; font-size: 13px; font-weight: 800; color: #64748b;">
+                  #${orderRef}
+                </div>
+              </div>
+
+              <p style="font-size: 14px; line-height: 1.6; color: #52665a; margin: 0 0 18px;">
+                Dear <strong>${customerName}</strong>,<br/>
+                ${submessage}
+              </p>
+
+              ${trackingBox}
+
+              <!-- Ordered Items List -->
+              ${items.length > 0 ? `
+              <div style="margin-bottom: 20px;">
+                <div style="font-size: 11px; font-weight: 750; color: #1a3325; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">
+                  Order Breakdown
+                </div>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                    ${itemsHtml}
+                  </tbody>
+                </table>
+              </div>
+              ` : ''}
+
+              <!-- Details Box -->
+              <div style="background-color: #faf7f2; border: 1px solid #ede5d8; border-radius: 12px; padding: 14px 18px; margin-bottom: 24px;">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td style="font-size: 13px; color: #52665a; padding-bottom: 4px;">Delivery Destination:</td>
+                    <td align="right" style="font-size: 13px; color: #1a3325; font-weight: 600; padding-bottom: 4px; max-width: 240px;">
+                      ${addressLine}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 14px; font-weight: 800; color: #1a3325; padding-top: 8px; border-top: 1px dashed #dcd4c6;">
+                      Order Total:
+                    </td>
+                    <td align="right" style="font-size: 16px; font-weight: 850; color: #b45309; padding-top: 8px; border-top: 1px dashed #dcd4c6;">
+                      ₹${totalAmount}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Action Link -->
+              <div style="text-align: center; margin-bottom: 10px;">
+                <a href="${BASE_URL}/profile" style="display: inline-block; background: linear-gradient(135deg, #166534 0%, #14532d 100%); color: #ffffff; font-size: 13px; font-weight: 750; text-decoration: none; padding: 11px 28px; border-radius: 50px; box-shadow: 0 4px 14px rgba(22, 101, 52, 0.3);">
+                  View Order Details →
+                </a>
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td>
+              ${getEmailFooter()}
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
 }
 
+export const generatePaymentSuccessEmail = generateOrderEmail;

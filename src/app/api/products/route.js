@@ -17,7 +17,7 @@ export async function GET(request) {
     const isAdminQuery = searchParams.get('admin') === 'true';
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '100', 10)));
-    const noCache = searchParams.get('nocache') === 'true' || searchParams.has('_t');
+    const noCache = searchParams.get('nocache') === 'true';
 
     // Check if user is authenticated admin or requested admin mode
     let userIsAdmin = false;

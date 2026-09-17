@@ -6,7 +6,7 @@ import Coupon from '@/models/Coupon';
 import { reduceStock } from '@/lib/inventory';
 import { sendEmail } from '@/lib/email';
 import { generateOrderEmail } from '@/lib/emailTemplates';
-import { requireAdmin } from '@/lib/auth';
+import { requireAuth, requireAdmin } from '@/lib/auth';
 import { invalidateProductCache, invalidateStatsCache } from '@/lib/cache';
 
 export async function GET(request) {
@@ -27,6 +27,11 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const auth = requireAuth(request);
+    if (auth.error) {
+      return NextResponse.json({ error: 'Please sign in or register to place your order.' }, { status: 401 });
+    }
+
     await connectDB();
     const {
       customerName,
@@ -48,8 +53,14 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
     }
 
-    if (!customerEmail || !customerName) {
-      return NextResponse.json({ error: 'Customer name and email are required.' }, { status: 400 });
+    let finalCustomerEmail = (customerEmail || '').trim();
+    if (!finalCustomerEmail) {
+      const cleanPhone = (phone || '').replace(/\D/g, '');
+      finalCustomerEmail = cleanPhone ? `${cleanPhone}@guest.venthulir.com` : 'guest@venthulir.com';
+    }
+
+    if (!customerName || !customerName.trim()) {
+      return NextResponse.json({ error: 'Customer name is required.' }, { status: 400 });
     }
 
     // Process coupon if present
@@ -60,8 +71,8 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Coupon is no longer valid' }, { status: 400 });
       }
 
-      if (customerEmail) {
-        const hasUsed = await Order.findOne({ customerEmail, couponUsed: coupon.couponCode });
+      if (finalCustomerEmail && !finalCustomerEmail.endsWith('@guest.venthulir.com')) {
+        const hasUsed = await Order.findOne({ customerEmail: finalCustomerEmail, couponUsed: coupon.couponCode });
         if (hasUsed) return NextResponse.json({ error: 'You have already used this coupon code' }, { status: 400 });
       }
 
@@ -108,9 +119,9 @@ export async function POST(request) {
     const verifiedTotalAmount = Math.max(0, computedOriginalTotal + verifiedShippingCharge - verifiedDiscount);
 
     const newOrder = new Order({
-      customerName,
-      customerEmail,
-      phone,
+      customerName: customerName.trim(),
+      customerEmail: finalCustomerEmail,
+      phone: (phone || '').trim(),
       deliveryAddress,
       items: enrichedItems,
       originalAmount: computedOriginalTotal,
@@ -131,8 +142,9 @@ export async function POST(request) {
     invalidateProductCache();
     invalidateStatsCache();
 
-    // Send confirmation email safely
-    if (customerEmail) {
+    // Send confirmation email safely if a real customer email was provided
+    const isGuestPlaceholder = finalCustomerEmail.endsWith('@guest.venthulir.com') || finalCustomerEmail === 'guest@venthulir.com';
+    if (finalCustomerEmail && !isGuestPlaceholder) {
       const orderRef = newOrder._id.toString().slice(-8).toUpperCase();
       const emailHtml = generateOrderEmail({
         order: newOrder,
@@ -147,7 +159,7 @@ export async function POST(request) {
       });
 
       sendEmail({
-        to: customerEmail,
+        to: finalCustomerEmail,
         subject: `🌿 Order Confirmed #${orderRef} - Venthulir Organic Harvest`,
         html: emailHtml,
         text: `Thank you for your order, ${customerName}!\n\nOrder Ref: #${orderRef}\nTotal Amount: ₹${verifiedTotalAmount}\nPayment Method: ${paymentMethod}\nDelivery to: ${deliveryAddress?.address || ''}, ${deliveryAddress?.city || ''}\n\nWe are preparing your fresh farm harvest batch!`

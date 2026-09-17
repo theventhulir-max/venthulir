@@ -38,9 +38,11 @@ import {
   Check,
   ClipboardCheck,
   Box,
-  Home
+  Home,
+  FileText
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import TaxInvoice from '@/components/TaxInvoice';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -51,6 +53,7 @@ export default function ProfilePage() {
   const [activeOrderTab, setActiveOrderTab] = useState('current'); // 'current' | 'past' | 'cancelled'
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [invoiceOrder, setInvoiceOrder] = useState(null);
 
   // Fetch real-time user orders
   const fetchOrders = async () => {
@@ -288,41 +291,10 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-
-        <div className="banner-content-right">
-          <div className="banner-stat-item">
-            <div className="stat-icon-wrap stat-blue">
-              <Package size={20} className="stat-icon" />
-            </div>
-            <p className="stat-value">{orders.length}</p>
-            <span className="stat-label">Total Orders</span>
-          </div>
-          <div className="banner-stat-item">
-            <div className="stat-icon-wrap stat-amber">
-              <Truck size={20} className="stat-icon" />
-            </div>
-            <p className="stat-value">{activeOrdersCount}</p>
-            <span className="stat-label">Active Dispatch</span>
-          </div>
-          <div className="banner-stat-item">
-            <div className="stat-icon-wrap stat-purple">
-              <Gift size={20} className="stat-icon" />
-            </div>
-            <p className="stat-value">3</p>
-            <span className="stat-label">VIP Vouchers</span>
-          </div>
-          <div className="banner-stat-item">
-            <div className="stat-icon-wrap stat-gold">
-              <Sparkles size={20} className="stat-icon" />
-            </div>
-            <p className="stat-value">4.9</p>
-            <span className="stat-label">Your Rating</span>
-          </div>
-        </div>
       </div>
 
-      {/* ── 2. THREE COLUMN LAYOUT ── */}
-      <div className="profile-3col-layout">
+      {/* ── 2. MAIN LAYOUT ── */}
+      <div className="profile-layout">
         
         {/* Left Sidebar */}
         <aside>
@@ -430,7 +402,7 @@ export default function ProfilePage() {
                       <Package size={72} color="#0f3d2a" strokeWidth={1} style={{fill: '#dcfce7'}} />
                     </div>
                     <h3 className="empty-state-title">No Orders Found</h3>
-                    <p className="empty-state-desc">Looks like you haven't placed any {activeOrderTab} orders yet.<br/>Explore our fresh and natural products!</p>
+                    <p className="empty-state-desc">Looks like you haven&apos;t placed any {activeOrderTab} orders yet.<br/>Explore our fresh and natural products!</p>
                     <Link href="/products" className="btn-start-shopping">
                       <ShoppingBag size={18} />
                       Start Shopping <ArrowRight size={18} />
@@ -474,9 +446,35 @@ export default function ProfilePage() {
                                 {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                               </span>
                             </div>
-                            <span className={`tracking-status-badge ${backendStatus}`}>
-                              {backendStatus === 'out_for_delivery' ? 'Out for Delivery' : order.status || 'Pending'}
-                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span className={`tracking-status-badge ${backendStatus}`}>
+                                {backendStatus === 'out_for_delivery' ? 'Out for Delivery' : order.status || 'Pending'}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setInvoiceOrder(order)}
+                                style={{
+                                  background: '#ffffff',
+                                  border: '1px solid #cbd5e1',
+                                  borderRadius: '6px',
+                                  padding: '4px 10px',
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  color: '#0f3d2a',
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  transition: 'all 0.15s ease'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
+                                title="View & Print Official Tax Invoice"
+                              >
+                                <FileText size={12} color="#0f3d2a" />
+                                <span>Tax Invoice</span>
+                              </button>
+                            </div>
                           </div>
 
                           {/* Product Summary */}
@@ -530,9 +528,6 @@ export default function ProfilePage() {
                                 <p>{statusMessage}</p>
                               </div>
                             </div>
-                            <button className="btn-track-action">
-                              Track Package <ChevronRight size={16} />
-                            </button>
                           </div>
                         </div>
                       );
@@ -780,35 +775,16 @@ export default function ProfilePage() {
           </div>
         </main>
 
-        {/* Right Sidebar */}
-        <aside className="right-sidebar-stack">
-          
-          <div className="right-card shipping-card">
-            <div className="shipping-card-left">
-              <Truck size={24} className="shipping-icon" />
-              <div className="shipping-text">
-                <strong>Free Shipping</strong>
-                <span>On orders above ₹999</span>
-              </div>
-            </div>
-            <div className="arrow-circle-btn">
-              <ArrowRight size={14} />
-            </div>
-          </div>
-
-
-
-          <div className="right-card brand-card">
-            <div className="brand-card-header">
-              <Sparkles size={18} color="#d97706" />
-              Pure. Fresh. Natural.
-            </div>
-            <p>From our farms to your home,<br/>with love and care.</p>
-          </div>
-
-        </aside>
-
       </div>
+
+      {/* Official Tax Invoice Modal */}
+      {invoiceOrder && (
+        <TaxInvoice
+          order={invoiceOrder}
+          isOpen={Boolean(invoiceOrder)}
+          onClose={() => setInvoiceOrder(null)}
+        />
+      )}
     </div>
   );
 }

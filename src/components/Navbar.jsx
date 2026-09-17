@@ -127,19 +127,15 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
           if (name.includes(token) || cat.includes(token) || desc.includes(token) || origin.includes(token) || badge.includes(token)) {
             return true;
           }
-          // Chili / Chilli alias
           if ((token === 'chili' || token === 'chilli') && (name.includes('chilli') || name.includes('chili') || desc.includes('chilli'))) {
             return true;
           }
-          // Oil aliases
           if ((token === 'oil' || token === 'oils') && (cat.includes('oil') || name.includes('oil'))) {
             return true;
           }
-          // Turmeric / Haldi / Manjal
           if ((token === 'turmeric' || token === 'manjal' || token === 'haldi') && (name.includes('turmeric') || desc.includes('curcumin'))) {
             return true;
           }
-          // Sambar / Masala
           if ((token === 'sambar' || token === 'masala') && (name.includes('sambar') || name.includes('masala') || cat.includes('masala'))) {
             return true;
           }
@@ -248,7 +244,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
           <div className="announcement-quick-links">
             <span className="announcement-badge-pill">100% PURE</span>
             <span className="divider">|</span>
-            <button type="button" className="quick-link-btn" onClick={() => router.push('/products')}>Shop Fresh Harvest</button>
+            <Link href="/products" prefetch={true} className="quick-link-btn" onClick={() => setMenuOpen(false)}>Shop Fresh Harvest</Link>
             <span className="divider">|</span>
             <a href="https://wa.me/918778476414" target="_blank" rel="noreferrer" className="quick-link-btn highlight">WhatsApp Order</a>
           </div>
@@ -427,6 +423,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
           <div className="navbar-nav-group">
             <Link 
               href="/home"
+              prefetch={true}
               className="nav-item-btn"
               onClick={(e) => { 
                 setMenuOpen(false); 
@@ -441,6 +438,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
 
             <Link 
               href="/products"
+              prefetch={true}
               className="nav-item-btn"
               onClick={() => { setMenuOpen(false); }}
             >
@@ -474,6 +472,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
                     <Link
                       key={cat.id}
                       href={cat.filter ? `/products?category=${encodeURIComponent(cat.filter)}` : '/products'}
+                      prefetch={true}
                       className="flyout-item"
                       onClick={() => setCategoryDropOpen(false)}
                     >
@@ -502,6 +501,7 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
             {/* Wishlist Button */}
             <Link 
               href="/products"
+              prefetch={true}
               className="nav-action-icon-btn"
               title="Saved Items"
             >
@@ -604,10 +604,10 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
                 <span>Home</span>
                 <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', color: '#94a3b8' }} />
               </button>
-              <button type="button" className="mobile-nav-row" onClick={() => { setMenuOpen(false); router.push('/products'); }}>
+              <Link href="/products" prefetch={true} className="mobile-nav-row" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <span>All Products</span>
                 <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', color: '#94a3b8' }} />
-              </button>
+              </Link>
               <button type="button" className="mobile-nav-row" onClick={() => navigateToSection('story', '/home#story')}>
                 <span>Our Story</span>
                 <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', color: '#94a3b8' }} />
@@ -639,13 +639,13 @@ export default function Navbar({ onAuthOpen, onSearchOpen }) {
                     href="/profile"
                     className="mobile-auth-cta"
                     onClick={() => setMenuOpen(false)}
-                    style={{ background: '#166534' }}
+                    style={{ background: '#1B5E2F' }}
                   >
                     <User size={16} />
                     <span>My Profile &amp; Orders</span>
                   </Link>
                   <button 
-                    type="button"
+                    type="button" 
                     className="mobile-auth-cta logout" 
                     onClick={() => { logout(); setMenuOpen(false); }}
                   >

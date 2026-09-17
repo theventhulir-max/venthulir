@@ -163,7 +163,7 @@ export default function AdminBannersPage() {
           </div>
 
           <p style={{ fontSize: '13px', color: '#4b5d54', lineHeight: 1.6 }}>
-            The customer landing page hero dynamically features the <strong>"Royal Organic"</strong> heritage harvest collection with natural leaf physics and product highlights.
+            The customer landing page hero dynamically features the <strong>&quot;Royal Organic&quot;</strong> heritage harvest collection with natural leaf physics and product highlights.
           </p>
 
           <div style={{ background: '#faf8f5', padding: '16px', borderRadius: '10px', border: '1px solid #e6e1d6', display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '14px' }}>
@@ -180,7 +180,7 @@ export default function AdminBannersPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#15803d' }} />
               <span style={{ fontSize: '13px', fontWeight: 600 }}>CTA Button:</span>
-              <span style={{ fontSize: '13px', color: '#64748b' }}>"Explore Our Harvest" ➔ /products</span>
+              <span style={{ fontSize: '13px', color: '#64748b' }}>&quot;Explore Our Harvest&quot; ➔ /products</span>
             </div>
           </div>
         </div>

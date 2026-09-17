@@ -5,24 +5,24 @@
    ========================================================================== */
 
 :root {
-  --admin-bg: #f8fafc;
-  --admin-bg-alt: #f1f5f9;
+  --admin-bg: #f4f7f6; /* Softer, breathable off-white */
+  --admin-bg-alt: #ffffff;
   --admin-surface: #ffffff;
-  --admin-surface-hover: #f8fafc;
-  --admin-border: #e2e8f0;
-  --admin-border-subtle: #edf2f7;
+  --admin-surface-hover: #fcfdfc;
+  --admin-border: #e6ece9;
+  --admin-border-subtle: #f0f4f2;
 
-  --admin-sidebar-bg: #0b1511;
-  --admin-sidebar-surface: #11221c;
-  --admin-sidebar-hover: #172d25;
-  --admin-sidebar-active: #1e3b30;
-  --admin-sidebar-text: #e2f1ec;
-  --admin-sidebar-muted: #7e9c91;
-  --admin-sidebar-border: rgba(255, 255, 255, 0.08);
+  --admin-sidebar-bg: #060b08; /* Obsidian Black */
+  --admin-sidebar-surface: #0a140e;
+  --admin-sidebar-hover: rgba(255, 255, 255, 0.05); /* Glassmorphic */
+  --admin-sidebar-active: #0f1e15;
+  --admin-sidebar-text: #e2ede8;
+  --admin-sidebar-muted: #6e8a7d;
+  --admin-sidebar-border: rgba(255, 255, 255, 0.06);
 
-  --admin-primary: #0f3d2a;
-  --admin-primary-hover: #154734;
-  --admin-primary-light: #edfcf2;
+  --admin-primary: #0a3322;
+  --admin-primary-hover: #072619;
+  --admin-primary-light: #e6f0eb;
 
   --admin-gold: #c9922c;
   --admin-gold-light: #fef9ee;
@@ -67,8 +67,8 @@
 
 /* ── 2. Left Sidebar (Independent Scroll Pane) ─────────────────────────── */
 .admin-sidebar {
-  width: 260px;
-  min-width: 260px;
+  width: 240px;
+  min-width: 240px;
   background-color: var(--admin-sidebar-bg);
   color: var(--admin-sidebar-text);
   display: flex;
@@ -219,18 +219,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 9px 12px;
+  padding: 10px 14px;
   color: var(--admin-sidebar-text);
   text-decoration: none;
   border-radius: var(--admin-radius-md);
   font-size: 13.5px;
   font-weight: 500;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border: 1px solid transparent;
 }
 
 .admin-nav-item:hover {
   background-color: var(--admin-sidebar-hover);
   color: #ffffff;
+  backdrop-filter: blur(8px);
+  border-color: rgba(255,255,255,0.05);
 }
 
 .admin-nav-item.active {
@@ -238,6 +242,10 @@
   color: #ffffff;
   font-weight: 600;
   border-left: 3px solid var(--admin-gold);
+  border-right: 1px solid rgba(255,255,255,0.03);
+  border-top: 1px solid rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .admin-nav-item.active .admin-nav-icon {
@@ -349,19 +357,22 @@
   background-color: var(--admin-bg);
 }
 
-/* ── 4. Top Navigation Bar (Fixed 64px Sticky Header) ──────────────────── */
+/* ── 4. Top Navigation Bar (Floating Header) ──────────────────── */
 .admin-topnav {
-  height: 64px;
-  min-height: 64px;
-  background-color: var(--admin-surface);
-  border-bottom: 1px solid var(--admin-border);
+  height: 60px;
+  min-height: 60px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
+  padding: 0 24px;
   flex-shrink: 0;
   z-index: 40;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 20px rgba(10, 51, 34, 0.04);
+  margin: 16px 20px 0 20px;
+  border-radius: 16px;
 }
 
 .admin-topnav-left {
@@ -459,11 +470,11 @@
 /* ── 5. Main Content: Independent Scroll Pane ──────────────────────────── */
 .admin-page-content {
   flex: 1;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 76px);
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
-  padding: 24px 28px 60px;
+  padding: 20px 24px 60px;
   scroll-behavior: smooth;
   box-sizing: border-box;
 }
@@ -495,16 +506,36 @@
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-lg);
-  padding: 18px 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   display: flex;
-  flex-direction: column;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  align-items: flex-start;
+  gap: 16px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0a3322, #c9922c);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .admin-stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(10, 51, 34, 0.06);
+  border-color: #d3e0d8;
+}
+
+.admin-stat-card:hover::before {
+  opacity: 1;
 }
 
 .admin-stat-top {
@@ -643,7 +674,8 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13.5px;
+  font-size: 12.5px;
+  table-layout: auto;
 }
 
 .admin-table th,
@@ -651,16 +683,17 @@
   background: #f8fafc;
   color: var(--admin-text-secondary);
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 13px 16px;
+  letter-spacing: 0.4px;
+  padding: 9px 8px;
   border-bottom: 1.5px solid var(--admin-border);
+  white-space: nowrap;
 }
 
 .admin-table td,
 .adm-table td {
-  padding: 13px 16px;
+  padding: 8px 8px;
   border-bottom: 1px solid var(--admin-border-subtle);
   color: var(--admin-text-primary);
   vertical-align: middle;
@@ -687,7 +720,7 @@
 }
 
 .admin-badge.success,
-.adm-status-badge.delivered { background: #dcfce7; color: #166534; }
+.adm-status-badge.delivered { background: #dcfce7; color: var(--accent); }
 
 .admin-badge.info,
 .adm-status-badge.confirmed,
@@ -702,7 +735,7 @@
 .adm-status-badge.cancelled { background: #fee2e2; color: #991b1b; }
 
 .admin-badge.gold { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.admin-badge.in-stock { background: #dcfce7; color: #166534; }
+.admin-badge.in-stock { background: #dcfce7; color: var(--accent); }
 
 /* ── 8. Form Controls & Inputs ─────────────────────────────────────────── */
 .admin-input,
@@ -889,26 +922,523 @@
   flex-shrink: 0;
 }
 
-/* ── Responsive helpers ────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .admin-sidebar {
-    position: fixed;
-    left: -260px;
-    top: 0;
-    bottom: 0;
-    transition: left 0.25s ease;
-  }
-  .admin-sidebar.mobile-open {
-    left: 0;
-  }
-  .admin-mobile-toggle {
-    display: flex;
-  }
-}
-
+/* ── Universal Animations ──────────────────────────────────────────────── */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 .spin, .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+@keyframes adminFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes adminSlideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Mobile & Responsive Design System ────────────────────────────────── */
+
+/* Sidebar Overlay */
+.admin-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1040;
+  animation: adminFadeIn 0.2s ease;
+}
+
+.admin-sidebar-mobile-close {
+  display: none;
+}
+
+/* Filters Bar Responsive Layout */
+.admin-filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.admin-filters-search {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.admin-filters-dates {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-date-input-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-date-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Orders Cards Feed */
+.admin-orders-cards-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-order-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-order-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 61, 42, 0.08);
+  border-color: #cbd5e1;
+}
+
+.admin-order-card:active {
+  transform: scale(0.99);
+}
+
+.admin-order-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed #e2e8f0;
+  margin-bottom: 14px;
+}
+
+.admin-order-card-id {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0b3d2e;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+}
+
+.admin-order-card-customer {
+  margin-bottom: 10px;
+}
+
+.admin-order-card-customer-name {
+  font-size: 14.5px;
+  font-weight: 750;
+  color: #0f172a;
+  margin-bottom: 3px;
+}
+
+.admin-order-card-phone {
+  font-size: 12px;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.admin-order-card-phone:hover {
+  color: #16a34a;
+}
+
+.admin-order-card-items {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+
+.admin-order-card-items-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-order-card-date {
+  font-size: 11px;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-order-card-items-names {
+  font-size: 11.5px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 3px;
+}
+
+.admin-order-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px dashed #e2e8f0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-order-card-total {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-order-card-total-mode {
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.admin-order-card-total-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f3d2a;
+  line-height: 1.2;
+}
+
+.admin-order-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Default display rules for Desktop */
+.admin-orders-desktop-table {
+  display: block;
+}
+
+
+
+
+
+/* User Pill in TopNav */
+.admin-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #edfcf2;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  border: 1px solid #bbf7d0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-mid);
+  white-space: nowrap;
+}
+
+/* ── Media Query: Tablet & Small Desktops (<= 900px) ─────────────────── */
+@media (max-width: 900px) {
+  .admin-app-container {
+    height: 100dvh;
+    max-height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    left: -290px;
+    top: 0;
+    bottom: 0;
+    width: 280px !important;
+    min-width: 280px !important;
+    height: 100dvh;
+    max-height: 100dvh;
+    z-index: 1050;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .admin-sidebar.mobile-open {
+    left: 0 !important;
+  }
+
+  .admin-sidebar.collapsed {
+    width: 280px !important;
+    min-width: 280px !important;
+  }
+
+  .admin-sidebar-mobile-close {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e2f1ec;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .admin-sidebar-mobile-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .admin-sidebar-toggle {
+    display: none !important;
+  }
+
+  .admin-mobile-toggle {
+    display: inline-flex !important;
+  }
+}
+
+/* ── Media Query: Mobile Phones (<= 768px) ───────────────────────────── */
+@media (max-width: 768px) {
+  .admin-topnav {
+    height: 56px;
+    min-height: 56px;
+    padding: 0 12px;
+  }
+
+  .admin-page-title-group h1 {
+    font-size: 15px !important;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-breadcrumbs {
+    display: none !important;
+  }
+
+  .admin-header-btn-label {
+    display: none !important;
+  }
+
+  .admin-header-btn {
+    padding: 6px 10px !important;
+  }
+
+  .admin-user-pill-name {
+    display: none !important;
+  }
+
+  .admin-user-pill {
+    padding: 6px 8px !important;
+  }
+
+  .admin-page-content {
+    padding: 14px 12px 64px !important;
+    height: calc(100dvh - 56px) !important;
+  }
+
+  /* Filters Bar Stacking */
+  .admin-filters-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .admin-filters-search {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .admin-filters-dates {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .admin-date-input-group {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+  }
+
+  .admin-date-input-group .admin-input {
+    width: 100% !important;
+  }
+
+  .admin-orders-cards-feed {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* When table is forced on mobile, make table scrollable nicely */
+  .admin-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .admin-table {
+    min-width: 700px !important;
+  }
+
+  /* Stats Grid: 2 columns on mobile */
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .admin-stat-card {
+    padding: 12px 14px !important;
+  }
+
+  .admin-stat-value {
+    font-size: 20px !important;
+  }
+
+  .admin-stat-label {
+    font-size: 11.5px !important;
+  }
+
+  .admin-stat-icon-wrap {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  /* Modals on Mobile: Bottom-Sheet Style */
+  .admin-modal-overlay,
+  .adm-modal-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .admin-modal,
+  .adm-modal-dialog {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 92dvh !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: 18px !important;
+    border-top-right-radius: 18px !important;
+    margin: 0 !important;
+    animation: adminSlideUp 0.25s ease-out;
+  }
+
+  .adm-modal-header,
+  .admin-modal-header {
+    padding: 14px 16px !important;
+  }
+
+  .adm-modal-body,
+  .admin-modal-body {
+    padding: 14px 16px !important;
+  }
+
+  .adm-modal-footer,
+  .admin-modal-footer {
+    padding: 12px 16px !important;
+    flex-wrap: wrap;
+  }
+
+  /* Modal Grids on Mobile */
+  .adm-stepper-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .adm-tracking-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .adm-triggers-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Stepper, Tracking & Trigger Grids Default */
+.adm-stepper-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.adm-tracking-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.adm-triggers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+/* ── Media Query: Extra Small Phones (<= 480px) ──────────────────────── */
+@media (max-width: 480px) {
+  .admin-order-card-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .admin-order-card-actions {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    margin-left: 0 !important;
+  }
+
+  .admin-order-card-actions button {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .admin-card {
+    padding: 14px 12px !important;
+  }
+}
+
+/* Dashboard Workspace 2-Column Layout */
+.admin-dashboard-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .admin-dashboard-workspace {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+}
+

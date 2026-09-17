@@ -31,7 +31,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 2.4rem;
   font-weight: 750;
-  color: #14532d;
+  color: var(--accent-dark);
   margin: 0;
   display: flex;
   align-items: center;
@@ -43,7 +43,7 @@
   font-size: 0.82rem;
   font-weight: 800;
   background: #edf6f1;
-  color: #166534;
+  color: var(--accent);
   border: 1px solid #badcc7;
   padding: 3px 12px;
   border-radius: 9999px;
@@ -97,12 +97,12 @@
   gap: 8px;
   font-size: 0.88rem;
   font-weight: 700;
-  color: #14532d;
+  color: var(--accent-dark);
   margin-bottom: 10px;
 }
 
 .shipping-banner-text.unlocked {
-  color: #166534;
+  color: var(--accent);
 }
 
 .shipping-progress-track {
@@ -244,7 +244,7 @@
   border-radius: 50%;
   border: none;
   background: transparent;
-  color: #166534;
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -253,7 +253,7 @@
 }
 
 .cart-qty-btn:hover:not(:disabled) {
-  background: #166534;
+  background: var(--accent);
   color: #ffffff;
 }
 
@@ -265,7 +265,7 @@
 .cart-qty-num {
   font-size: 0.88rem;
   font-weight: 800;
-  color: #166534;
+  color: var(--accent);
   min-width: 18px;
   text-align: center;
 }
@@ -273,7 +273,7 @@
 .cart-row-subtotal {
   font-size: 1.05rem;
   font-weight: 850;
-  color: #14532d;
+  color: var(--accent-dark);
 }
 
 .cart-row-remove-btn {
@@ -353,7 +353,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.5rem;
   font-weight: 750;
-  color: #14532d;
+  color: var(--accent-dark);
   margin: 0 0 18px;
   padding-bottom: 12px;
   border-bottom: 1px solid #edf2ee;
@@ -379,24 +379,25 @@
 }
 
 .cart-coupon-input:focus {
-  border-color: #166534;
+  border-color: var(--accent);
 }
 
 .btn-apply-cart-coupon {
   padding: 11px 18px;
   font-size: 0.84rem;
-  font-weight: 800;
-  color: #b45309;
-  background: #fef3c7;
-  border: 1.5px solid #f59e0b;
-  border-radius: 10px;
+  font-weight: 600;
+  color: #222222;
+  background: #F5F5F5;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-apply-cart-coupon:hover {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #ffffff;
+  background: #EBEBEB;
+  border-color: #D6D6D6;
+  color: #000000;
 }
 
 /* Breakdown rows */
@@ -406,7 +407,7 @@
   gap: 12px;
   padding: 16px 0;
   border-top: 1px dashed #dce8e0;
-  border-bottom: 1.5px solid #166534;
+  border-bottom: 1.5px solid var(--accent);
   margin-bottom: 20px;
 }
 
@@ -419,14 +420,14 @@
 }
 
 .breakdown-row.discount-row {
-  color: #166534;
+  color: var(--accent);
   font-weight: 700;
 }
 
 .breakdown-row.grand-row {
   font-size: 1.35rem;
   font-weight: 850;
-  color: #14532d;
+  color: #222222;
   padding-top: 6px;
 }
 
@@ -436,24 +437,23 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 15px 24px;
+  padding: 14px 24px;
   font-size: 1rem;
-  font-weight: 850;
+  font-weight: 600;
   color: #ffffff;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #c2410c 100%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 9999px;
+  background: #1B5E2F;
+  border: 1px solid #1B5E2F;
+  border-radius: 6px;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.24s ease;
-  box-shadow: 0 6px 22px rgba(217, 119, 6, 0.42);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  box-shadow: none;
 }
 
 .btn-proceed-checkout:hover {
-  background: linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ea580c 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(234, 88, 12, 0.55);
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
 }
 
 /* Trust Perks in Cart */
@@ -475,7 +475,7 @@
 }
 
 .cart-trust-item svg {
-  color: #166534;
+  color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -497,7 +497,7 @@
   border-radius: 50%;
   background: #f4f9f6;
   border: 2px dashed #badcc7;
-  color: #166534;
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -508,7 +508,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 2.2rem;
   font-weight: 750;
-  color: #14532d;
+  color: var(--accent-dark);
   margin: 0 0 8px;
 }
 

@@ -31,7 +31,7 @@ export async function POST(request) {
       { upsert: true, new: true }
     );
 
-    console.log(`[AUTH] Generated Registration OTP for ${cleanEmail}: ${otp}`);
+    console.log(`[AUTH] Registration OTP generated and dispatched for ${cleanEmail}`);
 
     const emailHtml = generateOtpEmail({
       otp,

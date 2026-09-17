@@ -86,7 +86,7 @@ function ProductsPageContent({ onCheckout }) {
       if (sort) params.set('sort', sort);
       params.set('limit', '60');
 
-      const res = await fetch(`${API}/products?${params.toString()}&_t=${Date.now()}`, { cache: 'no-store' });
+      const res = await fetch(`${API}/products?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.products)) {

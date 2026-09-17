@@ -6,6 +6,8 @@ import User from '@/models/User';
 import { requireAuth, requireAdmin } from '@/lib/auth';
 import { restoreStock } from '@/lib/inventory';
 import { invalidateStatsCache } from '@/lib/cache';
+import { sendEmail } from '@/lib/email';
+import { generateOrderStatusEmail } from '@/lib/emailTemplates';
 
 export async function GET(request, { params }) {
   try {
@@ -51,7 +53,7 @@ export async function PUT(request, { params }) {
     await connectDB();
     const { id } = await params;
     const body = await request.json();
-    let { status, action } = body;
+    let { status, action, trackingNumber, courierPartner } = body;
 
     let order = null;
     if (mongoose.Types.ObjectId.isValid(id)) {
@@ -83,6 +85,23 @@ export async function PUT(request, { params }) {
       }
       await order.save();
       invalidateStatsCache();
+
+      // Dispatch Cancellation Email
+      if (order.customerEmail) {
+        const orderRef = (order.orderId || order._id).toString().slice(-8).toUpperCase();
+        const emailHtml = generateOrderStatusEmail({
+          order,
+          newStatus: 'Cancelled',
+          customerName: order.customerName || 'Valued Customer'
+        });
+        sendEmail({
+          to: order.customerEmail,
+          subject: `🌿 Order #${orderRef} Cancellation Notice - Venthulir Organic Harvest`,
+          html: emailHtml,
+          text: `Dear ${order.customerName || 'Customer'},\n\nYour order #${orderRef} has been cancelled.\n\nThank you,\nVenthulir Organic Harvest`
+        }).catch(err => console.error('Cancellation email error:', err));
+      }
+
       return NextResponse.json({ msg: 'Order cancelled successfully', order });
     }
 
@@ -106,10 +125,32 @@ export async function PUT(request, { params }) {
 
     order.status = status;
     order.statusUpdatedAt = new Date();
+    if (trackingNumber !== undefined) order.trackingNumber = trackingNumber || null;
+    if (courierPartner !== undefined) order.courierPartner = courierPartner || null;
+
     await order.save();
     invalidateStatsCache();
 
-    return NextResponse.json({ msg: 'Order status updated', order });
+    // Trigger Automatic Transactional Status Email (Professional English)
+    if (order.customerEmail && prevStatus !== status) {
+      const orderRef = (order.orderId || order._id).toString().slice(-8).toUpperCase();
+      const emailHtml = generateOrderStatusEmail({
+        order,
+        newStatus: status,
+        trackingNumber: order.trackingNumber,
+        courierPartner: order.courierPartner,
+        customerName: order.customerName || 'Valued Customer'
+      });
+
+      sendEmail({
+        to: order.customerEmail,
+        subject: `🌿 Order #${orderRef} Status Update: ${status} - Venthulir Organic Harvest`,
+        html: emailHtml,
+        text: `Dear ${order.customerName || 'Valued Customer'},\n\nYour Venthulir Organic order #${orderRef} status is now: ${status}.\n\nTotal Amount: ₹${order.totalAmount}\nDelivery Address: ${order.deliveryAddress?.address || ''}\n\nThank you for choosing certified organic harvest.\n\nVenthulir Organic Harvest`
+      }).catch(err => console.error('Status update email error:', err));
+    }
+
+    return NextResponse.json({ msg: 'Order status updated and notification sent', order });
   } catch (err) {
     console.error('Order update error:', err);
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });

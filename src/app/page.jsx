@@ -48,7 +48,7 @@ const CATEGORIES = [
     origin: 'Salem & Guntur Direct Farms',
     highlights: ['Salem Turmeric', 'Guntur Red Chilli', 'Erode Coriander', 'Black Pepper'],
     isFeatured: true,
-    accentColor: '#166534'
+    accentColor: '#1B5E2F'
   },
   { 
     id: 'oils',
@@ -64,7 +64,7 @@ const CATEGORIES = [
     origin: 'Native Tamil Nadu Chekku',
     highlights: ['Gingelly (Sesame)', 'Groundnut', 'Pure Coconut', 'Sunflower'],
     isFeatured: true,
-    accentColor: '#166534'
+    accentColor: '#1B5E2F'
   },
   { 
     id: 'masalas',
@@ -80,7 +80,7 @@ const CATEGORIES = [
     origin: 'Chettinad & Kongu Heritage',
     highlights: ['Traditional Sambar', 'Royal Garam Masala', 'Kongu Rasam Powder'],
     isFeatured: false,
-    accentColor: '#166534'
+    accentColor: '#1B5E2F'
   },
   { 
     id: 'rice',
@@ -95,7 +95,7 @@ const CATEGORIES = [
     origin: 'Thanjavur & Cauvery Delta',
     highlights: ['Karuppu Kavuni', 'Mappillai Samba', 'Poongar Rice', 'Native Millets'],
     isFeatured: false,
-    accentColor: '#166534'
+    accentColor: '#1B5E2F'
   },
   { 
     id: 'sweeteners',
@@ -110,7 +110,7 @@ const CATEGORIES = [
     origin: 'Tirunelveli Palm Groves',
     highlights: ['Palm Jaggery (Karupatti)', 'Country Sugar', 'Raw Forest Honey'],
     isFeatured: false,
-    accentColor: '#166534'
+    accentColor: '#1B5E2F'
   },
   { 
     id: 'herbal',
@@ -125,7 +125,7 @@ const CATEGORIES = [
     origin: 'Western Ghats Foothills',
     highlights: ['Avarampoo Infusion', 'Nilavembu Vitality', 'Tulsi Leaves', 'Moringa Powder'],
     isFeatured: false,
-    accentColor: '#166534'
+    accentColor: '#1B5E2F'
   },
 ];
 
@@ -201,7 +201,7 @@ const HERO_POWDERS = [
     price: 'From ₹140',
     rating: '4.9 ★ (420+)',
     bgGradient: '#f4f8f5',
-    spiceColor: '#166534',
+    spiceColor: '#1B5E2F',
     auraGlow: 'rgba(22, 101, 52, 0.15)',
   },
   {
@@ -295,7 +295,7 @@ const HERO_OILS = [
     price: 'From ₹340',
     rating: '5.0 ★ (570+)',
     bgGradient: '#f4f8f5',
-    spiceColor: '#166534',
+    spiceColor: '#1B5E2F',
     auraGlow: 'rgba(22, 101, 52, 0.15)',
   },
   {
@@ -575,7 +575,7 @@ export default function HomePage({ onCheckout }) {
   // Load products from API (Fresh live fetch + newest first sort)
   const fetchFreshProducts = useCallback(() => {
     setLoading(true);
-    fetch(`${API}/products?limit=100&sort=newest&_t=${Date.now()}`, { cache: 'no-store' })
+    fetch(`${API}/products?limit=100&sort=newest`)
       .then((res) => res.json())
       .then((data) => {
         const list = Array.isArray(data) ? data : (data?.products || []);
@@ -1100,7 +1100,7 @@ export default function HomePage({ onCheckout }) {
             <div className="products-empty-state">
               <Package size={52} strokeWidth={1.2} />
               <h3>No products found</h3>
-              <p>Try searching for another keyword or selecting "All" categories.</p>
+              <p>Try searching for another keyword or selecting &quot;All&quot; categories.</p>
               <button
                 className="btn-secondary-sm"
                 onClick={() => {
@@ -1598,7 +1598,7 @@ export default function HomePage({ onCheckout }) {
                     <Quote size={24} className="quote-watermark" />
                   </div>
 
-                  <p className="review-comment">"{rev.text}"</p>
+                  <p className="review-comment">&quot;{rev.text}&quot;</p>
 
                   <div className="reviewer-profile">
                     <div className="reviewer-avatar">{rev.name[0]}</div>

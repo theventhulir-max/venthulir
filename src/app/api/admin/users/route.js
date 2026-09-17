@@ -39,7 +39,10 @@ export async function GET(request) {
       };
     }
 
-    const users = await User.find(query).sort({ createdAt: -1 }).lean();
+    const users = await User.find(query)
+      .select('-password -otp -otpExpires')
+      .sort({ createdAt: -1 })
+      .lean();
     return NextResponse.json(users);
   } catch (err) {
     console.error('API Admin Get Users Error:', err);

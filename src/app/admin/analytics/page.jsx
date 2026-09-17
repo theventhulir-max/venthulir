@@ -199,7 +199,7 @@ export default function AdminAnalyticsPage() {
               <div style={{ fontSize: '24px', fontWeight: 800, color: '#15803d', margin: '6px 0' }}>
                 {stats?.statusCounts?.delivered || 0}
               </div>
-              <div style={{ fontSize: '11px', color: '#166534' }}>Orders completed</div>
+              <div style={{ fontSize: '11px', color: '#1B5E2F' }}>Orders completed</div>
             </div>
 
             <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '16px', borderRadius: '10px', textAlign: 'center' }}>

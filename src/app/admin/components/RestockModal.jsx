@@ -93,7 +93,7 @@ export default function RestockModal({
             </div>
 
             <div style={{ background: '#dcfce7', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '12px', textAlign: 'center' }}>
-              <div style={{ fontSize: '11px', color: '#166534', textTransform: 'uppercase', fontWeight: 600 }}>New Stock</div>
+              <div style={{ fontSize: '11px', color: '#1B5E2F', textTransform: 'uppercase', fontWeight: 600 }}>New Stock</div>
               <div style={{ fontSize: '22px', fontWeight: 800, color: '#15803d' }}>
                 {newProjectedStock}
               </div>

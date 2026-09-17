@@ -15,62 +15,107 @@
   --font-sans:             'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* ══════════════════════════════════════════════════════════════
-     VENTHULIR LUXURY COLOR IDENTITY PALETTE
+     VENTHULIR — 60-30-10 COLOR THEORY SYSTEM
+     60% Off-White Base · 30% Logo Dark Green · 10% Logo Leaf Green
      ══════════════════════════════════════════════════════════════ */
 
-  /* Primary Fresh Botanical Emeralds */
-  --primary-color:         #166534;
-  --primary-dark:          #14532d;
-  --primary-mid:           #15803d;
-  --primary-light:         #22c55e;
-  --primary-pale:          #f0fdf4;
-  --primary-surface:       #f2fbf5;
+  /* ── 60% BASE (Background, Large Surfaces) ── */
+  --base-bg:               #FAF9F6;
+  --base-white:            #ffffff;
+  --base-surface:          #f5f4ef;
 
-  --green-dark:            #14532d;
-  --green-mid:             #166534;
-  --green-light:           #15803d;
-  --green-pale:            #f0fdf4;
+  /* ── 30% BRAND GREEN (Navbar, Buttons, Text Emphasis, UI Chrome) ── */
+  /* Exact colors from Venthulir logo */
+  --brand:                 #1B5E2F;
+  --brand-dark:            #134522;
+  --brand-mid:             #236B3A;
+  --brand-light:           #2E8049;
+  --brand-pale:            #E8F5EC;
+  --brand-surface:         #F0FAF3;
 
-  /* Harvest Amber & Sunburst Gold Accents */
-  --accent-gold:           #d97706;
-  --accent-gold-dark:      #b45309;
-  --accent-gold-light:     #f59e0b;
-  --accent-gold-pale:      #fef3c7;
-  --gold:                  #d97706;
-  --gold-light:            #fffbeb;
-  --accent-sun:            #f59e0b;
+  /* Neutral UI tones (for borders, surfaces, disabled) */
+  --ui-gray-100:           #F5F5F5;
+  --ui-gray-200:           #EBEBEB;
+  --ui-gray-300:           #E0E0E0;
+  --ui-gray-400:           #CCCCCC;
+  --ui-gray-500:           #999999;
+  --ui-charcoal:           #222222;
+  --ui-charcoal-deep:      #000000;
+
+  /* ── 10% ACCENT LEAF GREEN (CTA Pops, Success, Highlights, Trust) ── */
+  /* Bright leaf green from logo icon */
+  --accent:                #4CAF50;
+  --accent-dark:           #388E3C;
+  --accent-mid:            #66BB6A;
+  --accent-light:          #A5D6A7;
+  --accent-pale:           #E8F5E9;
+  --accent-surface:        #F1FBF2;
+
+  /* Legacy Alias — Botanical Greens (backward compatibility) */
+  --primary-color:         #1B5E2F;
+  --primary-dark:          #134522;
+  --primary-mid:           #236B3A;
+  --primary-light:         #2E8049;
+  --primary-pale:          #E8F5EC;
+  --primary-surface:       #F0FAF3;
+
+  --green-dark:            #134522;
+  --green-mid:             #1B5E2F;
+  --green-light:           #4CAF50;
+  --green-pale:            #E8F5E9;
+
+  /* Legacy Alias — Gold Accents (kept for compatibility) */
+  --accent-gold:           #B8860B;
+  --accent-gold-dark:      #9A7209;
+  --accent-gold-light:     #DAA520;
+  --accent-gold-pale:      #FDF8E8;
+  --gold:                  #B8860B;
+  --gold-light:            #FDF8E8;
+  --accent-sun:            #DAA520;
   --accent-terracotta:     #c2410c;
 
   /* Creamy Luxury Organic Backgrounds */
-  --bg-creamy:             #fbf8f3;
-  --cream:                 #fbf8f3;
-  --cream-soft:            #f6f1e8;
+  --bg-creamy:             #FAF9F6;
+  --cream:                 #FAF9F6;
+  --cream-soft:            #f5f4ef;
   --white:                 #ffffff;
-  --black:                 #0a1f14;
+  --black:                 #1B5E2F;
+
+  /* Modern D2C Button Tokens — 30% Brand Green Primary */
+  --btn-primary-bg:        #1B5E2F;
+  --btn-primary-hover:     #134522;
+  --btn-primary-text:      #ffffff;
+  --btn-secondary-bg:      #F5F5F5;
+  --btn-secondary-text:    #1B5E2F;
+  --btn-secondary-border:  #E0E0E0;
+  --btn-accent-bg:         #4CAF50;
+  --btn-accent-hover:      #388E3C;
+  --btn-accent-text:       #ffffff;
 
   /* Secondary Earthy Warm Borders & Surfaces */
-  --secondary-tan:         #e8dcce;
+  --secondary-tan:         #eae7df;
   --secondary-tan-light:   #f5eee4;
   --secondary-tan-pale:    #faf6f0;
-  --border:                #e5dcce;
+  --border:                #E5E5E5;
   --border-light:          #f0e9df;
   --border-emerald:        #bbf7d0;
 
   /* Typography Colors */
-  --text-dark:             #14422e;
-  --text-body:             #2d4a3b;
-  --text-mid:              #3f6350;
-  --text-muted:            #668775;
-  --text-light:            #8ea89a;
+  --text-dark:             #222222;
+  --text-body:             #2d3748;
+  --text-mid:              #4a5568;
+  --text-muted:            #718096;
+  --text-light:            #a0aec0;
 
   /* Shadows & Radius */
-  --shadow-xs:             0 1px 3px rgba(15, 61, 42, 0.04);
-  --shadow-sm:             0 4px 12px rgba(15, 61, 42, 0.05);
-  --shadow-md:             0 8px 24px rgba(15, 61, 42, 0.07);
-  --shadow-lg:             0 16px 40px rgba(15, 61, 42, 0.09);
-  --shadow-xl:             0 24px 64px -12px rgba(15, 61, 42, 0.14);
-  --shadow-gold:           0 10px 28px rgba(201, 146, 44, 0.22);
-  --shadow-emerald:        0 10px 28px rgba(19, 78, 53, 0.22);
+  --shadow-xs:             0 1px 3px rgba(27, 94, 47, 0.04);
+  --shadow-sm:             0 4px 12px rgba(27, 94, 47, 0.06);
+  --shadow-md:             0 8px 24px rgba(27, 94, 47, 0.08);
+  --shadow-lg:             0 16px 40px rgba(27, 94, 47, 0.10);
+  --shadow-xl:             0 24px 64px -12px rgba(27, 94, 47, 0.15);
+  --shadow-gold:           0 10px 28px rgba(184, 134, 11, 0.22);
+  --shadow-emerald:        0 10px 28px rgba(27, 94, 47, 0.22);
+  --shadow-accent:         0 10px 28px rgba(76, 175, 80, 0.20);
 
   --radius-xs:             6px;
   --radius-sm:             10px;
@@ -128,7 +173,7 @@ html.lenis, html.lenis body {
 
 body {
   font-family: var(--font-sans);
-  background: #fbf8f3;
+  background: #FAF9F6;
   color: var(--text-dark);
   overflow-x: hidden;
   width: 100%;
@@ -178,11 +223,11 @@ img {
   background: var(--bg-creamy); 
 }
 ::-webkit-scrollbar-thumb { 
-  background: #2a694d; 
+  background: var(--accent); 
   border-radius: 6px; 
 }
 ::-webkit-scrollbar-thumb:hover { 
-  background: var(--primary-mid); 
+  background: var(--accent-dark); 
 }
 
 /* Container */
@@ -206,7 +251,7 @@ img {
   font-weight: 800;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--accent-gold-dark);
+  color: var(--brand);
   margin-bottom: 10px;
   display: inline-flex;
   align-items: center;
@@ -216,7 +261,7 @@ img {
 .section-title {
   font-size: clamp(2rem, 3.6vw, 3rem);
   font-weight: 800;
-  color: var(--primary-dark);
+  color: var(--brand);
   letter-spacing: -0.028em;
   margin-bottom: 14px;
 }
@@ -228,69 +273,76 @@ img {
   line-height: 1.65;
 }
 
-/* Premium Buttons */
+/* Modern D2C Buttons — 60-30-10 Logo Green System */
+/* 30% Brand Primary (Logo Dark Green) */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 14px 32px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #c2410c 100%);
+  gap: 8px;
+  background: #1B5E2F;
   color: #ffffff;
-  border-radius: var(--radius-full);
-  font-weight: 850;
-  font-size: 0.95rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: var(--transition);
-  letter-spacing: 0.3px;
+  border: 1px solid #1B5E2F;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
   cursor: pointer;
-  box-shadow: 0 8px 25px rgba(217, 119, 6, 0.38);
-  position: relative;
-  overflow: hidden;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: 0.6s ease;
-}
-
-.btn-primary:hover::after {
-  left: 100%;
+  text-decoration: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ea580c 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(234, 88, 12, 0.52);
+  background: #134522;
+  border-color: #134522;
+  color: #ffffff;
 }
 
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #F5F5F5;
+  color: #1B5E2F;
+  border: 1px solid #E0E0E0;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background: #EBEBEB;
+  border-color: #D6D6D6;
+  color: #134522;
+}
+
+/* .btn-gold now matches brand primary green */
 .btn-gold {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  padding: 14px 32px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  gap: 8px;
+  background: #1B5E2F;
   color: #ffffff;
-  border-radius: var(--radius-full);
-  font-weight: 850;
-  font-size: 0.95rem;
-  transition: var(--transition);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.35);
+  border: 1px solid #1B5E2F;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
   cursor: pointer;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
 }
 
 .btn-gold:hover {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.48);
+  background: #134522;
+  border-color: #134522;
+  color: #ffffff;
 }
 
 .btn-outline {
@@ -298,24 +350,46 @@ img {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 13px 30px;
-  border: 1.5px solid #f59e0b;
-  color: #d97706;
-  border-radius: var(--radius-full);
-  font-weight: 800;
+  padding: 9px 18px;
+  border: 1px solid #1B5E2F;
+  color: #1B5E2F;
+  border-radius: 10px;
+  font-weight: 500;
   font-size: 0.92rem;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  transition: var(--transition);
+  background: #ffffff;
+  transition: all 0.2s ease;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .btn-outline:hover {
-  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  background: #E8F5EC;
+  border-color: #1B5E2F;
+  color: #134522;
+}
+/* 10% Accent CTA Buttons (Use Sparingly — Key Conversion Actions) */
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--accent);
   color: #ffffff;
-  border-color: #ea580c;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.35);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-accent:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: #ffffff;
+  box-shadow: var(--shadow-accent);
 }
 
 /* Smooth Utility Transitions & Animations */

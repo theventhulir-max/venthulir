@@ -269,7 +269,7 @@ export default function AdminCouponsPage() {
               {!loading && filtered.length === 0 && (
                 <tr>
                   <td colSpan={7} style={{ textAlign: 'center', padding: '36px', color: '#64748b' }}>
-                    No promo coupons created yet. Click "Create New Coupon" to start.
+                    No promo coupons created yet. Click &quot;Create New Coupon&quot; to start.
                   </td>
                 </tr>
               )}

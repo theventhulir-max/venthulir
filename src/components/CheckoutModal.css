@@ -90,7 +90,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #15803d;
+  color: var(--accent-mid);
   margin-bottom: 14px;
   display: flex;
   align-items: center;
@@ -112,7 +112,7 @@
   align-items: center;
   gap: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #edf5f0;
+  border-bottom: 1px solid #E8F5EC;
 }
 
 .checkout-item-img {
@@ -188,12 +188,12 @@
 }
 
 .co-total-row .discount {
-  color: #15803d;
+  color: var(--accent-mid);
   font-weight: 700;
 }
 
 .co-total-row .free {
-  color: #15803d;
+  color: var(--accent-mid);
   font-weight: 800;
 }
 
@@ -251,7 +251,7 @@
 
 .co-field input:focus {
   background: #ffffff;
-  border-color: #15803d;
+  border-color: var(--accent-mid);
   box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12);
 }
 
@@ -271,23 +271,21 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 20px;
+  padding: 13px 20px;
   font-size: 0.95rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #c9922c 0%, #b47a1b 50%, #926010 100%);
+  font-weight: 600;
+  background: #1B5E2F;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  border: 1px solid #1B5E2F;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 6px 20px rgba(180, 122, 27, 0.35);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+  box-shadow: none;
 }
 
 .co-submit:hover {
-  background: linear-gradient(135deg, #dfa83e 0%, #c9922c 50%, #b47a1b 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 26px rgba(180, 122, 27, 0.48);
+  background: #000000;
+  border-color: #000000;
 }
 
 .co-auth-note {
@@ -308,7 +306,7 @@
 }
 
 .checkout-placing .spin {
-  color: #15803d;
+  color: var(--accent-mid);
   animation: spin 1s linear infinite;
 }
 
@@ -322,7 +320,7 @@
 }
 
 .success-icon {
-  color: #15803d;
+  color: var(--accent-mid);
 }
 
 .checkout-success h2 {

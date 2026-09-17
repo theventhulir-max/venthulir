@@ -4,7 +4,7 @@ import Product from '@/models/Product';
 import { requireAdmin } from '@/lib/auth';
 import { invalidateProductCache } from '@/lib/cache';
 
-const STOCK_FIELDS_EXCLUDE = '-initialStock -currentStock -updatedAt';
+const STOCK_FIELDS_EXCLUDE = '-initialStock -updatedAt';
 
 export async function GET(request, { params }) {
   try {

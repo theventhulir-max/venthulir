@@ -21,7 +21,10 @@ import {
   Banknote,
   QrCode,
   PackageCheck,
-  Plus
+  Plus,
+  Lock,
+  MessageCircle,
+  ExternalLink
 } from 'lucide-react';
 import { PRESET_COUPONS } from '@/data/constants';
 import './CheckoutPage.css';
@@ -146,6 +149,12 @@ function CheckoutContent() {
     e.preventDefault();
     setOrderError('');
 
+    if (!isAuthenticated) {
+      setOrderError('Please sign in or register to place your order.');
+      router.push('/login?redirect=/checkout');
+      return;
+    }
+
     if (cartItems.length === 0) {
       setOrderError('Your cart is empty. Please add products before placing an order.');
       return;
@@ -180,9 +189,12 @@ function CheckoutContent() {
         }
       }
 
+      const cleanPhone = formData.phone.trim().replace(/\D/g, '');
+      const finalEmail = formData.email.trim() || user?.email || (cleanPhone ? `${cleanPhone}@guest.venthulir.com` : 'guest@venthulir.com');
+
       const orderPayload = {
         customerName: formData.name.trim(),
-        customerEmail: formData.email.trim() || user?.email || 'patron@venthulir.com',
+        customerEmail: finalEmail,
         phone: formData.phone.trim(),
         deliveryAddress: {
           address: formData.address.trim(),
@@ -235,56 +247,95 @@ function CheckoutContent() {
 
   // ── SUCCESS SCREEN ──
   if (placedOrder) {
+    const orderRef = (placedOrder._id || placedOrder.id || '').toString().slice(-8).toUpperCase();
+    const customerDisplayName = formData.name || user?.name || 'Valued Patron';
+
     return (
       <div className="checkout-page-root">
-        <div className="checkout-success-container">
-          <div className="success-badge-crest">
-            <PackageCheck size={40} />
+        <div className="checkout-success-container" style={{ maxWidth: '640px', padding: '36px 24px' }}>
+          <div className="success-badge-crest" style={{ background: '#ecfdf5', borderColor: '#a7f3d0', color: '#059669', width: '64px', height: '64px', borderRadius: '50%', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <CheckCircle2 size={36} color="#059669" />
           </div>
-          <h1 className="success-order-title">Order Placed Successfully!</h1>
-          <p className="success-order-msg">
-            Thank you for choosing Venthulir Organic Harvest. Your batch is being freshly packed and prepared for express farm dispatch.
+          
+          <div style={{ display: 'inline-block', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '30px', padding: '4px 14px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#b45309', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              🌿 Farm Harvest Booked Successfully
+            </span>
+          </div>
+
+          <h1 className="success-order-title" style={{ fontSize: '1.8rem', color: '#0f3d2a', margin: '0 0 8px' }}>
+            Congratulations, {customerDisplayName}!
+          </h1>
+          <p className="success-order-msg" style={{ fontSize: '0.92rem', color: '#52665a', lineHeight: 1.5, margin: '0 0 24px' }}>
+            Thank you for choosing pure organic living! Your order has been securely confirmed at our farm origin and is now queued for batch packing.
           </p>
 
-          <div className="success-order-meta-box">
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-              <span style={{ color: '#557262' }}>Order Reference:</span>
-              <strong style={{ color: '#0f3d2a' }}>#{placedOrder._id?.slice(-8).toUpperCase() || placedOrder._id}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-              <span style={{ color: '#557262' }}>Payment Method:</span>
-              <strong style={{ color: '#0f3d2a' }}>{paymentMethod}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-              <span style={{ color: '#557262' }}>Total Amount:</span>
-              <strong style={{ color: '#b45309', fontSize: '1rem' }}>₹{placedOrder.totalAmount || finalPayable}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-              <span style={{ color: '#557262' }}>Delivery Address:</span>
-              <span style={{ color: '#0f3d2a', textAlign: 'right', maxWidth: '240px' }}>
-                {formData.address}, {formData.city} - {formData.zipCode}
+          {/* Detailed Order Information Card */}
+          <div className="success-order-meta-box" style={{ background: '#faf9f6', border: '1px solid #e8e2d5', borderRadius: '14px', padding: '20px', textAlign: 'left', marginBottom: '22px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid #eee7dc', marginBottom: '12px' }}>
+              <div>
+                <span style={{ fontSize: '11px', textTransform: 'uppercase', fontWeight: 700, color: '#788c81', letterSpacing: '0.5px' }}>Order Reference</span>
+                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f3d2a', fontFamily: 'monospace' }}>#{orderRef}</div>
+              </div>
+              <span style={{ background: '#dcfce7', color: '#1B5E2F', border: '1px solid #bbf7d0', padding: '4px 12px', borderRadius: '50px', fontSize: '12px', fontWeight: 750, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <CheckCircle2 size={13} /> Confirmed
               </span>
             </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', fontSize: '0.86rem', marginBottom: '12px' }}>
+              <div>
+                <span style={{ color: '#788c81', display: 'block', fontSize: '11px', textTransform: 'uppercase', fontWeight: 700 }}>Total Payable</span>
+                <strong style={{ color: '#b45309', fontSize: '1.1rem' }}>₹{placedOrder.totalAmount || finalPayable}</strong>
+                <span style={{ fontSize: '11px', color: '#557262', marginLeft: '4px' }}>({paymentMethod})</span>
+              </div>
+              <div>
+                <span style={{ color: '#788c81', display: 'block', fontSize: '11px', textTransform: 'uppercase', fontWeight: 700 }}>Estimated Dispatch</span>
+                <strong style={{ color: '#0f3d2a' }}>24 to 48 Hours</strong>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid #eee7dc', paddingTop: '12px', fontSize: '0.86rem' }}>
+              <span style={{ color: '#788c81', display: 'block', fontSize: '11px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '2px' }}>Delivery Destination</span>
+              <span style={{ color: '#0f3d2a', fontWeight: 600, lineHeight: 1.4 }}>
+                {formData.address}, {formData.city}, {formData.state} - {formData.zipCode}
+              </span>
+            </div>
+
+            {(formData.email || user?.email) && (
+              <div style={{ marginTop: '12px', background: '#ffffff', border: '1px solid #e4ddd2', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#1B5E2F', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Mail size={14} />
+                <span>Confirmation email with digital invoice and tracking link sent to <strong>{formData.email || user?.email}</strong></span>
+              </div>
+            )}
           </div>
 
-          <div className="success-actions-row">
-            <Link href="/profile" className="btn-confirm-place-order" style={{ textDecoration: 'none' }}>
-              <span>View in My Orders</span>
+          {/* Action Buttons: Live Tracking & Continue Shopping */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <Link 
+              href="/profile" 
+              className="btn-confirm-place-order" 
+              style={{ textDecoration: 'none', width: '100%', justifyContent: 'center', fontSize: '0.95rem', padding: '14px 20px', background: 'linear-gradient(135deg, #166534, #14532d)' }}
+            >
+              <Truck size={18} />
+              <span>Track Live Order Status in My Profile</span>
               <ArrowRight size={18} />
             </Link>
+
             <Link 
               href="/products" 
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '14px 22px',
-                borderRadius: '9999px',
+                padding: '11px 20px',
+                borderRadius: '50px',
                 border: '1.5px solid #dce8e0',
                 color: '#0f3d2a',
-                fontWeight: 750,
+                fontWeight: 700,
                 textDecoration: 'none',
-                background: '#ffffff'
+                background: '#ffffff',
+                fontSize: '0.86rem',
+                marginTop: '4px'
               }}
             >
               Continue Shopping
@@ -305,7 +356,7 @@ function CheckoutContent() {
           </div>
           <h2 className="success-order-title" style={{ fontSize: '1.8rem' }}>Your Basket is Empty</h2>
           <p className="success-order-msg">
-            You haven't selected any organic products yet. Explore our cold-pressed oils, single-origin spices, and traditional grains.
+            You haven&apos;t selected any organic products yet. Explore our cold-pressed oils, single-origin spices, and traditional grains.
           </p>
           <Link href="/products" className="btn-confirm-place-order" style={{ display: 'inline-flex', maxWidth: '280px', margin: '0 auto', textDecoration: 'none' }}>
             <span>Explore All Products</span>
@@ -351,14 +402,62 @@ function CheckoutContent() {
           {/* ── LEFT COLUMN: DELIVERY & PAYMENT ── */}
           <div className="checkout-left-col">
             
-            {/* Account Status Prompt */}
+            {/* Mandatory Sign In Alert */}
             {!isAuthenticated && (
-              <div className="checkout-auth-alert">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={16} color="#d98e1e" />
-                  <span>Have an account? Sign in for 1-click address autofill.</span>
+              <div style={{
+                background: '#fffbeb',
+                border: '1.5px solid #fde68a',
+                padding: '16px 20px',
+                borderRadius: '12px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '14px',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    background: '#fef3c7',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <Lock size={20} color="#b45309" />
+                  </div>
+                  <div>
+                    <strong style={{ color: '#92400e', fontSize: '0.94rem', display: 'block', fontWeight: 800 }}>
+                      Sign-In Required to Place Order
+                    </strong>
+                    <span style={{ color: '#78350f', fontSize: '0.82rem', lineHeight: 1.4 }}>
+                      Please sign in or register to confirm your booking, receive digital invoices, and track live delivery.
+                    </span>
+                  </div>
                 </div>
-                <Link href="/login?redirect=/checkout">Sign In</Link>
+                <Link 
+                  href="/login?redirect=/checkout" 
+                  style={{
+                    background: 'linear-gradient(135deg, #b45309 0%, #92400e 100%)',
+                    color: '#ffffff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontSize: '0.86rem',
+                    fontWeight: 750,
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(180,83,9,0.25)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <span>Sign In / Register</span>
+                  <ArrowRight size={15} />
+                </Link>
               </div>
             )}
 
@@ -399,12 +498,12 @@ function CheckoutContent() {
                 </div>
 
                 <div className="checkout-form-group">
-                  <label htmlFor="chk-email">Email Address (for order updates)</label>
+                  <label htmlFor="chk-email">Email Address (Optional for order updates)</label>
                   <input
                     id="chk-email"
                     name="email"
                     type="email"
-                    placeholder="ramesh@example.com"
+                    placeholder="ramesh@example.com (optional)"
                     value={formData.email}
                     onChange={handleInputChange}
                   />
@@ -483,7 +582,7 @@ function CheckoutContent() {
                   onClick={() => setPaymentMethod('Cash on Delivery')}
                 >
                   <div className="payment-method-title">
-                    <Banknote size={18} color="#166534" />
+                    <Banknote size={18} color="#1B5E2F" />
                     <span>Cash on Delivery</span>
                   </div>
                   <p className="payment-method-desc">Pay with cash or UPI upon package handover.</p>
@@ -534,7 +633,7 @@ function CheckoutContent() {
                   )}
                 </button>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.76rem', color: '#557262', marginTop: '12px' }}>
-                  <ShieldCheck size={14} color="#166534" />
+                  <ShieldCheck size={14} color="#1B5E2F" />
                   <span>Zero Risk • Authenticity Guaranteed</span>
                 </div>
               </div>
@@ -649,7 +748,7 @@ function CheckoutContent() {
                 <div style={{
                   fontSize: '0.8rem',
                   fontWeight: 650,
-                  color: couponMsg.type === 'success' ? '#166534' : '#b91c1c',
+                  color: couponMsg.type === 'success' ? '#1B5E2F' : '#b91c1c',
                   marginBottom: '12px'
                 }}>
                   {couponMsg.text}
@@ -672,7 +771,7 @@ function CheckoutContent() {
 
                 <div className="pricing-row">
                   <span>Delivery Charges</span>
-                  <span>{shippingCharge === 0 ? <strong style={{ color: '#166534' }}>FREE</strong> : `₹${shippingCharge}`}</span>
+                  <span>{shippingCharge === 0 ? <strong style={{ color: '#1B5E2F' }}>FREE</strong> : `₹${shippingCharge}`}</span>
                 </div>
 
                 <div className="pricing-row grand-row">
@@ -699,23 +798,44 @@ function CheckoutContent() {
               )}
 
               {/* Confirm & Place Order CTA */}
-              <button
-                type="submit"
-                className="btn-confirm-place-order"
-                disabled={submitting}
-              >
-                {submitting ? (
-                  <span>Securing Your Order...</span>
-                ) : (
-                  <>
-                    <span>Confirm & Place Order • ₹{finalPayable}</span>
-                    <ArrowRight size={18} />
-                  </>
-                )}
-              </button>
+              {!isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={() => router.push('/login?redirect=/checkout')}
+                  className="btn-confirm-place-order"
+                  style={{
+                    background: 'linear-gradient(135deg, #b45309 0%, #92400e 100%)',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(180, 83, 9, 0.35)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <Lock size={18} />
+                  <span>Sign In to Place Order • ₹{finalPayable}</span>
+                  <ArrowRight size={18} />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="btn-confirm-place-order"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <span>Securing Your Order...</span>
+                  ) : (
+                    <>
+                      <span>Confirm & Place Order • ₹{finalPayable}</span>
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
+              )}
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.76rem', color: '#557262', marginTop: '14px' }}>
-                <ShieldCheck size={14} color="#166534" />
+                <ShieldCheck size={14} color="#1B5E2F" />
                 <span>Zero Risk • Authenticity Guaranteed</span>
               </div>
 

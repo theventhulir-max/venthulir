@@ -15,9 +15,16 @@ import {
   Truck,
   XCircle,
   Tag,
-  Loader2
+  Loader2,
+  MessageCircle,
+  Send,
+  ExternalLink,
+  ShieldCheck,
+  Check
 } from 'lucide-react';
 import ConfirmStatusModal from './ConfirmStatusModal';
+import TaxInvoice from '@/components/TaxInvoice';
+import { getWhatsAppOrderUrl } from '@/lib/whatsapp';
 
 export default function OrderDetailModal({
   order,
@@ -27,6 +34,11 @@ export default function OrderDetailModal({
 }) {
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState(null); // { targetStatus, isCancel }
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [trackingNumber, setTrackingNumber] = useState(order?.trackingNumber || '');
+  const [courierPartner, setCourierPartner] = useState(order?.courierPartner || 'ST Courier');
+  const [savingTracking, setSavingTracking] = useState(false);
+  const [trackingSavedSuccess, setTrackingSavedSuccess] = useState(false);
 
   if (!order) return null;
 
@@ -49,7 +61,10 @@ export default function OrderDetailModal({
 
     try {
       setUpdatingStatus(true);
-      await handler(order._id || order.orderId, targetStatus, isCancel);
+      await handler(order._id || order.orderId, targetStatus, isCancel, {
+        trackingNumber,
+        courierPartner
+      });
       setConfirmTarget(null);
     } catch (err) {
       console.error('Status update failed:', err);
@@ -58,8 +73,35 @@ export default function OrderDetailModal({
     }
   };
 
+  const handleSaveTracking = async () => {
+    const handler = onStatusUpdate || onStatusChange;
+    if (!handler) return;
+    try {
+      setSavingTracking(true);
+      await handler(order._id || order.orderId, currentStatus, false, {
+        trackingNumber,
+        courierPartner
+      });
+      setTrackingSavedSuccess(true);
+      setTimeout(() => setTrackingSavedSuccess(false), 3000);
+    } catch (err) {
+      console.error('Save tracking error:', err);
+    } finally {
+      setSavingTracking(false);
+    }
+  };
+
+  const triggerWhatsApp = (statusOverride) => {
+    const targetSt = statusOverride || currentStatus;
+    const url = getWhatsAppOrderUrl(order, targetSt, {
+      trackingNumber,
+      courierPartner
+    });
+    window.open(url, '_blank');
+  };
+
   const handlePrint = () => {
-    window.print();
+    setShowInvoice(true);
   };
 
   const getStatusBadge = (st) => {
@@ -97,6 +139,28 @@ export default function OrderDetailModal({
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               type="button"
+              style={{
+                background: '#25D366',
+                color: '#ffffff',
+                border: '1px solid #16a34a',
+                padding: '6px 12px',
+                fontSize: '12px',
+                fontWeight: 700,
+                borderRadius: '6px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                boxShadow: '0 2px 6px rgba(37, 211, 102, 0.25)'
+              }}
+              onClick={() => triggerWhatsApp(currentStatus)}
+              title="Notify Customer via WhatsApp (Professional English)"
+            >
+              <MessageCircle size={13} />
+              <span>WhatsApp Customer</span>
+            </button>
+            <button
+              type="button"
               className="adm-btn-secondary"
               onClick={handlePrint}
               style={{ padding: '6px 12px', fontSize: '12px' }}
@@ -116,109 +180,50 @@ export default function OrderDetailModal({
 
         {/* Body */}
         <div className="adm-modal-body">
-          {/* Status Workflow Progress Bar */}
           <div style={{
             background: '#f8fafc',
             border: '1px solid #e2e8f0',
             borderRadius: '12px',
             padding: '16px',
-            marginBottom: '20px'
+            marginBottom: '18px'
           }}>
-            <div style={{ fontSize: '12.5px', fontWeight: 700, marginBottom: '10px', color: '#0f172a' }}>
-              Quick Status Action Controls
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                className={`adm-btn-secondary ${currentStatus.toLowerCase() === 'pending' ? 'active' : ''}`}
-                style={{ 
-                  padding: '6px 14px', 
-                  fontSize: '12px', 
-                  fontWeight: 700,
-                  borderRadius: '8px',
-                  border: '1px solid #cbd5e1',
-                  background: currentStatus.toLowerCase() === 'pending' ? '#475569' : '#ffffff', 
-                  color: currentStatus.toLowerCase() === 'pending' ? '#ffffff' : '#334155',
-                  cursor: 'pointer'
-                }}
-                onClick={() => promptStatusChange('Pending')}
-                disabled={updatingStatus || currentStatus.toLowerCase() === 'cancelled'}
-              >
-                1. Pending
-              </button>
-
-              <button
-                type="button"
-                className={`adm-btn-secondary`}
-                style={{ 
-                  padding: '6px 14px', 
-                  fontSize: '12px', 
-                  fontWeight: 700,
-                  borderRadius: '8px',
-                  border: '1px solid #f59e0b',
-                  background: currentStatus.toLowerCase() === 'confirmed' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : '#fffbeb', 
-                  color: currentStatus.toLowerCase() === 'confirmed' ? '#ffffff' : '#b45309',
-                  cursor: 'pointer'
-                }}
-                onClick={() => promptStatusChange('Confirmed')}
-                disabled={updatingStatus || currentStatus.toLowerCase() === 'cancelled'}
-              >
-                2. Confirm Order
-              </button>
-
-              <button
-                type="button"
-                className={`adm-btn-secondary`}
-                style={{ 
-                  padding: '6px 14px', 
-                  fontSize: '12px', 
-                  fontWeight: 700,
-                  borderRadius: '8px',
-                  border: '1px solid #8b5cf6',
-                  background: currentStatus.toLowerCase() === 'shipped' ? 'linear-gradient(135deg, #8b5cf6, #7c3aed)' : '#f5f3ff', 
-                  color: currentStatus.toLowerCase() === 'shipped' ? '#ffffff' : '#6d28d9',
-                  cursor: 'pointer'
-                }}
-                onClick={() => promptStatusChange('Shipped')}
-                disabled={updatingStatus || currentStatus.toLowerCase() === 'cancelled'}
-              >
-                3. Mark Shipped
-              </button>
-
-              <button
-                type="button"
-                className={`adm-btn-secondary`}
-                style={{ 
-                  padding: '6px 14px', 
-                  fontSize: '12px', 
-                  fontWeight: 700,
-                  borderRadius: '8px',
-                  border: '1px solid #0284c7',
-                  background: currentStatus.toLowerCase() === 'delivered' ? 'linear-gradient(135deg, #0284c7, #0369a1)' : '#f0f9ff', 
-                  color: currentStatus.toLowerCase() === 'delivered' ? '#ffffff' : '#0369a1',
-                  cursor: 'pointer'
-                }}
-                onClick={() => promptStatusChange('Delivered')}
-                disabled={updatingStatus || currentStatus.toLowerCase() === 'cancelled'}
-              >
-                4. Mark Delivered
-              </button>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Fulfillment Pipeline
+                </span>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                  <span>Current Stage:</span>
+                  <span style={{
+                    background: currentStatus.toLowerCase() === 'cancelled' ? '#fee2e2' : '#dcfce7',
+                    color: currentStatus.toLowerCase() === 'cancelled' ? '#dc2626' : '#1B5E2F',
+                    padding: '2px 10px',
+                    borderRadius: '50px',
+                    fontSize: '12px',
+                    fontWeight: 750,
+                    border: `1px solid ${currentStatus.toLowerCase() === 'cancelled' ? '#fecaca' : '#bbf7d0'}`
+                  }}>
+                    {currentStatus.toLowerCase() === 'cancelled' ? '✕ Cancelled' : `✓ ${currentStatus}`}
+                  </span>
+                </div>
+              </div>
 
               {currentStatus.toLowerCase() !== 'cancelled' && (
                 <button
                   type="button"
                   style={{ 
-                    marginLeft: 'auto', 
-                    background: '#fee2e2', 
+                    background: '#ffffff', 
                     color: '#dc2626', 
                     border: '1px solid #fecaca', 
-                    padding: '6px 14px', 
-                    borderRadius: '8px', 
-                    fontSize: '12px', 
-                    fontWeight: 700, 
-                    cursor: 'pointer' 
+                    padding: '5px 12px', 
+                    borderRadius: '6px', 
+                    fontSize: '11.5px', 
+                    fontWeight: 600, 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#fef2f2'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
                   onClick={() => promptStatusChange('Cancelled', true)}
                   disabled={updatingStatus}
                 >
@@ -227,11 +232,233 @@ export default function OrderDetailModal({
               )}
             </div>
 
+            {/* Clean Minimal Stepper Grid */}
+            <div className="adm-stepper-grid">
+              {[
+                { key: 'pending', label: 'Pending', stepNum: 1 },
+                { key: 'confirmed', label: 'Confirmed', stepNum: 2 },
+                { key: 'shipped', label: 'Shipped', stepNum: 3 },
+                { key: 'delivered', label: 'Delivered', stepNum: 4 }
+              ].map((step, idx) => {
+                const normStatus = (currentStatus || 'pending').toLowerCase();
+                const activeKey = normStatus === 'processing' ? 'confirmed' : normStatus;
+                const isCancelled = activeKey === 'cancelled' || activeKey === 'returned';
+                
+                const stepOrder = ['pending', 'confirmed', 'shipped', 'delivered'];
+                const currentStepIdx = stepOrder.indexOf(activeKey);
+                
+                const isCompleted = !isCancelled && currentStepIdx > idx;
+                const isActive = !isCancelled && currentStepIdx === idx;
+
+                return (
+                  <button
+                    key={step.key}
+                    type="button"
+                    disabled={updatingStatus || isCancelled || isActive}
+                    onClick={() => promptStatusChange(step.label)}
+                    style={{
+                      padding: '10px 8px',
+                      borderRadius: '8px',
+                      cursor: isActive || isCancelled ? 'default' : 'pointer',
+                      border: isActive
+                        ? '1.5px solid #0f3d2a'
+                        : isCompleted
+                          ? '1px solid #bbf7d0'
+                          : '1px solid #cbd5e1',
+                      background: isActive
+                        ? '#0f3d2a'
+                        : isCompleted
+                          ? '#f0fdf4'
+                          : '#ffffff',
+                      color: isActive
+                        ? '#ffffff'
+                        : isCompleted
+                          ? '#1B5E2F'
+                          : '#334155',
+                      textAlign: 'center',
+                      transition: 'all 0.2s ease',
+                      boxShadow: isActive ? '0 2px 8px rgba(15, 61, 42, 0.15)' : 'none'
+                    }}
+                  >
+                    <div style={{ fontSize: '12px', fontWeight: isActive ? 800 : 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                      {isCompleted && <Check size={13} strokeWidth={3} color="#16a34a" />}
+                      {isActive && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }} />}
+                      <span>{step.stepNum}. {step.label}</span>
+                    </div>
+                    <div style={{
+                      fontSize: '10px',
+                      marginTop: '3px',
+                      fontWeight: 600,
+                      color: isActive ? '#a7f3d0' : isCompleted ? '#15803d' : '#94a3b8'
+                    }}>
+                      {isActive ? 'Active Now' : isCompleted ? 'Completed' : 'Click to Set'}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
             {updatingStatus && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px', fontSize: '12px', color: '#b45309' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px', fontSize: '12px', color: '#1B5E2F', fontWeight: 600 }}>
                 <Loader2 size={14} className="spin" /> Updating order status...
               </div>
             )}
+          </div>
+
+          {/* Customer Notification Hub (WhatsApp & Automatic Email) */}
+          <div style={{
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '12px',
+            padding: '14px 16px',
+            marginBottom: '20px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#25D366', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <MessageCircle size={14} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#0f172a' }}>
+                    Customer Notification Hub
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>
+                    Direct 1-click WhatsApp customer message & auto-email
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ fontSize: '11px', color: '#1B5E2F', background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                ✉️ Auto Email Synced
+              </div>
+            </div>
+
+            {/* Courier Tracking Inputs */}
+            <div style={{
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              padding: '10px 12px',
+              marginBottom: '10px'
+            }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Truck size={12} /> Courier & Tracking Reference
+              </div>
+              <div className="adm-tracking-grid">
+                <input
+                  type="text"
+                  placeholder="Courier (e.g. ST Courier)"
+                  value={courierPartner}
+                  onChange={(e) => setCourierPartner(e.target.value)}
+                  style={{
+                    padding: '6px 10px',
+                    fontSize: '12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    color: '#0f172a',
+                    background: '#ffffff'
+                  }}
+                />
+                <input
+                  type="text"
+                  placeholder="Tracking / AWB No (optional)"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                  style={{
+                    padding: '6px 10px',
+                    fontSize: '12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    color: '#0f172a',
+                    background: '#ffffff'
+                  }}
+                />
+                <button
+                  type="button"
+                  className="adm-btn-secondary"
+                  style={{ padding: '6px 12px', fontSize: '12px', fontWeight: 700 }}
+                  onClick={handleSaveTracking}
+                  disabled={savingTracking}
+                >
+                  {savingTracking ? 'Saving...' : trackingSavedSuccess ? '✓ Saved' : 'Save'}
+                </button>
+              </div>
+            </div>
+
+            {/* Quick 1-Click WhatsApp Triggers with Minimal, Unified Styling */}
+            <div className="adm-triggers-grid">
+              <button
+                type="button"
+                style={{
+                  background: currentStatus.toLowerCase() === 'confirmed' || currentStatus.toLowerCase() === 'processing' ? '#f0fdf4' : '#ffffff',
+                  border: currentStatus.toLowerCase() === 'confirmed' || currentStatus.toLowerCase() === 'processing' ? '1.5px solid #16a34a' : '1px solid #e2e8f0',
+                  color: currentStatus.toLowerCase() === 'confirmed' || currentStatus.toLowerCase() === 'processing' ? '#1B5E2F' : '#334155',
+                  padding: '8px 12px',
+                  fontSize: '11.5px',
+                  fontWeight: currentStatus.toLowerCase() === 'confirmed' ? 750 : 600,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={() => triggerWhatsApp('Confirmed')}
+                title="Send Order Confirmation via WhatsApp"
+              >
+                <MessageCircle size={13} color="#25D366" />
+                <span>1. Send Confirmed {currentStatus.toLowerCase() === 'confirmed' ? '✓' : ''}</span>
+              </button>
+
+              <button
+                type="button"
+                style={{
+                  background: currentStatus.toLowerCase() === 'shipped' ? '#f0fdf4' : '#ffffff',
+                  border: currentStatus.toLowerCase() === 'shipped' ? '1.5px solid #16a34a' : '1px solid #e2e8f0',
+                  color: currentStatus.toLowerCase() === 'shipped' ? '#1B5E2F' : '#334155',
+                  padding: '8px 12px',
+                  fontSize: '11.5px',
+                  fontWeight: currentStatus.toLowerCase() === 'shipped' ? 750 : 600,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={() => triggerWhatsApp('Shipped')}
+                title="Send Dispatch Tracking Details via WhatsApp"
+              >
+                <Truck size={13} color="#25D366" />
+                <span>2. Send Dispatched {currentStatus.toLowerCase() === 'shipped' ? '✓' : ''}</span>
+              </button>
+
+              <button
+                type="button"
+                style={{
+                  background: currentStatus.toLowerCase() === 'delivered' ? '#f0fdf4' : '#ffffff',
+                  border: currentStatus.toLowerCase() === 'delivered' ? '1.5px solid #16a34a' : '1px solid #e2e8f0',
+                  color: currentStatus.toLowerCase() === 'delivered' ? '#1B5E2F' : '#334155',
+                  padding: '8px 12px',
+                  fontSize: '11.5px',
+                  fontWeight: currentStatus.toLowerCase() === 'delivered' ? 750 : 600,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={() => triggerWhatsApp('Delivered')}
+                title="Send Delivery Notice via WhatsApp"
+              >
+                <CheckCircle2 size={13} color="#25D366" />
+                <span>3. Send Delivered {currentStatus.toLowerCase() === 'delivered' ? '✓' : ''}</span>
+              </button>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '20px' }}>
@@ -245,8 +472,32 @@ export default function OrderDetailModal({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
                   <Mail size={13} /> {order.customerEmail || 'Registered Member'}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                  <Phone size={13} /> {order.phone || order.shippingAddress?.phone || 'No phone provided'}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', color: '#475569' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Phone size={13} /> {order.phone || order.shippingAddress?.phone || 'No phone provided'}
+                  </div>
+                  {(order.phone || order.shippingAddress?.phone) && (
+                    <button
+                      type="button"
+                      style={{
+                        background: '#25D366',
+                        color: '#ffffff',
+                        border: 'none',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => triggerWhatsApp(currentStatus)}
+                      title="Open WhatsApp Chat with Customer"
+                    >
+                      <MessageCircle size={11} /> WhatsApp
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -334,6 +585,15 @@ export default function OrderDetailModal({
           onConfirm={executeStatusChange}
           onClose={() => setConfirmTarget(null)}
           loading={updatingStatus}
+        />
+      )}
+
+      {/* Official Tax Invoice Modal */}
+      {showInvoice && (
+        <TaxInvoice
+          order={order}
+          isOpen={showInvoice}
+          onClose={() => setShowInvoice(false)}
         />
       )}
     </div>

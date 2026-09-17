@@ -235,7 +235,7 @@ export default function AdminOffersPage() {
 
         {!loading && offers.length === 0 && (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '48px', color: '#64748b' }}>
-            No campaign offers launched yet. Click "New Campaign Offer" to create your first promotion.
+            No campaign offers launched yet. Click &quot;New Campaign Offer&quot; to create your first promotion.
           </div>
         )}
       </div>

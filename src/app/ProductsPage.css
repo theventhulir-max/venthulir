@@ -173,17 +173,17 @@
 }
 
 .category-pill-btn:hover {
-  background: #fffbeb;
-  border-color: #f59e0b;
-  color: #b45309;
+  background: #f0f7f3;
+  border-color: #1B5E2F;
+  color: #1B5E2F;
 }
 
 .category-pill-btn.active {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #c2410c 100%);
-  border-color: #c2410c;
+  background: #1B5E2F;
+  border-color: #1B5E2F;
   color: #ffffff;
-  font-weight: 850;
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  font-weight: 750;
+  box-shadow: 0 4px 14px rgba(27, 94, 47, 0.25);
 }
 
 /* Results Info */
@@ -199,7 +199,7 @@
 .btn-clear-filters {
   background: none;
   border: none;
-  color: #15803d;
+  color: var(--accent-mid);
   font-weight: 700;
   font-size: 0.82rem;
   cursor: pointer;
@@ -275,7 +275,7 @@
 }
 
 .trust-strip-item .trust-icon {
-  color: #15803d;
+  color: var(--accent-mid);
   flex-shrink: 0;
 }
 

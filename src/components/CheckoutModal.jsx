@@ -29,15 +29,23 @@ export default function CheckoutModal({ cartSummary, onClose, onAuthOpen }) {
 
   const placeOrder = async (e) => {
     e.preventDefault();
+
     if (!isAuthenticated) {
-      onClose();
-      onAuthOpen();
+      if (onAuthOpen) {
+        onClose();
+        onAuthOpen();
+      } else {
+        window.location.href = '/login?redirect=/checkout';
+      }
       return;
     }
 
     setStep('placing');
     try {
-      const token = localStorage.getItem('venthulir_token');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('venthulir_token') : null;
+      const cleanPhone = (form.phone || '').replace(/\D/g, '');
+      const finalEmail = form.email.trim() || (cleanPhone ? `${cleanPhone}@guest.venthulir.com` : 'guest@venthulir.com');
+
       const res = await fetch(`/api/orders`, {
         method: 'POST',
         headers: {
@@ -45,10 +53,10 @@ export default function CheckoutModal({ cartSummary, onClose, onAuthOpen }) {
           ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
-          customerName:    form.name,
-          customerEmail:   form.email,
-          phone:           form.phone,
-          deliveryAddress: { address: form.address, city: form.city, state: form.state, zipCode: form.zipCode },
+          customerName:    form.name.trim(),
+          customerEmail:   finalEmail,
+          phone:           form.phone.trim(),
+          deliveryAddress: { address: form.address.trim(), city: form.city.trim(), state: form.state || 'Tamil Nadu', zipCode: form.zipCode.trim() },
           items:           cartItems.map(i => ({ product: i.productId || i.product, name: i.name, variant: i.variant?.label, price: i.price, quantity: i.quantity })),
           totalAmount:     grandTotal,
           originalAmount:  grandTotal + discount,
@@ -92,7 +100,7 @@ export default function CheckoutModal({ cartSummary, onClose, onAuthOpen }) {
           <div className="checkout-success">
             <CheckCircle size={56} className="success-icon" />
             <h2>Order Placed!</h2>
-            <p>Thank you for your order. We'll send a confirmation to <strong>{form.email}</strong>.</p>
+            <p>Thank you for your order. We&apos;ll send updates to your mobile <strong>{form.phone}</strong>{form.email ? ` and ${form.email}` : ''}.</p>
             {orderId && <p className="order-id">Order ID: <strong>{orderId}</strong></p>}
             <button className="btn-primary" onClick={onClose} style={{ marginTop: 8 }}>Continue Shopping</button>
           </div>
@@ -132,21 +140,38 @@ export default function CheckoutModal({ cartSummary, onClose, onAuthOpen }) {
               <form className="checkout-form" onSubmit={placeOrder}>
                 <h3 className="checkout-section-title"><MapPin size={16} /> Delivery Details</h3>
                 <div className="form-2col">
-                  <div className="co-field"><label>Full Name</label><input required placeholder="Name" value={form.name} onChange={e=>update('name',e.target.value)} /></div>
-                  <div className="co-field"><label>Phone</label><input required placeholder="+91" value={form.phone} onChange={e=>update('phone',e.target.value)} /></div>
+                  <div className="co-field"><label>Full Name *</label><input required placeholder="Name" value={form.name} onChange={e=>update('name',e.target.value)} /></div>
+                  <div className="co-field"><label>Phone *</label><input required placeholder="+91" value={form.phone} onChange={e=>update('phone',e.target.value)} /></div>
                 </div>
-                <div className="co-field"><label>Email</label><input required type="email" placeholder="Email" value={form.email} onChange={e=>update('email',e.target.value)} /></div>
-                <div className="co-field"><label>Street Address</label><input required placeholder="House No., Street…" value={form.address} onChange={e=>update('address',e.target.value)} /></div>
+                <div className="co-field"><label>Email (Optional for updates)</label><input type="email" placeholder="Email (optional)" value={form.email} onChange={e=>update('email',e.target.value)} /></div>
+                <div className="co-field"><label>Street Address *</label><input required placeholder="House No., Street…" value={form.address} onChange={e=>update('address',e.target.value)} /></div>
                 <div className="form-3col">
-                  <div className="co-field"><label>City</label><input required placeholder="City" value={form.city} onChange={e=>update('city',e.target.value)} /></div>
-                  <div className="co-field"><label>State</label><input required placeholder="State" value={form.state} onChange={e=>update('state',e.target.value)} /></div>
-                  <div className="co-field"><label>PIN Code</label><input required placeholder="600001" value={form.zipCode} onChange={e=>update('zipCode',e.target.value)} /></div>
+                  <div className="co-field"><label>City *</label><input required placeholder="City" value={form.city} onChange={e=>update('city',e.target.value)} /></div>
+                  <div className="co-field"><label>State *</label><input required placeholder="State" value={form.state} onChange={e=>update('state',e.target.value)} /></div>
+                  <div className="co-field"><label>PIN Code *</label><input required placeholder="600001" value={form.zipCode} onChange={e=>update('zipCode',e.target.value)} /></div>
                 </div>
                 {error && <p className="co-error">{error}</p>}
-                <button type="submit" className="btn-primary co-submit">
-                  Place Order · ₹{grandTotal}
-                </button>
-                {!isAuthenticated && <p className="co-auth-note">You'll be asked to sign in before placing the order.</p>}
+                {!isAuthenticated ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      if (onAuthOpen) onAuthOpen();
+                      else window.location.href = '/login?redirect=/checkout';
+                    }}
+                    className="btn-primary co-submit"
+                    style={{ background: '#b45309' }}
+                  >
+                    🔒 Sign In to Place Order · ₹{grandTotal}
+                  </button>
+                ) : (
+                  <button type="submit" className="btn-primary co-submit">
+                    Place Order · ₹{grandTotal}
+                  </button>
+                )}
+                <p className="co-auth-note" style={{ color: isAuthenticated ? '#1B5E2F' : '#b45309', fontWeight: 600 }}>
+                  {!isAuthenticated ? '🔒 Sign-in required to confirm order & track live delivery' : '✓ 100% Authentic Farm Harvest Direct'}
+                </p>
               </form>
             </div>
           </>

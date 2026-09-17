@@ -1,0 +1,9 @@
+.next/
+node_modules/
+backend/
+client/
+frontend/
+server/
+scratch/
+images/
+public/

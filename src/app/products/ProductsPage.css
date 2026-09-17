@@ -47,7 +47,7 @@
   font-size: clamp(1.6rem, 2.4vw, 2.1rem);
   font-weight: 750;
   line-height: 1.15;
-  color: #14532d;
+  color: var(--accent-dark);
   letter-spacing: -0.015em;
   margin: 0 0 4px;
 }
@@ -109,7 +109,7 @@
 }
 
 .catalog-search-wrapper input:focus {
-  border-color: #166534;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.08);
 }
 
@@ -162,28 +162,32 @@
 
 .category-pill-btn {
   background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  color: #334155;
-  font-size: 0.8rem;
+  border: 1.5px solid #E2DDD5;
+  color: #2D4A38;
+  font-size: 0.84rem;
   font-weight: 750;
-  padding: 6px 14px;
-  border-radius: 40px;
+  padding: 8px 16px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 }
 
 .category-pill-btn:hover {
-  background: #fffbeb;
-  border-color: #f59e0b;
-  color: #b45309;
+  background: #E8F5E9;
+  border-color: #1B5E2F;
+  color: #134522;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(27, 94, 47, 0.12);
 }
 
 .category-pill-btn.active {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #c2410c 100%);
-  border-color: #c2410c;
-  color: #ffffff;
-  font-weight: 850;
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+  background: #1B5E2F !important;
+  border-color: #1B5E2F !important;
+  color: #ffffff !important;
+  font-weight: 750;
+  box-shadow: 0 4px 14px rgba(27, 94, 47, 0.25);
+  transform: translateY(-1px);
 }
 
 /* Results Info */
@@ -199,9 +203,9 @@
 .btn-clear-filters {
   background: none;
   border: none;
-  color: #b45309;
+  color: #1B5E2F;
   font-weight: 750;
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -210,7 +214,7 @@
 .catalog-products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 20px;
+  gap: 24px;
 }
 
 /* Empty State */
@@ -219,34 +223,37 @@
   padding: 60px 20px;
   background: #fdfdfd;
   border: 1.5px dashed #dbe8e0;
-  border-radius: 20px;
+  border-radius: 16px;
   color: #557260;
 }
 
 .catalog-empty-state h3 {
   font-size: 1.25rem;
-  color: #143323;
+  color: #0F3D2A;
   margin: 14px 0 6px;
+  font-weight: 800;
 }
 
 .btn-reset-catalog {
   margin-top: 16px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #c2410c 100%);
+  background: #1B5E2F;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 10px 24px;
-  border-radius: 50px;
-  font-size: 0.88rem;
-  font-weight: 800;
+  border: 1.5px solid #1B5E2F;
+  padding: 12px 26px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 750;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(27, 94, 47, 0.2);
 }
 
 .btn-reset-catalog:hover {
-  background: linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ea580c 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.45);
+  background: #134522;
+  border-color: #134522;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(27, 94, 47, 0.3);
 }
 
 /* Trust Strip */
@@ -269,7 +276,7 @@
 }
 
 .trust-strip-item .trust-icon {
-  color: #15803d;
+  color: var(--accent-mid);
   flex-shrink: 0;
 }
 
@@ -343,9 +350,9 @@
 }
 
 .quickview-close-btn:hover {
-  background: #166534;
+  background: var(--accent);
   color: #ffffff;
-  border-color: #166534;
+  border-color: var(--accent);
 }
 
 .quickview-grid {
@@ -391,13 +398,13 @@
   top: 14px;
   left: 14px;
   z-index: 5;
-  background: #166534;
+  background: var(--accent);
   color: #f7efe4;
   font-size: 0.7rem;
   font-weight: 850;
   padding: 4px 12px;
   border-radius: 9999px;
-  border: 1px solid #22c55e;
+  border: 1px solid var(--accent-light);
   box-shadow: 0 2px 8px rgba(22, 101, 52, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -424,7 +431,7 @@
 }
 
 .qv-thumb-btn.active {
-  border-color: #166534;
+  border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(22, 101, 52, 0.2);
 }
 
@@ -462,7 +469,7 @@
   gap: 5px;
   font-size: 0.78rem;
   font-weight: 750;
-  color: #166534;
+  color: var(--accent);
   background: #fdf7ea;
   border: 1px solid #f2dfb8;
   padding: 3px 10px;
@@ -473,7 +480,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 2.1rem;
   font-weight: 750;
-  color: #14532d;
+  color: var(--accent-dark);
   line-height: 1.15;
   margin: 0 0 12px;
   letter-spacing: -0.015em;
@@ -492,7 +499,7 @@
 .qv-price {
   font-size: 1.7rem;
   font-weight: 900;
-  color: #166534;
+  color: var(--accent);
   letter-spacing: -0.02em;
 }
 
@@ -543,13 +550,13 @@
 }
 
 .qv-variant-pill:hover {
-  border-color: #166534;
+  border-color: var(--accent);
   background: #f4f8f5;
 }
 
 .qv-variant-pill.active {
-  background: #166534;
-  border-color: #166534;
+  background: var(--accent);
+  border-color: var(--accent);
   color: #ffffff;
   box-shadow: 0 4px 14px rgba(22, 101, 52, 0.2);
 }
@@ -594,7 +601,7 @@
   border-radius: 50%;
   border: none;
   background: #ffffff;
-  color: #166534;
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -604,7 +611,7 @@
 }
 
 .qv-qty-picker button:hover:not(:disabled) {
-  background: #166534;
+  background: var(--accent);
   color: #ffffff;
 }
 
@@ -618,7 +625,7 @@
   text-align: center;
   font-size: 0.94rem;
   font-weight: 800;
-  color: #166534;
+  color: var(--accent);
 }
 
 .qv-action-buttons-grid {
@@ -634,23 +641,22 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: #ffffff;
-  color: #926010;
-  border: 1.5px solid #c9922c;
-  border-radius: 9999px;
+  background: #F5F5F5;
+  color: #1B5E2F;
+  border: 1px solid #E0E0E0;
+  border-radius: 10px;
   padding: 12px 18px;
   font-size: 0.88rem;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.22s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .qv-add-cart-btn:hover {
-  background: #c9922c;
-  border-color: #c9922c;
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(180, 122, 27, 0.28);
+  background: #EBEBEB;
+  border-color: #D6D6D6;
+  color: #134522;
 }
 
 .qv-buy-now-btn {
@@ -658,23 +664,24 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #c9922c 0%, #b47a1b 50%, #926010 100%);
+  background: #1B5E2F;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 9999px;
+  border: 1px solid #1B5E2F;
+  border-radius: 10px;
   padding: 12px 20px;
   font-size: 0.9rem;
-  font-weight: 850;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.22s ease;
-  box-shadow: 0 4px 16px rgba(180, 122, 27, 0.35);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(27, 94, 47, 0.2);
   white-space: nowrap;
 }
 
 .qv-buy-now-btn:hover {
-  background: linear-gradient(135deg, #dfa83e 0%, #c9922c 50%, #b47a1b 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(180, 122, 27, 0.5);
+  background: #134522;
+  border-color: #134522;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(27, 94, 47, 0.3);
 }
 
 /* ── Micro Guarantees ── */

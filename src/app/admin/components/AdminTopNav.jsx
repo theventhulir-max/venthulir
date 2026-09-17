@@ -94,7 +94,7 @@ export default function AdminTopNav({
           title="Open Live Customer Storefront"
         >
           <ExternalLink size={15} />
-          <span>Live Store</span>
+          <span className="admin-header-btn-label">Live Store</span>
         </Link>
 
         {/* Notifications */}
@@ -216,20 +216,9 @@ export default function AdminTopNav({
         </div>
 
         {/* Admin Badge */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: '#edfcf2',
-          padding: '6px 12px',
-          borderRadius: '9999px',
-          border: '1px solid #bbf7d0',
-          fontSize: '12.5px',
-          fontWeight: 600,
-          color: '#15803d'
-        }}>
+        <div className="admin-user-pill">
           <ShieldCheck size={15} />
-          <span>{user?.name?.split(' ')[0] || 'Admin'}</span>
+          <span className="admin-user-pill-name">{user?.name?.split(' ')[0] || 'Admin'}</span>
         </div>
       </div>
     </header>

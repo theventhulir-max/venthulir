@@ -11,7 +11,7 @@ export async function GET(request) {
     }
 
     await connectDB();
-    const user = await User.findById(auth.user.id).select('-password').lean();
+    const user = await User.findById(auth.user.id).select('-password -otp -otpExpires').lean();
     if (!user) {
       return NextResponse.json({ msg: 'User not found' }, { status: 404 });
     }

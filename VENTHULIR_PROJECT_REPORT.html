@@ -3,26 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Venthulir — Master Technical Architecture & End-to-End Dataflow Report</title>
+  <title>Venthulir Organic E-Commerce — Full Project Technical Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
-
     :root {
-      --primary: #0f3d2a;
-      --primary-dark: #071f15;
-      --gold: #c9922c;
-      --gold-light: #fef9ee;
-      --slate: #0f172a;
-      --slate-muted: #64748b;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --border: #e2e8f0;
-      --border-dark: #cbd5e1;
-      --code-bg: #0b1511;
-      --code-text: #6ee7b7;
-      --success: #16a34a;
-      --warning: #d97706;
-      --danger: #dc2626;
+      --brand: #1B5E2F;
+      --brand-hover: #134522;
+      --brand-light: #E8F5E9;
+      --gold: #C8973A;
+      --bg: #FAF8F5;
+      --card-bg: #FFFFFF;
+      --text: #1A1A1A;
+      --text-muted: #555555;
+      --border: #E8E2D5;
+      --shadow: 0 4px 20px rgba(27, 94, 47, 0.08);
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     * {
@@ -32,634 +30,584 @@
     }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-main);
       background-color: var(--bg);
-      color: var(--slate);
-      line-height: 1.6;
-      padding: 30px 15px;
+      color: var(--text);
+      line-height: 1.65;
+      padding-bottom: 80px;
     }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: var(--card-bg);
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    /* Top Action Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #ffffff;
+      border: 1px solid var(--brand);
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--text);
       border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--brand-light);
+      border-color: var(--brand);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1000px;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+
+    /* Header Card */
+    .header-card {
+      background: linear-gradient(135deg, #1B5E2F 0%, #134522 100%);
+      color: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 32px;
+      position: relative;
       overflow: hidden;
     }
 
-    .header-banner {
-      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-      color: #ffffff;
-      padding: 48px 40px;
-      border-bottom: 4px solid var(--gold);
-      position: relative;
+    .header-card::after {
+      content: "🌿";
+      position: absolute;
+      right: 20px;
+      bottom: -20px;
+      font-size: 140px;
+      opacity: 0.12;
+      pointer-events: none;
     }
 
-    .brand-tag {
+    .header-badge {
       display: inline-block;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--gold);
-      margin-bottom: 12px;
-      background: rgba(201, 146, 44, 0.15);
+      background: rgba(255, 255, 255, 0.2);
       padding: 4px 12px;
       border-radius: 20px;
-      border: 1px solid rgba(201, 146, 44, 0.3);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
     }
 
-    h1 {
-      font-family: 'Cinzel', serif;
-      font-size: 30px;
+    .header-title {
+      font-size: 2.3rem;
       font-weight: 800;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-      line-height: 1.3;
+      line-height: 1.2;
+      margin-bottom: 8px;
     }
 
-    .header-desc {
-      font-size: 15px;
-      color: #cbd5e1;
-      max-width: 800px;
+    .header-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 20px;
     }
 
-    .meta-bar {
-      display: flex;
-      gap: 24px;
-      margin-top: 24px;
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
       padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      font-size: 13px;
-      color: #94a3b8;
-      flex-wrap: wrap;
+      font-size: 0.9rem;
     }
 
     .meta-item strong {
-      color: #ffffff;
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      opacity: 0.75;
+      letter-spacing: 0.5px;
     }
 
-    .content-body {
-      padding: 40px;
+    /* Section Card */
+    .section-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 32px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
 
     h2 {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 36px 0 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--border);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 18px;
       display: flex;
       align-items: center;
       gap: 10px;
+      border-bottom: 2px solid var(--brand-light);
+      padding-bottom: 8px;
     }
 
     h3 {
-      font-size: 16px;
+      font-size: 1.15rem;
       font-weight: 700;
-      color: var(--slate);
-      margin: 24px 0 10px;
+      color: var(--text);
+      margin: 20px 0 10px 0;
     }
 
     p {
       margin-bottom: 14px;
-      font-size: 14px;
-      color: #334155;
+      color: var(--text);
     }
 
     ul, ol {
-      margin-bottom: 16px;
-      padding-left: 24px;
-      font-size: 14px;
-      color: #334155;
+      margin: 0 0 16px 24px;
     }
 
     li {
       margin-bottom: 6px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 18px 0 28px;
-      font-size: 13.5px;
-      background: #ffffff;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    th {
-      background: #f1f5f9;
-      color: var(--slate);
-      text-align: left;
-      padding: 12px 16px;
-      font-weight: 700;
-      font-size: 12.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1.5px solid var(--border);
-    }
-
-    td {
-      padding: 11px 16px;
-      border-bottom: 1px solid var(--border);
-      color: #334155;
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    tr:hover td {
-      background: #f8fafc;
-    }
-
+    /* Badge Tags */
     .badge {
       display: inline-block;
       padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
     }
 
-    .badge-success { background: #dcfce7; color: #166534; }
-    .badge-gold { background: #fef3c7; color: #92400e; }
-    .badge-blue { background: #dbeafe; color: #1e40af; }
-    .badge-gray { background: #f1f5f9; color: #475569; }
+    .badge-green { background: #E8F5E9; color: #1B5E2F; }
+    .badge-gold { background: #FFF8E1; color: #B78103; }
+    .badge-blue { background: #E3F2FD; color: #1565C0; }
 
-    .card-grid {
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--brand-light);
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #FAFAFA;
+    }
+
+    /* Code Blocks */
+    pre, code {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+    }
+
+    code {
+      background: #F1F3F5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #D32F2F;
+    }
+
+    pre {
+      background: #1E293B;
+      color: #E2E8F0;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 14px 0;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* Grid layout for features */
+    .feature-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 16px;
-      margin: 20px 0;
+      margin: 16px 0;
     }
 
-    .info-card {
-      background: #f8fafc;
+    .feature-box {
+      background: #FAF8F5;
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 18px;
     }
 
-    .info-card h4 {
-      font-size: 14px;
+    .feature-box h4 {
+      color: var(--brand);
+      font-size: 1rem;
       font-weight: 700;
-      color: var(--primary);
       margin-bottom: 8px;
-    }
-
-    .info-card p {
-      font-size: 13px;
-      color: #64748b;
-      margin-bottom: 0;
-    }
-
-    .diagram-box {
-      background: var(--code-bg);
-      color: var(--code-text);
-      padding: 20px;
-      border-radius: 10px;
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
-      font-size: 12px;
-      overflow-x: auto;
-      margin: 18px 0 24px;
-      border: 1px solid rgba(201, 146, 44, 0.3);
-      line-height: 1.4;
-      white-space: pre;
-    }
-
-    .print-btn {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      background: var(--primary);
-      color: #ffffff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(15, 61, 42, 0.25);
+      gap: 6px;
     }
 
-    .print-btn:hover {
-      background: #154734;
-    }
-
-    code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12.5px;
-      background: #f1f5f9;
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: #0f172a;
-      border: 1px solid var(--border);
-    }
-
+    /* Print Styles */
     @media print {
-      body {
-        padding: 0;
-        background: #ffffff;
-      }
-      .container {
-        box-shadow: none;
-        border: none;
-      }
-      .print-btn {
-        display: none;
-      }
-      .diagram-box {
-        border: 1px solid #333;
-      }
+      .top-bar { display: none !important; }
+      body { background: #ffffff; padding: 0; }
+      .container { max-width: 100%; margin: 0; padding: 0; }
+      .section-card { border: none; box-shadow: none; padding: 16px 0; page-break-inside: avoid; }
+      .header-card { page-break-inside: avoid; border-radius: 0; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="header-banner">
-      <span class="brand-tag">Master System Architecture & Dataflow Specification</span>
-      <h1>Venthulir Platform Architecture & Dataflow Specification</h1>
-      <div class="header-desc">
-        Complete end-to-end technical reference, sequence diagrams, database schemas, API routes, and operational runbook for the Royal Venthulir Fullstack Next.js 15 Platform.
-      </div>
-      <div class="meta-bar">
-        <div class="meta-item">Version: <strong>1.0.0 Master</strong></div>
-        <div class="meta-item">Date: <strong>September 2026</strong></div>
-        <div class="meta-item">Runtime: <strong>Next.js 15 App Router (Fullstack)</strong></div>
-        <div class="meta-item">Database: <strong>MongoDB Atlas Cluster</strong></div>
-      </div>
+  <!-- Top Action Bar -->
+  <header class="top-bar">
+    <div class="brand-title">
+      <span>🌿</span> Venthulir Technical Documentation
     </div>
+    <div class="actions">
+      <button onclick="window.print()" class="btn btn-primary">
+        <span>🖨️</span> Print / Save as PDF
+      </button>
+      <a href="VENTHULIR_PROJECT_REPORT.md" download="VENTHULIR_PROJECT_REPORT.md" class="btn btn-secondary">
+        <span>📥</span> Download Markdown (.md)
+      </a>
+    </div>
+  </header>
 
-    <div class="content-body">
-      <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  <main class="container">
 
-      <h2>1. High-Level Architecture Overview</h2>
+    <!-- Header Banner -->
+    <section class="header-card">
+      <span class="header-badge">Architecture & Implementation Blueprint</span>
+      <h1 class="header-title">Venthulir Organic E-Commerce</h1>
+      <p class="header-subtitle">Comprehensive Fullstack Technical Report — Next.js 15, MongoDB Atlas & Razorpay</p>
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <strong>Project Name</strong>
+          <span>Venthulir (வெண்துளிர்)</span>
+        </div>
+        <div class="meta-item">
+          <strong>Version</strong>
+          <span>2.0.0 (Next.js Fullstack)</span>
+        </div>
+        <div class="meta-item">
+          <strong>Generated Date</strong>
+          <span>September 2026</span>
+        </div>
+        <div class="meta-item">
+          <strong>Security Status</strong>
+          <span>Production Ready</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. Executive Summary -->
+    <section class="section-card">
+      <h2>1. Executive Summary & Brand Overview</h2>
       <p>
-        Venthulir is an organic e-commerce ecosystem and operations platform. It combines a customer storefront with a full-featured Executive Operations Console (`/admin`) and Customer Member Suite (`/profile`).
+        <strong>Venthulir</strong> is an enterprise-ready, high-converting organic e-commerce web platform engineered specifically for <strong>traditional wood cold-pressed oils, single-origin farm harvests, and organic grocery items</strong> originating from Tamil Nadu.
+      </p>
+      <p>
+        The platform unifies a customer digital storefront with an administration suite featuring real-time stock control, order fulfillment workflows, automated WhatsApp dispatch links, transactional HTML emails, Razorpay payments, and promotional coupon engines.
       </p>
 
-      <div class="diagram-box">
-+---------------------------------------------------------------------------------------------------+
-|                                      CLIENT / USER BROWSER                                        |
-|                                                                                                   |
-|   +---------------------------------------+       +-------------------------------------------+   |
-|   |         PUBLIC STOREFRONT             |       |         EXECUTIVE ADMIN CONSOLE           |   |
-|   |   - Hero & Categories Showcase        |       |   - Dashboard (Revenue, Orders, Alerts)   |   |
-|   |   - Product Detail (Variant Matrix)   |       |   - Catalog & Local Image Upload          |   |
-|   |   - Cart & Checkout Subsystem         |       |   - Warehouse Inventory Control           |   |
-|   |   - Member Suite (/profile - 5 Tabs)  |       |   - Order Lifecycle & Receipts            |   |
-|   +---------------------------------------+       +-------------------------------------------+   |
-|                        ▲                                                ▲                         |
-|                        │ HTTP/HTTPS                                     │ HTTP/HTTPS              |
-|                        ▼                                                ▼                         |
-+---------------------------------------------------------------------------------------------------+
-|                                 NEXT.JS 15 FULLSTACK SERVER LAYER                                 |
-|                                                                                                   |
-|   +-------------------------------------------------------------------------------------------+   |
-|   |                                     APP ROUTER RUNTIME                                    |   |
-|   |   - Server Components (SSR / Static Cache)                                                |   |
-|   |   - API Route Handlers (/api/auth, /api/products, /api/orders, /api/inventory, etc.)      |   |
-|   |   - Route-Aware Smooth Scroll Controller (Lenis bypass on /admin & /profile)              |   |
-|   +-------------------------------------------------------------------------------------------+   |
-|                        │                                                │                         |
-|           Mongoose ODM │                                   SMTP SSL 465 │ Nodemailer Engine       |
-|                        ▼                                                ▼                         |
-+-----------------------------------+               +-----------------------------------------------+
-|         MONGODB ATLAS CLUSTER     |               |             GMAIL / RESEND SMTP               |
-|                                   |               |                                               |
-|   - Users & Admin Auth Records    |               |   - Verification Code Delivery (Inbox-First)  |
-|   - Products, Variants & Inventory|               |   - Order Confirmation Receipts               |
-|   - Orders & Timeline History     |               |   - Anti-Spam Transactional Envelope          |
-|   - Coupons, Offers & Inquiries   |               |                                               |
-+-----------------------------------+               +-----------------------------------------------+
+      <h3>🎨 Brand Design System (60-30-10 Rule)</h3>
+      <div class="feature-grid">
+        <div class="feature-box">
+          <h4><span class="badge badge-gold">60%</span> Dominant Canvas</h4>
+          <p>Warm organic cream (<code>#FAF8F5</code>, <code>#FFFFFF</code>, <code>#F9F6F0</code>) creating an authentic, clean farm feel without visual clutter.</p>
+        </div>
+        <div class="feature-box">
+          <h4><span class="badge badge-blue">30%</span> Structural Elements</h4>
+          <p>Crisp readable dark charcoal typography (<code>#1A1A1A</code>, <code>#222222</code>) and soft organic border accents (<code>#E8E2D5</code>).</p>
+        </div>
+        <div class="feature-box">
+          <h4><span class="badge badge-green">10%</span> Brand Accent</h4>
+          <p>Signature Venthulir Brand Leaf Green (<code>#1B5E2F</code>, hover <code>#134522</code>) and Harvest Gold (<code>#C8973A</code>) for primary CTAs and badges.</p>
+        </div>
       </div>
+    </section>
 
-      <h2>2. End-to-End System Dataflows</h2>
-
-      <h3>2.1 Customer Registration & Email Verification Dataflow</h3>
-      <p>Sequence diagram for customer account creation, OTP generation, authenticated Gmail SMTP dispatch, and email verification:</p>
-      <div class="diagram-box">
-[Customer Browser]               [Next.js API Handler]             [Gmail SMTP Server]            [MongoDB Atlas]
-        │                                  │                                │                            │
-        │── 1. POST /api/auth/register ────>│                                │                            │
-        │      { name, email, password }   │                                │                            │
-        │                                  │── 2. Check existing email ─────────────────────────────────>│
-        │                                  │<── 3. null (Not registered) ────────────────────────────────│
-        │                                  │                                │                            │
-        │                                  │── 4. Generate 6-digit OTP      │                            │
-        │                                  │      Hash password (Bcrypt)    │                            │
-        │                                  │                                │                            │
-        │                                  │── 5. Send verification email ─>│                            │
-        │                                  │      (Port 465 SSL, headers:   │                            │
-        │                                  │       Auto-Submitted: auto)    │                            │
-        │                                  │<── 6. 250 OK (Queued for Inbox)│                            │
-        │                                  │                                │                            │
-        │                                  │── 7. Store user in DB ─────────────────────────────────────>│
-        │                                  │      { email, otp, isVerified: false }                      │
-        │                                  │                                │                            │
-        │<── 8. 201 Created { msg } ───────│                                │                            │
-        │                                  │                                │                            │
-        │── 9. POST /api/auth/verify-otp ─>│                                │                            │
-        │      { email, otp: "123456" }    │                                │                            │
-        │                                  │── 10. Query user by email & OTP ───────────────────────────>│
-        │                                  │<── 11. User record matched ─────────────────────────────────│
-        │                                  │                                │                            │
-        │                                  │── 12. Update isVerified: true ─────────────────────────────>│
-        │                                  │── 13. Sign JWT Token           │                            │
-        │<── 14. 200 OK { token, user } ───│                                │                            │
-      </div>
-
-      <h3>2.2 Authentication, Admin Guard & JWT Session Dataflow</h3>
-      <p>Handles user login, credential verification, auto-bootstrap of the master administrator, and JWT token issuance:</p>
-      <div class="diagram-box">
-[Admin / User Browser]           [Next.js API: /api/auth/login]            [Database Layer: MongoDB]
-         │                                      │                                      │
-         │── 1. POST /api/auth/login ──────────>│                                      │
-         │      { email: "admin",               │                                      │
-         │        password: "admin123" }        │                                      │
-         │                                      │── 2. Sanitize & map "admin"          │
-         │                                      │      to "admin@venthulir.com"        │
-         │                                      │                                      │
-         │                                      │── 3. Query User record ─────────────>│
-         │                                      │<── 4. Return user / null ────────────│
-         │                                      │                                      │
-         │                                      │── 5. Auto-Bootstrap Check:           │
-         │                                      │      If user is null & creds match   │
-         │                                      │      seed master admin account ─────>│
-         │                                      │                                      │
-         │                                      │── 6. Compare Bcrypt password hash    │
-         │                                      │      Verify user.isAdmin === true    │
-         │                                      │                                      │
-         │                                      │── 7. Generate HS256 JWT Token        │
-         │                                      │      { id, isAdmin: true, name }     │
-         │                                      │                                      │
-         │<── 8. Return 200 OK ─────────────────│                                      │
-         │      { token, user: { isAdmin: true } }                                     │
-         │                                                                             │
-         │── 9. Save in localStorage:                                                  │
-         │      venthulir_token & venthulir_user                                       │
-         │── 10. AdminGuard renders Executive Console                                  │
-      </div>
-
-      <h3>2.3 Order Placement & Stock Depletion Dataflow</h3>
-      <p>Handles cart checkout, order persistence, payment status, and inventory decrement:</p>
-      <div class="diagram-box">
-[Checkout Page]                [API: /api/orders]              [MongoDB: Order]              [MongoDB: Product]
-       │                                │                              │                             │
-       │── 1. POST /api/orders ────────>│                              │                             │
-       │      { items, shippingAddress, │                              │                             │
-       │        paymentMethod, coupon } │                              │                             │
-       │                                │── 2. Validate Cart & Prices ─┼────────────────────────────>│
-       │                                │<── 3. Stock verified ────────┼─────────────────────────────│
-       │                                │                              │                             │
-       │                                │── 4. Generate Order ID:      │                             │
-       │                                │      "VNT-ORD-98421"         │                             │
-       │                                │                              │                             │
-       │                                │── 5. Insert Order record ───>│                             │
-       │                                │      status: "Pending"       │                             │
-       │                                │                              │                             │
-       │                                │── 6. Decrement Stock Units ──┼────────────────────────────>│
-       │                                │      $inc: { currentStock:   │                             │
-       │                                │              -item.quantity }│                             │
-       │                                │                              │                             │
-       │<── 7. 201 Created { order } ───│                              │                             │
-       │                                │                              │                             │
-       │── 8. Clear Cart Context ───────│                              │                             │
-       │── 9. Redirect to Confirmation  │                              │                             │
-      </div>
-
-      <h3>2.4 Admin Product Creation & Local Image Upload Dataflow</h3>
-      <p>Allows adding products with local computer image files and multi-weight variants:</p>
-      <div class="diagram-box">
-[Admin Modal UI]                 [FileReader Encoder]               [Next.js API: /api/products]     [MongoDB Atlas]
-       │                                  │                                      │                          │
-       │── 1. Admin selects image file ──>│                                      │                          │
-       │      (e.g., coconut_oil.jpg)     │                                      │                          │
-       │                                  │── 2. Convert to Base64 Data URI ────>│                          │
-       │<── 3. Render instant preview ────│      data:image/jpeg;base64,...      │                          │
-       │                                                                         │                          │
-       │── 4. Admin configures variants:                                         │                          │
-       │      • 500ml: ₹240 (SKU: VNT-COC-500)                                   │                          │
-       │      • 1000ml: ₹450 (SKU: VNT-COC-1L)                                   │                          │
-       │                                                                         │                          │
-       │── 5. Submit "Save Heritage Product" ───────────────────────────────────>│                          │
-       │                                                                         │── 6. Validate & Sanitize │
-       │                                                                         │      Create Slug         │
-       │                                                                         │                          │
-       │                                                                         │── 7. Product.create() ──>│
-       │                                                                         │<── 8. Saved Document ────│
-       │                                                                         │                          │
-       │<── 9. HTTP 201 Created { product } ─────────────────────────────────────│                          │
-       │── 10. Trigger Catalog Refetch & Toast Notification                      │                          │
-      </div>
-
-      <h3>2.5 Dual-Pane Independent Scrolling Architecture</h3>
-      <p>Decouples sidebar navigation scrolling from the main operations canvas:</p>
-      <div class="diagram-box">
-+-----------------------------------------------------------------------------------------------+
-| BROWSER WINDOW (100vw, 100vh)                                                                 |
-| CSS Rule: body { overflow: hidden; }                                                          |
-| Lenis Smooth-Scroll: Route-Aware Middleware DISBLES Lenis on /admin and /profile routes       |
-|                                                                                               |
-|  +-------------------------------------+   +-----------------------------------------------+  |
-|  | LEFT SIDEBAR CONTAINER              |   | RIGHT MAIN OPERATIONS CONTAINER               |  |
-|  | (.admin-sidebar)                    |   | (.admin-main)                                 |  |
-|  | height: 100vh;                      |   | height: 100vh; overflow: hidden;              |  |
-|  | overflow-y: auto;                   |   |                                               |  |
-|  | overscroll-behavior: contain;       |   |  +-----------------------------------------+  |  |
-|  |                                     |   |  | FIXED STICKY TOPBAR HEADER              |  |  |
-|  | [ Brand Logo & Identity ]           |   |  | height: 64px; flex-shrink: 0;           |  |  |
-|  | [ Navigation Link: Dashboard ]      |   |  +-----------------------------------------+  |  |
-|  | [ Navigation Link: Products ]       |   |                                               |  |
-|  | [ Navigation Link: Categories ]     |   |  +-----------------------------------------+  |  |
-|  | [ Navigation Link: Inventory ]      |   |  | INDEPENDENT SCROLL CANVAS               |  |  |
-|  | [ Navigation Link: Orders ]         |   |  | (.admin-page-content)                   |  |  |
-|  | [ Navigation Link: Customers ]      |   |  | height: calc(100vh - 64px);             |  |  |
-|  | [ Navigation Link: Coupons ]        |   |  | overflow-y: auto;                       |  |  |
-|  | [ Navigation Link: Analytics ]      |   |  | overscroll-behavior: contain;           |  |  |
-|  |                                     |   |  |                                         |  |  |
-|  |                                     |   |  | [ KPI Stat Cards Grid ]                 |  |  |
-|  | [ Admin Profile Sticky Footer ]     |   |  | [ Filter Tabs Bar (All, Low Stock) ]    |  |  |
-|  |                                     |   |  | [ Responsive Data Table / Content ]     |  |  |
-|  |  * SCROLLS ON ITS OWN WHEEL *       |   |  |  * SCROLLS ON ITS OWN WHEEL *           |  |  |
-|  +-------------------------------------+   +--+-----------------------------------------+--+  |
-+-----------------------------------------------------------------------------------------------+
-      </div>
-
-      <h2>3. Complete Database Models & Schema Specifications</h2>
-      <div class="diagram-box">
-                             +-------------------+
-                             |      User         |
-                             +-------------------+
-                             | _id               |
-                             | name              |
-                             | email (unique)    |
-                             | password (hash)   |
-                             | phone             |
-                             | isAdmin (boolean) |
-                             | deliveryAddress   |
-                             +---------+---------+
-                                       │ 1
-                                       │
-                                       │ places
-                                       │
-                                       ▼ *
-+--------------------+       +-------------------+       +-------------------+
-|      Category      |       |      Order        |       |      Coupon       |
-+--------------------+       +-------------------+       +-------------------+
-| _id                |       | _id               |       | _id               |
-| name               |       | orderNumber       |       | code (unique)     |
-| slug               |       | user (ref: User)  |       | discountType      |
-| taxRate            |       | items [Product]   |       | discountValue     |
-| sortOrder          |       | totalAmount       |       | minOrderAmount    |
-| isActive           |       | orderStatus       |       | validUntil        |
-+---------+----------+       | paymentStatus     |       | usageLimit        |
-          │                  | statusHistory     |       +-------------------+
-          │ organizes        +-------------------+
-          │
-          ▼ *
-+--------------------+       +-------------------+       +-------------------+
-|      Product       |       |  ContactMessage   |       |      Banner       |
-+--------------------+       +-------------------+       +-------------------+
-| _id                |       | _id               |       | _id               |
-| name               |       | name              |       | title             |
-| productCode (SKU)  |       | email             |       | subtitle          |
-| price / mrp        |       | phone             |       | imageUrl          |
-| currentStock       |       | subject           |       | linkUrl           |
-| variants [Size]    |       | message           |       | isActive          |
-| isFeatured         |       | status            |       +-------------------+
-+--------------------+       +-------------------+
-      </div>
-
-      <h2>4. Complete REST API Route Registry (44+ Endpoints)</h2>
+    <!-- 2. Tech Stack -->
+    <section class="section-card">
+      <h2>2. Technology Stack & System Architecture</h2>
       <table>
         <thead>
           <tr>
-            <th>Endpoint Route</th>
-            <th>HTTP Method</th>
-            <th>Authentication</th>
-            <th>Functionality Description</th>
+            <th>Layer</th>
+            <th>Technology</th>
+            <th>Duty / Implementation Details</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><code>/api/auth/register</code></td>
-            <td><span class="badge badge-gold">POST</span></td>
-            <td>Public</td>
-            <td>Registers customer, hashes password, generates OTP, sends verification email.</td>
+            <td><strong>Frontend Framework</strong></td>
+            <td>Next.js 15.2.0 (App Router) + React 19</td>
+            <td>Server-Side Rendering (SSR), Static Generation (SSG), dynamic routes</td>
           </tr>
           <tr>
-            <td><code>/api/auth/verify-otp</code></td>
-            <td><span class="badge badge-gold">POST</span></td>
-            <td>Public</td>
-            <td>Validates OTP and activates user account.</td>
+            <td><strong>Styling & Design</strong></td>
+            <td>Pure Vanilla CSS + Custom Property Tokens</td>
+            <td>Zero runtime CSS overhead, theme tokens in <code>globals.css</code></td>
           </tr>
           <tr>
+            <td><strong>Database Layer</strong></td>
+            <td>MongoDB Atlas + Mongoose 8.9.0</td>
+            <td>Connection pooling in <code>src/lib/db.js</code> with indexed schemas</td>
+          </tr>
+          <tr>
+            <td><strong>Authentication</strong></td>
+            <td>JWT (jsonwebtoken) + bcryptjs</td>
+            <td>Stateless token validation, password hashing & OTP storage</td>
+          </tr>
+          <tr>
+            <td><strong>Payment Gateway</strong></td>
+            <td>Razorpay SDK (Live/Test)</td>
+            <td>UPI, Cards, Netbanking, QR with HMAC-SHA256 signature verification</td>
+          </tr>
+          <tr>
+            <td><strong>Transactional Email</strong></td>
+            <td>Dual Engine (Resend API + Nodemailer)</td>
+            <td>Responsive HTML invoices, order tracking emails & 6-digit OTPs</td>
+          </tr>
+          <tr>
+            <td><strong>Messaging Service</strong></td>
+            <td>WhatsApp Deep-Linking Engine</td>
+            <td>1-Click customer order confirmation & courier dispatch notifications</td>
+          </tr>
+          <tr>
+            <td><strong>Animations & UX</strong></td>
+            <td>GSAP 3.15 + Lenis 1.3 Smooth Scroll</td>
+            <td>Cinematic scroll interactions and momentum scrolling</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 3. Database Architecture -->
+    <section class="section-card">
+      <h2>3. Database Schema & Architecture (9 Collections)</h2>
+      <p>All database models are located in <code>src/models/</code> and utilize Mongoose schema validation:</p>
+
+      <div class="feature-grid">
+        <div class="feature-box">
+          <h4>1. Product (ProductDetails)</h4>
+          <p>Fields: <code>productCode</code> (auto <code>VNT-XXXXXX</code>), <code>name</code>, <code>price</code>, <code>originalPrice</code>, <code>discountPercent</code>, <code>variants[]</code>, <code>comboContents[]</code>, <code>currentStock</code>, <code>initialStock</code>, <code>hsnSac</code>, <code>slug</code>.</p>
+        </div>
+        <div class="feature-box">
+          <h4>2. Order (OrderRegistry)</h4>
+          <p>Fields: <code>customerName</code>, <code>customerEmail</code>, <code>phone</code>, <code>deliveryAddress</code>, <code>items[]</code>, <code>totalAmount</code>, <code>paymentMethod</code>, <code>status</code>, <code>trackingNumber</code>, <code>courierPartner</code>.</p>
+        </div>
+        <div class="feature-box">
+          <h4>3. User (CustomerDetails)</h4>
+          <p>Fields: <code>name</code>, <code>email</code> (unique), <code>phone</code>, <code>password</code> (bcrypt), <code>deliveryAddress</code>, <code>isAdmin</code>, <code>otp</code>, <code>otpExpires</code>.</p>
+        </div>
+        <div class="feature-box">
+          <h4>4. Offer (OffersCollection)</h4>
+          <p>Fields: <code>name</code>, <code>price</code>, <code>offerPrice</code>, <code>mrpIllusion</code>, <code>stock</code>, <code>startDate</code>, <code>endDate</code>, <code>badge</code>, virtual computed <code>status</code>.</p>
+        </div>
+        <div class="feature-box">
+          <h4>5. Coupon (Coupons)</h4>
+          <p>Fields: <code>couponCode</code>, <code>discountPercentage</code>, <code>maxUses</code>, <code>usedCount</code>, <code>expiryDate</code>, <code>status</code>.</p>
+        </div>
+        <div class="feature-box">
+          <h4>6. Settings (GlobalSettings)</h4>
+          <p>Fields: <code>storeName</code>, <code>supportEmail</code>, <code>defaultShippingFee</code>, <code>freeShippingThreshold</code> (₹499), <code>enableCOD</code>, <code>enableOnlinePayment</code>, <code>announcementText</code>.</p>
+        </div>
+        <div class="feature-box">
+          <h4>7. OtpStore (Temporary Auth)</h4>
+          <p>Fields: <code>email</code>, <code>otpHash</code>, <code>type</code>, <code>expiresAt</code>. Features a native MongoDB TTL Index (auto-deletes after expiry).</p>
+        </div>
+        <div class="feature-box">
+          <h4>8. Message (ContactInquiries)</h4>
+          <p>Fields: <code>name</code>, <code>email</code>, <code>phone</code>, <code>subject</code>, <code>message</code>, <code>isRead</code>, <code>createdAt</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. API Endpoints -->
+    <section class="section-card">
+      <h2>4. Complete API Directory (Route Handlers)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Module</th>
+            <th>Route</th>
+            <th>Method</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Auth</strong></td>
             <td><code>/api/auth/login</code></td>
-            <td><span class="badge badge-gold">POST</span></td>
-            <td>Public</td>
-            <td>Authenticates credentials, auto-provisions master admin if needed, returns JWT.</td>
+            <td>POST</td>
+            <td>Customer and Admin authentication & JWT token issuance</td>
           </tr>
           <tr>
-            <td><code>/api/auth/me</code></td>
-            <td><span class="badge badge-blue">GET</span></td>
-            <td>Bearer JWT</td>
-            <td>Returns current authenticated profile session.</td>
+            <td><strong>Auth</strong></td>
+            <td><code>/api/auth/register</code></td>
+            <td>POST</td>
+            <td>New customer registration with password hashing</td>
           </tr>
           <tr>
-            <td><code>/api/auth/update-profile</code></td>
-            <td><span class="badge badge-gray">PUT</span></td>
-            <td>Bearer JWT</td>
-            <td>Updates personal information and delivery address.</td>
+            <td><strong>Auth</strong></td>
+            <td><code>/api/auth/forgot-password</code></td>
+            <td>POST</td>
+            <td>Dispatches 6-digit OTP reset email with 10-min validity</td>
           </tr>
           <tr>
+            <td><strong>Auth</strong></td>
+            <td><code>/api/auth/verify-otp</code></td>
+            <td>POST</td>
+            <td>Validates submitted OTP code against OtpStore</td>
+          </tr>
+          <tr>
+            <td><strong>Auth</strong></td>
+            <td><code>/api/auth/reset-password</code></td>
+            <td>POST</td>
+            <td>Sets new bcrypt password for verified email</td>
+          </tr>
+          <tr>
+            <td><strong>Products</strong></td>
             <td><code>/api/products</code></td>
-            <td><span class="badge badge-blue">GET</span></td>
-            <td>Public / Admin</td>
-            <td>Returns catalog with category, search, and pagination filters.</td>
+            <td>GET, POST, PUT, DELETE</td>
+            <td>Full CRUD operations, SKU generation, inventory sync</td>
           </tr>
           <tr>
-            <td><code>/api/products</code></td>
-            <td><span class="badge badge-gold">POST</span></td>
-            <td>Admin JWT</td>
-            <td>Creates new product with multi-weight variants and images.</td>
-          </tr>
-          <tr>
-            <td><code>/api/products/[id]</code></td>
-            <td><span class="badge badge-gray">PUT</span></td>
-            <td>Admin JWT</td>
-            <td>Updates product metadata, pricing, or stock units.</td>
-          </tr>
-          <tr>
+            <td><strong>Orders</strong></td>
             <td><code>/api/orders</code></td>
-            <td><span class="badge badge-gold">POST</span></td>
-            <td>User JWT</td>
-            <td>Submits new order, validates stock, and decrements inventory.</td>
+            <td>GET, POST</td>
+            <td>Create new order, admin order listing, stock deduction</td>
           </tr>
           <tr>
+            <td><strong>Orders</strong></td>
             <td><code>/api/orders/[id]</code></td>
-            <td><span class="badge badge-gray">PUT</span></td>
-            <td>Admin JWT</td>
-            <td>Transitions order lifecycle status (Pending ➔ Delivered).</td>
+            <td>GET, PUT</td>
+            <td>Update order status (Pending, Confirmed, Shipped, Delivered)</td>
           </tr>
           <tr>
-            <td><code>/api/coupons</code></td>
-            <td><span class="badge badge-gold">POST</span></td>
-            <td>Admin JWT</td>
-            <td>Registers new promo code with usage limit rules.</td>
+            <td><strong>Payment</strong></td>
+            <td><code>/api/payment/create-order</code></td>
+            <td>POST</td>
+            <td>Initializes server-side Razorpay order token</td>
           </tr>
           <tr>
-            <td><code>/api/analytics</code></td>
-            <td><span class="badge badge-blue">GET</span></td>
-            <td>Admin JWT</td>
-            <td>Returns computed revenue, order velocity, and sales distributions.</td>
+            <td><strong>Payment</strong></td>
+            <td><code>/api/payment/verify</code></td>
+            <td>POST</td>
+            <td>Validates cryptographic HMAC-SHA256 signature</td>
+          </tr>
+          <tr>
+            <td><strong>Admin</strong></td>
+            <td><code>/api/admin/stats</code></td>
+            <td>GET</td>
+            <td>Dashboard stats: total revenue, order count, low-stock warnings</td>
           </tr>
         </tbody>
       </table>
+    </section>
 
-      <h2>5. Verified Administrator Access</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Role</th>
-            <th>Username / Email</th>
-            <th>Default Password</th>
-            <th>Access URL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="badge badge-gold">Master Admin</span></td>
-            <td><code>admin</code> or <code>admin@venthulir.com</code></td>
-            <td><code>admin123</code></td>
-            <td><a href="http://localhost:3000/admin" target="_blank">http://localhost:3000/admin</a></td>
-          </tr>
-          <tr>
-            <td><span class="badge badge-blue">Executive Admin</span></td>
-            <td><code>mentorixacademy.ma@gmail.com</code></td>
-            <td><code>Test@123</code></td>
-            <td><a href="http://localhost:3000/admin" target="_blank">http://localhost:3000/admin</a></td>
-          </tr>
-          <tr>
-            <td><span class="badge badge-success">Operations Admin</span></td>
-            <td><code>thesmgroups@gmail.com</code></td>
-            <td><code>Admin@123</code></td>
-            <td><a href="http://localhost:3000/admin" target="_blank">http://localhost:3000/admin</a></td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- 5. Storefront & Customer Features -->
+    <section class="section-card">
+      <h2>5. Customer Storefront Features</h2>
+      <ul>
+        <li><strong>Homepage:</strong> Hero banner carousel, limited-stock countdown flash deals, bestseller showcase, brand trust pillars, and customer reviews.</li>
+        <li><strong>Catalog & Filtering:</strong> Category tabs (Oils, Grains, Sweeteners, Spices), live multi-attribute search, price sorting, and variant selector dropdowns.</li>
+        <li><strong>Cart & Checkout:</strong> Real-time cart drawer with subtotal calculations, live coupon validation, automatic free shipping calculator (&gt; ₹499), and COD/Razorpay selection.</li>
+        <li><strong>Customer Dashboard:</strong> Order history timeline with live progress tracking (<code>Pending</code> &rarr; <code>Confirmed</code> &rarr; <code>Shipped</code> &rarr; <code>Delivered</code>), AWB tracking numbers, and saved address book.</li>
+        <li><strong>Authentication Flow:</strong> Centered desktop and mobile login card, OTP-based password reset, and session persistence via AuthContext.</li>
+      </ul>
+    </section>
 
-    </div>
-  </div>
+    <!-- 6. Admin Panel -->
+    <section class="section-card">
+      <h2>6. Admin Panel Management Suite (<code>/admin</code>)</h2>
+      <p>Protected by <code>AdminGuard.jsx</code> which enforces JWT token validation and admin role permissions:</p>
+      <ul>
+        <li><strong>Orders Fulfillment:</strong> Filter orders by status, input tracking numbers and courier partner names.</li>
+        <li><strong>1-Click WhatsApp Dispatch:</strong> Generates formatted WhatsApp messages with Order ID, item list, courier name, and tracking links to send directly to customers.</li>
+        <li><strong>Printable GST Tax Invoice:</strong> Generates official A4 tax invoices with HSN/SAC codes, company details, item breakdowns, and tax rates.</li>
+        <li><strong>Inventory & Low Stock Alerts:</strong> Real-time inventory table highlighting products with &lt; 5 units with a 1-click restock modal.</li>
+        <li><strong>Flash Sales & Coupons:</strong> Create countdown offers, configure discount percentages, usage limits, and expiration dates.</li>
+      </ul>
+    </section>
+
+    <!-- 7. Setup & Run Instructions -->
+    <section class="section-card">
+      <h2>7. Setup & Execution Commands</h2>
+      <pre><code># 1. Install project dependencies
+npm install
+
+# 2. Start local development server (Port 3000)
+npm run dev
+
+# 3. Build optimized production bundle
+npm run build
+
+# 4. Start production server
+npm start</code></pre>
+    </section>
+
+  </main>
 
 </body>
 </html>

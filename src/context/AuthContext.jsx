@@ -173,6 +173,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const resetPassword = async (email, otp, newPassword) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, newPassword })
+      });
+      const data = await res.json();
+      if (res.ok && data.token && data.user) {
+        setUser(data.user);
+        setIsAuthenticated(true);
+        localStorage.setItem('venthulir_token', data.token);
+        localStorage.setItem('venthulir_user', JSON.stringify(data.user));
+      }
+      return res.ok ? { success: true, msg: data.msg, user: data.user } : { success: false, msg: data.msg || 'Reset failed' };
+    } catch {
+      return { success: false, msg: 'Server connection failed' };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
@@ -196,7 +216,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, register, requestOTP, requestRegisterOTP, verifyOTP, verifyRegisterOTP, forgotPassword, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, register, requestOTP, requestRegisterOTP, verifyOTP, verifyRegisterOTP, forgotPassword, resetPassword, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -14,11 +14,11 @@ import {
   ArrowRight,
   ArrowLeft,
   CheckCircle2, 
-  Leaf,
+  AlertCircle,
   Loader2,
   KeyRound,
   RotateCw,
-  MapPin
+  Sparkles
 } from 'lucide-react';
 import '../app/login/AuthPages.css';
 
@@ -88,7 +88,6 @@ export default function AuthCard({ initialMode = 'login' }) {
     }
   };
 
-  // ─────────────────────────────────────────────────────────────
   // Direct Password Login (Instant 1-step sign-in)
   const handleDirectPasswordLogin = async (e) => {
     e.preventDefault();
@@ -126,8 +125,8 @@ export default function AuthCard({ initialMode = 'login' }) {
   // Step 1: Send Login OTP
   const handleSendLoginOTP = async (e) => {
     e.preventDefault();
-    if (!loginEmail || !loginPassword) {
-      setError('Please enter both email and password.');
+    if (!loginEmail) {
+      setError('Please enter your email to receive a login code.');
       return;
     }
 
@@ -136,7 +135,7 @@ export default function AuthCard({ initialMode = 'login' }) {
     setSuccessMsg('');
 
     try {
-      const res = await requestOTP(loginEmail.toLowerCase().trim(), loginPassword);
+      const res = await requestOTP(loginEmail.toLowerCase().trim(), loginPassword || '');
       if (res.success) {
         setSuccessMsg(`A 6-digit login verification code has been sent to ${loginEmail}`);
         setMode('login-otp');
@@ -191,7 +190,7 @@ export default function AuthCard({ initialMode = 'login' }) {
     setLoading(true);
     setError('');
     try {
-      const res = await requestOTP(loginEmail.toLowerCase().trim(), loginPassword);
+      const res = await requestOTP(loginEmail.toLowerCase().trim(), loginPassword || '');
       if (res.success) {
         setSuccessMsg('A new verification code has been sent to your email.');
         setResendTimer(60);
@@ -204,10 +203,6 @@ export default function AuthCard({ initialMode = 'login' }) {
       setLoading(false);
     }
   };
-
-  // ─────────────────────────────────────────────────────────────
-  // 2. REGISTRATION FLOW
-  // ─────────────────────────────────────────────────────────────
 
   // Step 1: Send Registration OTP
   const handleSendRegisterOTP = async (e) => {
@@ -324,231 +319,297 @@ export default function AuthCard({ initialMode = 'login' }) {
   const isOtpStep = mode === 'login-otp' || mode === 'register-otp';
 
   return (
-    <div className="auth-page-root">
-      
-      {/* ── CENTRAL FLOATING GLASS CARD ── */}
-      <div className="glass-auth-card">
+    <div className="luxury-auth-viewport">
+      <div className="luxury-auth-card">
         
-        <Link href="/home" style={{position: 'absolute', top: '24px', left: '24px', color: '#114529', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontSize: '13px', fontWeight: 600}}>
-          <ArrowLeft size={14} /> Back
-        </Link>
-
-        <div className="auth-brand-logo">
-          <img src="/logo.png" alt="Venthulir Logo" className="auth-logo-img" />
+        <div className="luxury-panel-top">
+          <Link href="/home" className="back-to-store-link">
+            <ArrowLeft size={14} /> <span>Return to Store</span>
+          </Link>
+          <div className="ssl-secure-badge">
+            <Lock size={12} /> <span>256-Bit SSL Secure</span>
+          </div>
         </div>
 
-        <h1 className="auth-main-title">
-          {mode === 'login' 
-            ? 'Welcome Back' 
-            : mode === 'login-otp' 
-            ? 'Security Verification' 
-            : mode === 'register-otp'
-            ? 'Verify Your Email'
-            : 'Join the Family'}
-        </h1>
-        <p className="auth-main-subtitle">
-          {mode === 'login' 
-            ? 'Sign in to access your farm-fresh orders and perks.' 
-            : mode === 'login-otp'
-            ? `Enter the 6-digit code sent to ${loginEmail}`
-            : mode === 'register-otp'
-            ? `Enter the 6-digit code sent to ${regData.email}`
-            : 'Experience the pure taste of nature.'}
-        </p>
+        {/* Brand Logo & Name */}
+        <div className="luxury-brand-header">
+          <img src="/logo.png" alt="Venthulir Logo" className="luxury-brand-logo" />
+          <span className="brand-title">VENTHULIR</span>
+          <span className="brand-subtitle">100% PURE ORGANIC HARVEST</span>
+        </div>
 
-        {/* Switch Tabs */}
-        {!isOtpStep && (
-          <div className="auth-tabs-toggle">
-            <button 
-              type="button" 
-              className={`auth-toggle-tab ${mode === 'login' ? 'active' : ''}`} 
-              onClick={() => handleTabSwitch('login')}
-            >
-              Sign In
-            </button>
-            <button 
-              type="button" 
-              className={`auth-toggle-tab ${mode === 'register' ? 'active' : ''}`} 
-              onClick={() => handleTabSwitch('register')}
-            >
-              Create Account
-            </button>
-          </div>
-        )}
+        <h1 className="luxury-page-heading">
+              {mode === 'login' 
+                ? 'Welcome Back' 
+                : mode === 'login-otp' 
+                ? 'Security Verification' 
+                : mode === 'register-otp'
+                ? 'Verify Your Email'
+                : 'Create Account'}
+            </h1>
+            <p className="luxury-page-subheading">
+              {mode === 'login' 
+                ? 'Sign in to access member pricing, live orders & addresses.' 
+                : mode === 'login-otp'
+                ? `Enter the 6-digit code sent to ${loginEmail}`
+                : mode === 'register-otp'
+                ? `Enter the 6-digit code sent to ${regData.email}`
+                : 'Join South Indian families enjoying pure farm-direct organic harvest.'}
+            </p>
 
-        {/* Alerts */}
-        {error && <div className="auth-alert-message error"><CheckCircle2 size={16} /> {error}</div>}
-        {successMsg && <div className="auth-alert-message info"><CheckCircle2 size={16} /> {successMsg}</div>}
-
-        {/* ── 1. SIGN IN FORM ── */}
-        {mode === 'login' && (
-          <form onSubmit={handleDirectPasswordLogin} className="auth-inner-form">
-            <div className="auth-input-group">
-              <label htmlFor="login-email">Email or Username</label>
-              <div className="auth-input-wrapper">
-                <Mail size={16} className="input-icon" />
-                <input 
-                  id="login-email"
-                  type="text" 
-                  placeholder="admin@venthulir.com" 
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  required 
-                />
-              </div>
-            </div>
-
-            <div className="auth-input-group">
-              <label htmlFor="login-password">
-                <span>Password</span>
-                <Link href="/forgot-password" style={{ color: '#114529', textDecoration: 'none', fontWeight: 600 }}>Forgot?</Link>
-              </label>
-              <div className="auth-input-wrapper">
-                <Lock size={16} className="input-icon" />
-                <input 
-                  id="login-password"
-                  type={showPass ? 'text' : 'password'} 
-                  placeholder="••••••••" 
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  required 
-                />
-                <button type="button" className="password-toggle-btn" onClick={() => setShowPass(v => !v)}>
-                  {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+            {/* Switch Tabs */}
+            {!isOtpStep && (
+              <div className="luxury-tab-toggle">
+                <button 
+                  type="button" 
+                  className={`luxury-tab-btn ${mode === 'login' ? 'active' : ''}`} 
+                  onClick={() => handleTabSwitch('login')}
+                >
+                  Sign In
+                </button>
+                <button 
+                  type="button" 
+                  className={`luxury-tab-btn ${mode === 'register' ? 'active' : ''}`} 
+                  onClick={() => handleTabSwitch('register')}
+                >
+                  Create Account
                 </button>
               </div>
-            </div>
+            )}
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: '#444' }}>
-              <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} style={{accentColor: '#114529'}} />
-              Keep me signed in
-            </label>
+            {/* Alerts */}
+            {error && <div className="luxury-alert error"><AlertCircle size={16} /> <span>{error}</span></div>}
+            {successMsg && <div className="luxury-alert success"><CheckCircle2 size={16} /> <span>{successMsg}</span></div>}
 
-            <button type="submit" className="auth-action-btn" disabled={loading}>
-              {loading ? <Loader2 size={16} className="spin-icon" /> : 'Sign In with Password'}
-              {!loading && <ArrowRight size={16} />}
-            </button>
-
-            <button type="button" className="auth-secondary-btn" onClick={handleSendLoginOTP} disabled={loading}>
-              <KeyRound size={14} /> Sign In with Email OTP
-            </button>
-          </form>
-        )}
-
-        {/* ── 2. LOGIN OTP VERIFICATION ── */}
-        {mode === 'login-otp' && (
-          <form onSubmit={handleVerifyLoginOTP} className="auth-inner-form">
-            <div className="auth-input-group">
-              <label style={{justifyContent: 'center'}}>6-Digit Code</label>
-              <div className="auth-input-wrapper">
-                <input 
-                  type="text" 
-                  placeholder="••••••" 
-                  maxLength={6}
-                  value={loginOtp} 
-                  onChange={(e) => setLoginOtp(e.target.value.replace(/\D/g, ''))}
-                  className="otp-digit-input"
-                  autoFocus
-                  required 
-                />
-              </div>
-            </div>
-
-            <button type="submit" className="auth-action-btn" disabled={loading}>
-              {loading ? <Loader2 size={16} className="spin-icon" /> : 'Verify & Enter'}
-              {!loading && <ArrowRight size={16} />}
-            </button>
-
-            <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '16px'}}>
-              <span style={{color: '#114529', cursor: 'pointer', fontSize: '13px', fontWeight: 600}} onClick={() => setMode('login')}>← Edit</span>
-              <span style={{color: resendTimer > 0 ? '#888' : '#114529', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer', fontSize: '13px', fontWeight: 600}} onClick={handleResendLoginOTP}>
-                {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Code'}
-              </span>
-            </div>
-          </form>
-        )}
-
-        {/* ── 3. REGISTER FORM ── */}
-        {mode === 'register' && (
-          <form onSubmit={handleSendRegisterOTP} className="auth-inner-form">
-            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px'}}>
-              <div className="auth-input-group">
-                <label>Full Name *</label>
-                <div className="auth-input-wrapper">
-                  <User size={15} className="input-icon" />
-                  <input type="text" placeholder="Your name" value={regData.name} onChange={(e) => setRegData(p => ({ ...p, name: e.target.value }))} required />
+            {/* ── 1. SIGN IN FORM ── */}
+            {mode === 'login' && (
+              <form onSubmit={handleDirectPasswordLogin} className="luxury-form">
+                <div className="luxury-field-group">
+                  <label htmlFor="login-email">Email or Username</label>
+                  <div className="luxury-input-wrapper">
+                    <Mail size={16} className="luxury-input-icon" />
+                    <input 
+                      id="login-email"
+                      type="text" 
+                      placeholder="you@email.com or username" 
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      required 
+                      autoFocus
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="auth-input-group">
-                <label>Phone *</label>
-                <div className="auth-input-wrapper">
-                  <Phone size={15} className="input-icon" />
-                  <input type="tel" placeholder="Mobile" value={regData.phone} onChange={(e) => setRegData(p => ({ ...p, phone: e.target.value }))} required />
+
+                <div className="luxury-field-group">
+                  <label htmlFor="login-password">
+                    <span>Password</span>
+                    <Link href="/forgot-password" className="forgot-link">Forgot Password?</Link>
+                  </label>
+                  <div className="luxury-input-wrapper">
+                    <Lock size={16} className="luxury-input-icon" />
+                    <input 
+                      id="login-password"
+                      type={showPass ? 'text' : 'password'} 
+                      placeholder="••••••••" 
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      required 
+                    />
+                    <button type="button" className="luxury-pass-toggle" onClick={() => setShowPass(v => !v)}>
+                      {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="auth-input-group">
-              <label>Email Address *</label>
-              <div className="auth-input-wrapper">
-                <Mail size={15} className="input-icon" />
-                <input type="email" placeholder="you@domain.com" value={regData.email} onChange={(e) => setRegData(p => ({ ...p, email: e.target.value }))} required />
-              </div>
-            </div>
+                <label className="luxury-checkbox-row">
+                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+                  <span>Keep me signed in on this device</span>
+                </label>
 
-            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px'}}>
-              <div className="auth-input-group">
-                <label>Password *</label>
-                <div className="auth-input-wrapper">
-                  <Lock size={15} className="input-icon" />
-                  <input type={showPass ? 'text' : 'password'} placeholder="Min. 6 chars" value={regData.password} onChange={(e) => setRegData(p => ({ ...p, password: e.target.value }))} required />
-                  <button type="button" className="password-toggle-btn" onClick={() => setShowPass(v => !v)}>
-                    {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                <button type="submit" className="luxury-btn-primary" disabled={loading}>
+                  {loading ? <Loader2 size={16} className="spin-icon" /> : (
+                    <>
+                      <span>Sign In with Password</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+
+                <button type="button" className="luxury-btn-secondary" onClick={handleSendLoginOTP} disabled={loading}>
+                  <KeyRound size={15} /> <span>Sign In with Email OTP</span>
+                </button>
+              </form>
+            )}
+
+            {/* ── 2. LOGIN OTP VERIFICATION ── */}
+            {mode === 'login-otp' && (
+              <form onSubmit={handleVerifyLoginOTP} className="luxury-form">
+                <div className="luxury-field-group">
+                  <label style={{ justifyContent: 'center' }}>Enter 6-Digit Code</label>
+                  <div className="luxury-input-wrapper">
+                    <input 
+                      type="text" 
+                      placeholder="••••••" 
+                      maxLength={6}
+                      value={loginOtp} 
+                      onChange={(e) => setLoginOtp(e.target.value.replace(/\D/g, ''))}
+                      className="luxury-otp-box"
+                      autoFocus
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" className="luxury-btn-primary" disabled={loading}>
+                  {loading ? <Loader2 size={16} className="spin-icon" /> : (
+                    <>
+                      <span>Verify Code & Sign In</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setMode('login')}
+                    style={{ background: 'none', border: 'none', color: '#0c2f34', fontWeight: 700, fontSize: '13px', cursor: 'pointer', padding: 0 }}
+                  >
+                    ← Edit Details
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={handleResendLoginOTP}
+                    disabled={resendTimer > 0 || loading}
+                    style={{ background: 'none', border: 'none', color: resendTimer > 0 ? '#888' : '#0c2f34', fontWeight: 700, fontSize: '13px', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer', padding: 0 }}
+                  >
+                    {resendTimer > 0 ? `Resend Code in ${resendTimer}s` : 'Resend Code'}
                   </button>
                 </div>
-              </div>
-              <div className="auth-input-group">
-                <label>Confirm *</label>
-                <div className="auth-input-wrapper">
-                  <Lock size={15} className="input-icon" />
-                  <input type={showPass ? 'text' : 'password'} placeholder="Confirm" value={regData.confirmPassword} onChange={(e) => setRegData(p => ({ ...p, confirmPassword: e.target.value }))} required />
+              </form>
+            )}
+
+            {/* ── 3. REGISTER FORM ── */}
+            {mode === 'register' && (
+              <form onSubmit={handleSendRegisterOTP} className="luxury-form">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div className="luxury-field-group">
+                    <label>Full Name *</label>
+                    <div className="luxury-input-wrapper">
+                      <User size={15} className="luxury-input-icon" />
+                      <input type="text" placeholder="e.g. Maya Raman" value={regData.name} onChange={(e) => setRegData(p => ({ ...p, name: e.target.value }))} required />
+                    </div>
+                  </div>
+                  <div className="luxury-field-group">
+                    <label>Phone Number *</label>
+                    <div className="luxury-input-wrapper">
+                      <Phone size={15} className="luxury-input-icon" />
+                      <input type="tel" placeholder="+91 98765 43210" value={regData.phone} onChange={(e) => setRegData(p => ({ ...p, phone: e.target.value }))} required />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <button type="submit" className="auth-action-btn" disabled={loading}>
-              {loading ? <Loader2 size={16} className="spin-icon" /> : 'Create Account'}
-              {!loading && <ArrowRight size={16} />}
-            </button>
-          </form>
-        )}
-        
-        {/* ── 4. REGISTER OTP VERIFICATION ── */}
-        {mode === 'register-otp' && (
-          <form onSubmit={handleVerifyRegisterOTP} className="auth-inner-form">
-            <div className="auth-input-group">
-              <label style={{justifyContent: 'center'}}>6-Digit Code for {regData.email}</label>
-              <div className="auth-input-wrapper">
-                <input 
-                  type="text" 
-                  placeholder="••••••" 
-                  maxLength={6}
-                  value={regOtp} 
-                  onChange={(e) => setRegOtp(e.target.value.replace(/\D/g, ''))}
-                  className="otp-digit-input"
-                  autoFocus
-                  required 
-                />
-              </div>
-            </div>
+                <div className="luxury-field-group">
+                  <label>Email Address *</label>
+                  <div className="luxury-input-wrapper">
+                    <Mail size={15} className="luxury-input-icon" />
+                    <input type="email" placeholder="you@email.com" value={regData.email} onChange={(e) => setRegData(p => ({ ...p, email: e.target.value }))} required />
+                  </div>
+                </div>
 
-            <button type="submit" className="auth-action-btn" disabled={loading}>
-              {loading ? <Loader2 size={16} className="spin-icon" /> : 'Complete Registration'}
-              {!loading && <CheckCircle2 size={16} />}
-            </button>
-          </form>
-        )}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div className="luxury-field-group">
+                    <label>Set Password *</label>
+                    <div className="luxury-input-wrapper">
+                      <Lock size={15} className="luxury-input-icon" />
+                      <input type={showPass ? 'text' : 'password'} placeholder="Min 6 chars" value={regData.password} onChange={(e) => setRegData(p => ({ ...p, password: e.target.value }))} required />
+                      <button type="button" className="luxury-pass-toggle" onClick={() => setShowPass(v => !v)}>
+                        {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="luxury-field-group">
+                    <label>Confirm *</label>
+                    <div className="luxury-input-wrapper">
+                      <Lock size={15} className="luxury-input-icon" />
+                      <input type={showPass ? 'text' : 'password'} placeholder="Re-enter password" value={regData.confirmPassword} onChange={(e) => setRegData(p => ({ ...p, confirmPassword: e.target.value }))} required />
+                    </div>
+                  </div>
+                </div>
 
+                <label className="luxury-checkbox-row">
+                  <input type="checkbox" checked={agreeTerms} onChange={(e) => setAgreeTerms(e.target.checked)} />
+                  <span>I agree to Venthulir&apos;s Terms of Service & Privacy Policy</span>
+                </label>
+
+                <button type="submit" className="luxury-btn-primary" disabled={loading}>
+                  {loading ? <Loader2 size={16} className="spin-icon" /> : (
+                    <>
+                      <span>Continue to Verification</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* ── 4. REGISTER OTP VERIFICATION ── */}
+            {mode === 'register-otp' && (
+              <form onSubmit={handleVerifyRegisterOTP} className="luxury-form">
+                <div className="luxury-field-group">
+                  <label style={{ justifyContent: 'center' }}>6-Digit Code for {regData.email}</label>
+                  <div className="luxury-input-wrapper">
+                    <input 
+                      type="text" 
+                      placeholder="••••••" 
+                      maxLength={6}
+                      value={regOtp} 
+                      onChange={(e) => setRegOtp(e.target.value.replace(/\D/g, ''))}
+                      className="luxury-otp-box"
+                      autoFocus
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" className="luxury-btn-primary" disabled={loading}>
+                  {loading ? <Loader2 size={16} className="spin-icon" /> : (
+                    <>
+                      <span>Complete Registration</span>
+                      <CheckCircle2 size={16} />
+                    </>
+                  )}
+                </button>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setMode('register')}
+                    style={{ background: 'none', border: 'none', color: '#0c2f34', fontWeight: 700, fontSize: '13px', cursor: 'pointer', padding: 0 }}
+                  >
+                    ← Edit Details
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={handleResendRegisterOTP}
+                    disabled={resendTimer > 0 || loading}
+                    style={{ background: 'none', border: 'none', color: resendTimer > 0 ? '#888' : '#0c2f34', fontWeight: 700, fontSize: '13px', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer', padding: 0 }}
+                  >
+                    {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Code'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+      </div>
+
+      {/* Trust Badges Below Card */}
+      <div className="luxury-trust-footer">
+        <span className="trust-item">🌾 100% Farm-Direct</span>
+        <span className="trust-item">•</span>
+        <span className="trust-item">🪵 Traditional Wood-Pressed</span>
+        <span className="trust-item">•</span>
+        <span className="trust-item">🔒 100% Secure Checkout</span>
       </div>
     </div>
   );

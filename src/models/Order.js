@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema({
   customerName: { type: String, required: true },
-  customerEmail: { type: String, required: true },
+  customerEmail: { type: String, default: 'guest@venthulir.com' },
   phone: { type: String, required: true },
   deliveryAddress: { type: Object, required: true },
   items: { type: Array, default: [] },
@@ -16,6 +16,8 @@ const OrderSchema = new mongoose.Schema({
   razorpayPaymentId: { type: String, default: null },
   status: { type: String, default: 'Pending' },
   statusUpdatedAt: { type: Date },
+  trackingNumber: { type: String, default: null },
+  courierPartner: { type: String, default: null },
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -61,8 +61,12 @@ export default function ProductCard({ product, onQuickView, onBuyNow }) {
     setLiked(!liked);
   };
 
+  const handleCardNavigate = () => {
+    router.push(`/products/${product._id || product.slug}`);
+  };
+
   return (
-    <div className="product-card" onClick={() => onQuickView && onQuickView(product)}>
+    <div className="product-card" onClick={handleCardNavigate} style={{ cursor: 'pointer' }}>
       
       {/* ── Top Visual Stage / Image Container ── */}
       <div className="product-card-media">

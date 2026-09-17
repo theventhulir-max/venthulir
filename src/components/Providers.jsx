@@ -12,6 +12,7 @@ import CheckoutModal from '@/components/CheckoutModal';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Lenis from 'lenis';
 
 const UIModalContext = createContext();
 export const useUIModal = () => useContext(UIModalContext);
@@ -28,6 +29,32 @@ function ProvidersInner({ children }) {
 
 
   const router = useRouter();
+
+  useEffect(() => {
+    // Disable smooth scrolling in Admin dashboard to prevent scroll hijacking bugs
+    if (isAdminRoute) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      direction: 'vertical',
+      gestureDirection: 'vertical',
+      smooth: true,
+      smoothTouch: false,
+      touchMultiplier: 2,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
 
   const openCheckout = (cartSummary) => {
     setIsCartOpen(false);

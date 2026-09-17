@@ -7,8 +7,8 @@ import { toast } from 'react-toastify';
 import './AuthModal.css';
 
 export default function AuthModal({ onClose }) {
-  const { login, register, requestOTP, verifyOTP } = useAuth();
-  const [tab, setTab]           = useState('login');   // 'login' | 'register' | 'otp'
+  const { login, register, requestOTP, verifyOTP, forgotPassword, resetPassword } = useAuth();
+  const [tab, setTab]           = useState('login');   // 'login' | 'register' | 'otp' | 'forgot' | 'reset-pass'
   const [form, setForm]         = useState({ 
     name: '', 
     email: '', 
@@ -20,6 +20,8 @@ export default function AuthModal({ onClose }) {
     zipCode: '', 
     otp: '' 
   });
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
@@ -115,6 +117,52 @@ export default function AuthModal({ onClose }) {
     setLoading(false);
   };
 
+  // Request Forgot Password Reset Code
+  const handleForgotRequest = async (e) => {
+    e.preventDefault();
+    if (!form.email || !form.email.trim()) {
+      setError('Please enter your registered email address.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    const res = await forgotPassword(form.email.trim());
+    if (res.success) {
+      setTab('reset-pass');
+      toast.info('6-digit reset code sent to your email.');
+    } else {
+      setError(res.msg || 'Could not find an account with that email.');
+    }
+    setLoading(false);
+  };
+
+  // Submit New Password with Reset Code
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.otp || form.otp.trim().length < 4) {
+      setError('Please enter the 6-digit verification code.');
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      setError('New password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    const res = await resetPassword(form.email.trim(), form.otp.trim(), newPassword);
+    if (res.success) {
+      toast.success('Password updated successfully! Welcome back.');
+      onClose();
+    } else {
+      setError(res.msg || 'Invalid or expired code.');
+    }
+    setLoading(false);
+  };
+
   return (
     <>
       <div className="modal-overlay" onClick={onClose} />
@@ -163,13 +211,23 @@ export default function AuthModal({ onClose }) {
               <div className="auth-field">
                 <div className="field-label-row">
                   <label>Password</label>
-                  <button 
-                    type="button" 
-                    className="forgot-pass-btn" 
-                    onClick={handleRequestOTP}
-                  >
-                    Forgot / Login with OTP
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button 
+                      type="button" 
+                      className="forgot-pass-btn" 
+                      onClick={() => { setTab('forgot'); setError(''); setSuccessMsg(''); }}
+                    >
+                      Forgot Password?
+                    </button>
+                    <span style={{ color: '#d1d5db', fontSize: '11px' }}>•</span>
+                    <button 
+                      type="button" 
+                      className="forgot-pass-btn" 
+                      onClick={handleRequestOTP}
+                    >
+                      Login with OTP
+                    </button>
+                  </div>
                 </div>
                 <div className="auth-input-wrapper pass-wrap">
                   <Lock size={15} className="field-icon" />
@@ -382,6 +440,124 @@ export default function AuthModal({ onClose }) {
               <span>Wrong email?</span>
               <button type="button" onClick={() => { setTab('login'); setError(''); }}>
                 Go back to Sign In
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ── TAB: FORGOT PASSWORD REQUEST ── */}
+        {tab === 'forgot' && (
+          <>
+            <h2 className="auth-title">Reset Password</h2>
+            <p className="auth-sub">Enter your registered email address to receive a secure 6-digit verification code.</p>
+
+            <form onSubmit={handleForgotRequest} className="auth-form">
+              <div className="auth-field">
+                <label>Registered Email Address</label>
+                <div className="auth-input-wrapper">
+                  <Mail size={15} className="field-icon" />
+                  <input 
+                    type="email" 
+                    placeholder="you@email.com" 
+                    value={form.email} 
+                    onChange={e => update('email', e.target.value)} 
+                    required 
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {error && <div className="auth-error-banner">{error}</div>}
+
+              <button type="submit" className="auth-submit-btn" disabled={loading}>
+                {loading ? <Loader size={16} className="spin" /> : (
+                  <>
+                    <span>Send Verification Code</span>
+                    <ArrowRight size={15} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="auth-footer-prompt">
+              <span>Remembered password?</span>
+              <button type="button" onClick={() => { setTab('login'); setError(''); }}>
+                Back to Sign In
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ── TAB: ENTER CODE & SET NEW PASSWORD ── */}
+        {tab === 'reset-pass' && (
+          <>
+            <h2 className="auth-title">Create New Password</h2>
+            <p className="auth-sub">Enter the 6-digit code sent to <strong>{form.email}</strong> and set your new password.</p>
+
+            <form onSubmit={handleResetPasswordSubmit} className="auth-form">
+              <div className="auth-field">
+                <label>6-Digit Verification Code</label>
+                <input 
+                  className="otp-input-box" 
+                  placeholder="• • • • • •" 
+                  value={form.otp} 
+                  onChange={e => update('otp', e.target.value.replace(/\D/g, ''))} 
+                  maxLength={6} 
+                  required 
+                  autoFocus
+                />
+              </div>
+
+              <div className="auth-field">
+                <label>New Password (min 6 characters)</label>
+                <div className="auth-input-wrapper pass-wrap">
+                  <Lock size={15} className="field-icon" />
+                  <input 
+                    type={showPass ? 'text' : 'password'} 
+                    placeholder="Enter new password" 
+                    value={newPassword} 
+                    onChange={e => setNewPassword(e.target.value)} 
+                    required 
+                  />
+                  <button 
+                    type="button" 
+                    className="pass-toggle-btn"
+                    onClick={() => setShowPass(v => !v)}
+                  >
+                    {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="auth-field">
+                <label>Confirm New Password</label>
+                <div className="auth-input-wrapper pass-wrap">
+                  <Lock size={15} className="field-icon" />
+                  <input 
+                    type={showPass ? 'text' : 'password'} 
+                    placeholder="Confirm new password" 
+                    value={confirmNewPassword} 
+                    onChange={e => setConfirmNewPassword(e.target.value)} 
+                    required 
+                  />
+                </div>
+              </div>
+
+              {error && <div className="auth-error-banner">{error}</div>}
+
+              <button type="submit" className="auth-submit-btn" disabled={loading}>
+                {loading ? <Loader size={16} className="spin" /> : (
+                  <>
+                    <span>Set New Password & Sign In</span>
+                    <CheckCircle size={15} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="auth-footer-prompt">
+              <button type="button" onClick={() => { setTab('forgot'); setError(''); }}>
+                ← Change Email / Resend Code
               </button>
             </div>
           </>
